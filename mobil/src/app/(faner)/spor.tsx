@@ -106,8 +106,8 @@ export default function SporHylla() {
       const blob = await (await fetch(uri)).blob();
       skjema.append("lyd", blob, blob.type.includes("mp4") ? "sporsmal.m4a" : "sporsmal.webm");
     } else {
-      // På telefonen laster React Native opp filen fra uri-en.
-      skjema.append("lyd", { uri, name: "sporsmal.m4a", type: "audio/m4a" } as unknown as Blob);
+      // Expo sin fetch godtar ikke { uri, name, type }, men en File fra expo-file-system fungerer.
+      skjema.append("lyd", new File(uri) as unknown as Blob);
     }
     skjema.append("historikk", JSON.stringify(historikk()));
     try {
