@@ -73,7 +73,7 @@ export default function Vare() {
           <Kort style={{ gap: 8 }}>
             <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 17 }}>Kameraet leter etter</Txt>
             <Txt style={{ color: F.dempet, fontSize: 14 }}>
-              {v.egenPrompt ? "Din egen beskrivelse." : "Laget automatisk av navnet."} Skriv på engelsk, kort og konkret, f.eks. «blue water bottle».
+              {v.egenPrompt ? "Din egen beskrivelse." : "Laget automatisk av navnet."} Skriv på engelsk, og få med det som skiller den fra andre ting på hylla, f.eks. «clear plastic bottle with blue cap».
             </Txt>
             <Rad gap={8}>
               <TextInput

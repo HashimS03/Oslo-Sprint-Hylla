@@ -27,10 +27,12 @@ export function samPrompt(v: Pick<Vare, "navn" | "farge" | "prompt"> | undefined
   return autoPrompt(v);
 }
 
-/** Søketekster å prøve i rekkefølge: egen beskrivelse først, så den automatiske engelske. */
+/** Søketekster å prøve i rekkefølge: egen beskrivelse først, så den automatiske engelske med farge. */
 export function samPrompter(v: Pick<Vare, "navn" | "farge" | "prompt"> | undefined): string[] {
   if (!v) return ["object"];
-  return [...new Set([samPrompt(v), autoPrompt(v), autoPrompt({ ...v, farge: "" })].filter(Boolean))];
+  // Ikke prøv uten farge: «water bottle» finner også andre flasker på hylla, og da ser det ut som
+  // varen fortsatt står der etter at den er tatt bort.
+  return [...new Set([samPrompt(v), autoPrompt(v)].filter(Boolean))];
 }
 
 function autoPrompt(v: Pick<Vare, "navn" | "farge">): string {
