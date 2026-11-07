@@ -1,102 +1,116 @@
 import Link from "next/link";
 import { hentState } from "@/lib/store";
-import { apneAvvik, erIdag, sisteTelling, totalBeholdning, vare } from "@/lib/lager";
-import { fortegn, hilsen, klokke, typeFarge } from "@/lib/format";
-import { Side } from "@/components/Nav";
-import { Ikon } from "@/components/ui";
+import { apneAvvik, beholdning, hylleStatus, sisteTelling, totalBeholdning, vare } from "@/lib/lager";
+import { fortegn, hilsen, klokke, kortDato, dagTittel, typeFarge } from "@/lib/format";
+import { lavBeholdning, rapport } from "@/lib/rapport";
+import { Innhold, Kpi, Ruter, Panel, PanelLenke, Prikk, Tabell, TomRad, Topp, TypeChip } from "@/components/dash";
+import { StatusChip } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
-export default async function Hjem() {
+const tidTekst = (iso: string) => (dagTittel(iso) === "I dag" ? klokke(iso) : `${kortDato(iso)} ${klokke(iso)}`);
+
+export default async function Oversikt() {
   const s = await hentState();
   const avvik = apneAvvik(s);
-  const talt = s.hyller.filter((h) => {
-    const t = sisteTelling(s, h.id);
-    return t && erIdag(t.tid);
-  }).length;
-  const ting = avvik.length + (s.hyller.length - talt > 0 ? 1 : 0);
-  const siste = [...s.hendelser].sort((a, b) => b.tid.localeCompare(a.tid)).slice(0, 4);
-  const dato = new Date().toLocaleDateString("nb-NO", { timeZone: "Europe/Oslo", weekday: "long", day: "numeric", month: "short" }).toUpperCase();
+  const lav = lavBeholdning(s);
+  const uke = rapport(s, 7);
+  const idag = rapport(s, 1);
+  const siste = [...s.hendelser].sort((a, b) => b.tid.localeCompare(a.tid)).slice(0, 8);
+  const dato = new Date().toLocaleDateString("nb-NO", { timeZone: "Europe/Oslo", weekday: "long", day: "numeric", month: "long" });
 
   return (
-    <Side>
-      <header className="flex items-center justify-between px-5 pt-5 pb-3">
-        <div className="display flex items-center gap-2 text-[26px]" style={{ fontStretch: "78%" }}>
-          <span className="inline-block h-4 w-4 border-[2.5px] border-tekst bg-gul" />
-          Hylla
-        </div>
-        <Link href="/innstillinger" aria-label="Innstillinger" className="flex h-11 w-11 items-center justify-center rounded-full bg-graa">
-          <Ikon navn="tannhjul" />
-        </Link>
-      </header>
-
-      <main className="flex flex-1 flex-col gap-4 px-5 pt-1 pb-4">
-        <div className="flex flex-col gap-0.5">
-          <span className="font-mono text-xs text-dempet">{s.innstillinger.lager.toUpperCase()} · {dato}</span>
-          <h1 className="display text-[34px]">
-            {hilsen()} {ting === 0 ? "Alt ser bra ut." : `${ting} ${ting === 1 ? "ting trenger" : "ting trenger"} deg i dag.`}
-          </h1>
+    <>
+      <Topp
+        tittel={`${hilsen()} ${avvik.length ? `${avvik.length} ${avvik.length === 1 ? "avvik venter" : "avvik venter"}.` : "Ingen åpne avvik."}`}
+        under={<span className="first-letter:uppercase">{dato} · {s.innstillinger.lager}</span>}
+      >
+        <Link href="/rapport" className="knapp-gul !h-11 !w-auto !rounded-[10px] !border-2 px-5 !text-[14px]">Se rapport</Link>
+      </Topp>
+      <Innhold>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+          <Kpi etikett="På lager" verdi={totalBeholdning(s)} under={`${s.varer.length} varetyper`} href="/varer" />
+          <Kpi etikett="Åpne avvik" verdi={avvik.length} under={avvik.length ? `${avvik.reduce((n, a) => n - a.endring, 0)} stk uavklart` : "Alt er avklart"} tone={avvik.length ? "rod" : undefined} href="/avvik" />
+          <Kpi etikett="Svinn, 7 dager" verdi={uke.totalt.svinn} under={uke.totalt.muligSvinn ? `+ ${uke.totalt.muligSvinn} stk uavklart` : "bekreftet etter kontroll"} href="/rapport?dager=7" />
+          <Kpi etikett="Bevegelser i dag" verdi={idag.antallHendelser} under={`+${idag.totalt.mottatt} inn · −${idag.totalt.solgt} solgt`} tone={idag.antallHendelser ? "gronn" : undefined} href="/logg?dager=1" />
+          <Kpi etikett="Lav beholdning" verdi={lav.length} under="varer med 3 eller færre" tone={lav.length ? "gul" : undefined} href="/varer?status=lav" />
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          <div className="kort rounded-xl p-2.5">
-            <div className="display text-[26px]" style={{ fontStretch: "100%" }}>{totalBeholdning(s)}</div>
-            <div className="text-[11px] text-dempet">varer på lager</div>
-          </div>
-          <Link href="/tell" className="kort rounded-xl p-2.5">
-            <div className="display text-[26px]" style={{ fontStretch: "100%" }}>{talt}/{s.hyller.length}</div>
-            <div className="text-[11px] text-dempet">hyller talt i dag</div>
-          </Link>
-          <Link href={avvik[0] ? `/avvik/${avvik[0].id}` : "/logg?type=mulig_svinn"} className={`rounded-xl bg-white p-2.5 ${avvik.length ? "border-[1.5px] border-rodkant" : "border border-kant"}`}>
-            <div className={`display text-[26px] ${avvik.length ? "text-rod" : ""}`} style={{ fontStretch: "100%" }}>{avvik.length}</div>
-            <div className="text-[11px] text-dempet">mulig svinn</div>
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2.5">
-          <Link href="/tell" className="flex h-[132px] flex-col justify-between rounded-[18px] border-[2.5px] border-tekst bg-gul p-4">
-            <Ikon navn="kamera" size={30} />
-            <div>
-              <div className="display text-xl" style={{ fontStretch: "85%" }}>Tell en hylle</div>
-              <div className="text-xs">Ta ett bilde</div>
-            </div>
-          </Link>
-          <Link href="/spor" className="flex h-[132px] flex-col justify-between rounded-[18px] bg-tekst p-4 text-bg">
-            <Ikon navn="mikrofon" size={30} className="text-gul" />
-            <div>
-              <div className="display text-xl" style={{ fontStretch: "85%" }}>Spør Hylla</div>
-              <div className="text-xs text-[#C9D1CE]">Snakk eller skriv</div>
-            </div>
-          </Link>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <div className="flex items-baseline justify-between">
-            <h2 className="display text-lg" style={{ fontStretch: "85%", fontWeight: 700 }}>Siste hendelser</h2>
-            <Link href="/logg" className="text-[13px] underline">Se loggen</Link>
-          </div>
-          <div className="kort overflow-hidden">
-            {siste.map((h, i) => {
-              const svinn = h.type === "mulig_svinn" && h.avvik?.status === "apen";
-              return (
-                <Link
-                  key={h.id}
-                  href={h.type === "mulig_svinn" ? `/avvik/${h.id}` : `/varer/${h.sku}`}
-                  className={`flex items-center gap-2.5 px-3 py-[11px] ${i ? "border-t border-kant" : ""} ${svinn ? "bg-rodlys" : ""}`}
-                >
-                  <span className="w-9 font-mono text-[11px] text-dempet">{klokke(h.tid)}</span>
-                  <span className="flex-1 text-[13px]">
-                    <b className="font-semibold">{h.hylle} · {vare(s, h.sku)?.navn}</b>
-                    <br />
-                    <span className="text-[11.5px] text-dempet">{h.aarsak}</span>
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+          <Panel tittel="Åpne avvik" handling={<PanelLenke href="/avvik">Alle avvik</PanelLenke>}>
+            <ul className="divide-y divide-linje">
+              {avvik.slice(0, 5).map((a) => (
+                <li key={a.id} className="flex flex-wrap items-center gap-4 bg-rodlys px-4 py-3.5">
+                  <span className="display w-12 text-[30px] text-rod" style={{ fontStretch: "100%" }}>−{Math.abs(a.endring)}</span>
+                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="text-[15px] font-semibold">{vare(s, a.sku)?.navn ?? a.sku} · {a.hylle}</span>
+                    <span className="text-[12.5px] text-dempet">{a.aarsak} · {tidTekst(a.tid)}</span>
                   </span>
-                  <span className={`font-mono text-xs font-medium ${typeFarge(h.type, h.endring)}`}>{fortegn(h.endring)}</span>
-                </Link>
-              );
-            })}
-          </div>
+                  <Link href={`/avvik/${a.id}`} className="flex h-10 items-center rounded-[9px] bg-rod px-4 text-[13px] font-bold text-bg hover:opacity-90">Behandle</Link>
+                </li>
+              ))}
+              {avvik.length === 0 && <li className="px-4 py-8 text-center text-[13.5px] text-dempet">Ingen åpne avvik. Nye avvik dukker opp her så snart de oppdages.</li>}
+              {avvik.length > 5 && <li className="px-4 py-3 text-[13px] text-dempet">{avvik.length - 5} til. <Link href="/avvik" className="underline underline-offset-2">Se alle</Link></li>}
+            </ul>
+          </Panel>
+
+          <Panel tittel="Lav beholdning" handling={<PanelLenke href="/varer?status=lav">Se varer</PanelLenke>}>
+            <ul className="divide-y divide-linje">
+              {lav.slice(0, 6).map((v) => (
+                <li key={v.sku}>
+                  <Link href={`/varer/${encodeURIComponent(v.sku)}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-graa">
+                    <Prikk farge={v.swatch} />
+                    <span className="flex-1 text-[13.5px]">{v.navn}<span className="ml-2 font-mono text-[11px] text-dempet">{v.sku}</span></span>
+                    <Ruter antall={v.antall} />
+                    <span className={`display w-7 text-right text-[20px] ${v.antall <= 2 ? "text-rod" : "text-gultekst"}`} style={{ fontStretch: "100%" }}>{v.antall}</span>
+                  </Link>
+                </li>
+              ))}
+              {lav.length === 0 && <li className="px-4 py-8 text-center text-[13.5px] text-dempet">Ingen varer er nede på 3 eller færre.</li>}
+            </ul>
+          </Panel>
         </div>
-      </main>
-    </Side>
+
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+          <Panel tittel="Siste hendelser" handling={<PanelLenke href="/logg">Hele loggen</PanelLenke>}>
+            <Tabell hode={["Tid", "Type", "Lokasjon", "Vare", "Endring", "Årsak"]} hoyre={[4]}>
+              {siste.map((h) => (
+                <tr key={h.id}>
+                  <td className="font-mono text-[12px] whitespace-nowrap text-dempet">{tidTekst(h.tid)}</td>
+                  <td><TypeChip type={h.type} /></td>
+                  <td className="font-semibold">{h.hylle}</td>
+                  <td><Link href={`/varer/${encodeURIComponent(h.sku)}`} className="hover:underline">{vare(s, h.sku)?.navn ?? h.sku}</Link></td>
+                  <td className={`text-right font-mono font-medium ${typeFarge(h.type, h.endring)}`}>{fortegn(h.endring)}</td>
+                  <td className="max-w-[240px] truncate text-[12.5px] whitespace-nowrap text-dempet" title={h.aarsak}>{h.aarsak}</td>
+                </tr>
+              ))}
+              {siste.length === 0 && <TomRad kolonner={6}>Ingen hendelser ennå.</TomRad>}
+            </Tabell>
+          </Panel>
+
+          <Panel tittel="Lokasjoner" handling={<PanelLenke href="/lokasjoner">Alle lokasjoner</PanelLenke>}>
+            <ul className="divide-y divide-linje">
+              {s.hyller.map((hy) => {
+                const t = sisteTelling(s, hy.id);
+                const stk = hy.innhold.reduce((n, i) => n + beholdning(s, i.sku, hy.id), 0);
+                return (
+                  <li key={hy.id}>
+                    <Link href={`/lokasjoner#${hy.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-graa">
+                      <span className="flex h-9 w-11 items-center justify-center rounded-md border border-gulkant bg-gullys font-display text-[15px] font-extrabold">{hy.id}</span>
+                      <span className="flex flex-1 flex-col text-[13.5px]">
+                        <span className="font-semibold">{hy.navn}</span>
+                        <span className="text-[12px] text-dempet">{hy.innhold.length} varetyper · {stk} stk{t ? ` · sist kontrollert ${tidTekst(t.tid)}` : ""}</span>
+                      </span>
+                      <StatusChip status={hylleStatus(s, hy.id)} />
+                    </Link>
+                  </li>
+                );
+              })}
+              {s.hyller.length === 0 && <li className="px-4 py-8 text-center text-[13.5px] text-dempet">Ingen lokasjoner registrert.</li>}
+            </ul>
+          </Panel>
+        </div>
+      </Innhold>
+    </>
   );
 }
