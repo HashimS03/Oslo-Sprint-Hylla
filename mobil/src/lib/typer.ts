@@ -32,7 +32,7 @@ export type VareRad = { sku: string; navn: string; swatch: string; antall: numbe
 
 export type VareDetalj = {
   sku: string; navn: string; farge: string; storrelse: string; leverandor: string | null; swatch: string;
-  bilde: string | null; antall: number;
+  bilde: string | null; antall: number; apneSalg: number;
   perHylle: { hylle: string; antall: number; nivaa: string | null }[];
   innkjop: { id: string; bestilt: number; mottatt: number; bestiltDato: string; plukket: number; mottak: { tid: string; antall: number }[] } | null;
   historikk: LoggRad[];

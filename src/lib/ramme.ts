@@ -5,11 +5,14 @@ import sharp from "sharp";
 // Vi teller først når noen har rørt på noe, bildet har vært stille en liten stund,
 // og bildet nå er annerledes enn bildet vi sist telte. Da blir kameraet en slags «RFID-leser».
 
-const BREDDE = 48;
-const HOYDE = 36;
+const BREDDE = 64;
+const HOYDE = 48;
 
 const BEVEGELSE = Number(process.env.RAMME_BEVEGELSE ?? 0.035); // gjennomsnittlig pikselendring mellom to bilder
-const ENDRING = Number(process.env.RAMME_ENDRING ?? 0.02); // endring mot sist telte bilde
+// Andel av pikslene som har endret seg tydelig mot sist telte bilde. Et snitt over hele bildet
+// ble for lite når én liten vare ble tatt bort, så nå teller vi piksler i stedet.
+const ENDRING = Number(process.env.RAMME_ENDRING ?? 0.01);
+const PIKSEL_TERSKEL = 0.1; // så mye én piksel må endre seg for å telle som endret
 const STILLE_RAMMER = Number(process.env.RAMME_STILLE ?? 2); // så mange stille bilder på rad før vi teller
 const PAUSE_MS = Number(process.env.RAMME_PAUSE_MS ?? 4000); // minste tid mellom tellinger per kamera
 
@@ -32,6 +35,17 @@ async function gra(dataUrl: string): Promise<Buffer> {
   return sharp(Buffer.from(b64, "base64")).resize(BREDDE, HOYDE, { fit: "fill" }).removeAlpha().raw().toBuffer();
 }
 
+/** Andel piksler som har endret seg mer enn PIKSEL_TERSKEL. */
+function andelEndret(a: Buffer, b: Buffer): number {
+  const grense = PIKSEL_TERSKEL * 255;
+  let n = 0;
+  for (let i = 0; i < a.length; i += 3) {
+    const d = Math.abs(a[i] - b[i]) + Math.abs(a[i + 1] - b[i + 1]) + Math.abs(a[i + 2] - b[i + 2]);
+    if (d / 3 > grense) n++;
+  }
+  return n / (a.length / 3);
+}
+
 function avstand(a: Buffer, b: Buffer): number {
   let sum = 0;
   for (let i = 0; i < a.length; i++) sum += Math.abs(a[i] - b[i]);
@@ -44,7 +58,7 @@ export async function vurder(kameraId: string, bilde: string, tving = false) {
   alle().set(kameraId, t);
   const na = await gra(bilde);
   const bevegelse = t.forrige ? avstand(na, t.forrige) : 0;
-  const endring = t.referanse ? avstand(na, t.referanse) : 1;
+  const endring = t.referanse ? andelEndret(na, t.referanse) : 1;
   t.forrige = na;
 
   const mal = { bevegelse, endring };

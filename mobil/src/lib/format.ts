@@ -26,7 +26,7 @@ export const ukedag = (iso: string) => new Date(iso).toLocaleDateString("nb-NO",
 export const fortegn = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : "0");
 
 export const TYPE_NAVN: Record<string, string> = {
-  start: "Start", mottak: "Mottak", plukk: "Plukk", mulig_svinn: "Mulig svinn", svinn: "Svinn", funnet: "Funnet", korrigering: "Korrigering",
+  start: "Start", mottak: "Mottak", plukk: "Salg", mulig_svinn: "Mulig svinn", svinn: "Svinn", funnet: "Funnet", korrigering: "Korrigering",
 };
 
 export function hilsen(): string {

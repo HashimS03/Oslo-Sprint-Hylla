@@ -270,6 +270,10 @@ export const demoTeller: Teller = {
   async tell({ state, hylle }) {
     await new Promise((r) => setTimeout(r, 2500));
     const tall = DEMO[hylle.id] ?? {};
+    if (!hylle.innhold.some((p) => tall[p.sku])) {
+      // Demoen har bare faste tall for demovarene. For egne varer ville den bare gjentatt forrige antall.
+      throw new Error("Ingen ekte teller er satt opp. Sett META_API_KEY, ANTHROPIC_API_KEY eller SAM3_URL i .env");
+    }
     return {
       varer: hylle.innhold.map((p) => {
         const d = tall[p.sku];
