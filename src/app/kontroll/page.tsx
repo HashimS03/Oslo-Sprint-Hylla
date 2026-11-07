@@ -1,8 +1,6 @@
-import { Kontroll } from "./Kontroll";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
-// Dashboard for driftsleder: avvik fra matcheren, tell-liste for i dag, nøkkeltall og lagerkart.
+// Kontrollsiden er flyttet inn i dashboardet under Kamera.
 export default function Side() {
-  return <Kontroll />;
+  redirect("/kamera");
 }

@@ -3,13 +3,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type IkonNavn = "oversikt" | "varer" | "lokasjoner" | "avvik" | "hendelser" | "rapport" | "spor" | "innstillinger";
+type IkonNavn = "oversikt" | "varer" | "lokasjoner" | "avvik" | "hendelser" | "rapport" | "spor" | "innstillinger" | "kamera";
 
 const MENY: { href: string; navn: string; ikon: IkonNavn; aktiv: (p: string) => boolean }[] = [
   { href: "/", navn: "Oversikt", ikon: "oversikt", aktiv: (p) => p === "/" },
   { href: "/varer", navn: "Varer", ikon: "varer", aktiv: (p) => p.startsWith("/varer") },
   { href: "/lokasjoner", navn: "Lokasjoner", ikon: "lokasjoner", aktiv: (p) => p.startsWith("/lokasjoner") },
   { href: "/avvik", navn: "Avvik", ikon: "avvik", aktiv: (p) => p.startsWith("/avvik") },
+  { href: "/kamera", navn: "Kamera", ikon: "kamera", aktiv: (p) => p.startsWith("/kamera") || p.startsWith("/tak") },
   { href: "/logg", navn: "Hendelser", ikon: "hendelser", aktiv: (p) => p.startsWith("/logg") },
   { href: "/rapport", navn: "Rapport", ikon: "rapport", aktiv: (p) => p.startsWith("/rapport") },
 ];
@@ -38,6 +39,7 @@ function MenyIkon({ navn }: { navn: IkonNavn }) {
     case "avvik": return <svg {...p}><path d="M12 4l9 16H3z" /><path d="M12 10v4M12 17v.5" /></svg>;
     case "hendelser": return <svg {...p}><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" /></svg>;
     case "rapport": return <svg {...p}><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>;
+    case "kamera": return <svg {...p}><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></svg>;
     case "spor": return <svg {...p}><path d="M4 5h16v11H9l-5 4z" /></svg>;
     case "innstillinger": return <svg {...p}><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1" /></svg>;
   }
