@@ -28,6 +28,17 @@ Er backenden et annet sted (f.eks. Vercel), lag `mobil/.env`:
 EXPO_PUBLIC_API_URL=https://hylla-dere.vercel.app
 ```
 
+**Ferdig app (release-bygg) krever https.** Bygger dere appen med EAS, må `EXPO_PUBLIC_API_URL` starte med `https://`.
+Ellers viser appen en feilmelding i stedet for å sende data ukryptert. `http://` fungerer bare mens dere utvikler med `npx expo start`.
+
+### Tilgangskode (PIN)
+
+Hvis backenden har `HYLLA_PIN` satt, må appen sende koden med hvert kall (i headeren `x-hylla-secret`).
+Åpne **Innstillinger → Tilgang** i appen, skriv inn koden og trykk «Lagre». Koden lagres kryptert på telefonen med `expo-secure-store`.
+Mangler koden, eller er den feil, sier appen «Serveren krever tilgangskode» og viser vei til Innstillinger.
+
+Ikke legg koden i `.env` som `EXPO_PUBLIC_…`: alt med det navnet bygges inn i appen og kan leses av alle som har den.
+
 Uten nøkler i backenden kjører alt i demomodus. På tellingskjermen finnes også «Bruk demotelling» hvis dere ikke har en hylle foran dere.
 
 ## Skjermene

@@ -1,9 +1,10 @@
-import { useState, type ReactNode } from "react";
-import { Alert, Pressable, StyleSheet, View } from "react-native";
+import { useEffect, useState, type ReactNode } from "react";
+import { Alert, Pressable, StyleSheet, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import * as Speech from "expo-speech";
 import type { Innstillinger as Inn, InnstillingerSvar } from "@/lib/typer";
-import { apiUrl, send } from "@/lib/api";
+import { apiUrl, send, usikkerAdresse } from "@/lib/api";
+import { lagrePin, lesPin, slettPin } from "@/lib/pin";
 import { useHent } from "@/lib/useHent";
 import { F, S } from "@/lib/tema";
 import { Ikon } from "@/components/Ikon";
@@ -13,13 +14,39 @@ export default function Innstillinger() {
   const { data, feil, last, setData } = useHent<InnstillingerSvar>("/api/innstillinger");
   const [nullstiller, setNullstiller] = useState(false);
   const inn = data?.innstillinger;
+  const [pin, setPin] = useState("");
+  const [harPin, setHarPin] = useState(false);
+  const [pinLagret, setPinLagret] = useState(false);
+
+  useEffect(() => {
+    lesPin().then((p) => setHarPin(!!p));
+  }, []);
+
+  const lagreKode = async () => {
+    try {
+      await lagrePin(pin);
+      setHarPin(!!pin.trim());
+      setPin("");
+      setPinLagret(true);
+      last();
+    } catch (e) {
+      Alert.alert("Kunne ikke lagre tilgangskoden", e instanceof Error ? e.message : "");
+    }
+  };
+
+  const fjernKode = async () => {
+    await slettPin().catch(() => {});
+    setHarPin(false);
+    setPinLagret(false);
+  };
 
   const endre = async (e: Partial<Inn>) => {
     if (!data) return;
     setData({ ...data, innstillinger: { ...data.innstillinger, ...e } });
     try {
       await send("/api/innstillinger", e);
-    } catch {
+    } catch (err) {
+      Alert.alert("Kunne ikke lagre", err instanceof Error ? err.message : "");
       last();
     }
   };
@@ -30,7 +57,7 @@ export default function Innstillinger() {
       {
         text: "Nullstill", style: "destructive", onPress: async () => {
           setNullstiller(true);
-          await send("/api/demo/nullstill", {}).catch(() => {});
+          await send("/api/demo/nullstill", {}).catch((e) => Alert.alert("Det gikk ikke", e instanceof Error ? e.message : ""));
           setNullstiller(false);
           last();
         },
@@ -43,7 +70,7 @@ export default function Innstillinger() {
       {
         text: "Tøm", style: "destructive", onPress: async () => {
           setNullstiller(true);
-          await send("/api/demo/nullstill", { tom: true }).catch(() => {});
+          await send("/api/demo/nullstill", { tom: true }).catch((e) => Alert.alert("Det gikk ikke", e instanceof Error ? e.message : ""));
           setNullstiller(false);
           last();
         },
@@ -53,6 +80,40 @@ export default function Innstillinger() {
   return (
     <Skjerm tittel="Innstillinger" fane="index">
       {feil && <Feilboks melding={feil} igjen={last} />}
+      {usikkerAdresse() && <Feilboks melding={usikkerAdresse()!} />}
+      <Etikett>Tilgang</Etikett>
+      <Gruppe>
+        <Linje
+          tittel="Tilgangskode (PIN)"
+          hoyre={<Txt style={{ color: harPin ? F.tekst : F.dempet }}>{harPin ? "Lagret på telefonen" : "Ikke satt"}</Txt>}
+        />
+        <View style={[st.pinRad, st.skille]}>
+          <TextInput
+            value={pin}
+            onChangeText={(t) => {
+              setPin(t);
+              setPinLagret(false);
+            }}
+            placeholder={harPin ? "Skriv ny kode for å bytte" : "Koden dere har fått"}
+            placeholderTextColor={F.dempet}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            onSubmitEditing={lagreKode}
+            style={st.input}
+          />
+          <LenkeKnapp tekst="Lagre" onPress={lagreKode} />
+        </View>
+        <View style={{ paddingVertical: 12, gap: 6 }}>
+          <Txt style={{ fontSize: 13, color: F.dempet }}>
+            {pinLagret
+              ? "Lagret. Appen sender koden med hvert kall til serveren."
+              : "Trengs bare hvis serveren er låst med HYLLA_PIN. Koden lagres kryptert på denne telefonen."}
+          </Txt>
+          {harPin && <LenkeKnapp tekst="Fjern koden fra telefonen" style={{ color: F.rod }} onPress={fjernKode} />}
+        </View>
+      </Gruppe>
+
       <Etikett>Lager</Etikett>
       <Gruppe>
         <Linje tittel="Lager" fet hoyre={<Txt>{inn?.lager ?? "–"}</Txt>} />
@@ -142,5 +203,7 @@ const st = StyleSheet.create({
   skille: { borderBottomWidth: 1, borderBottomColor: F.kant },
   boks: { width: 28, height: 28, borderRadius: 4, borderWidth: 1.5, borderColor: F.tekst, alignItems: "center", justifyContent: "center" },
   stepper: { borderWidth: 1, borderColor: F.kant, borderRadius: 8, backgroundColor: F.graa },
+  pinRad: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10 },
+  input: { flex: 1, borderWidth: 1, borderColor: F.kant, borderRadius: 8, backgroundColor: F.graa, paddingHorizontal: 12, paddingVertical: 10, fontFamily: S.tekst, fontSize: 16, color: F.tekst },
   stepKnapp: { width: 34, height: 36, alignItems: "center", justifyContent: "center" },
 });

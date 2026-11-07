@@ -53,7 +53,8 @@
           "cameraPermission": "Hylla tar bilder av nye varer så den kjenner dem igjen."
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
