@@ -1,0 +1,9 @@
+{
+  "name": "Hylla",
+  "short_name": "Hylla",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F8F7",
+  "theme_color": "#F4C430",
+  "lang": "nb"
+}

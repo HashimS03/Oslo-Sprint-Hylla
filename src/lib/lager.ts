@@ -206,6 +206,7 @@ export function lagreForslag(
       nye.push(hend);
     }
   }
+  ryddBilder(s, f.hylle);
   return { tellingId: telling.id, hendelser: nye };
 }
 
@@ -231,4 +232,19 @@ export function lukkAvvik(s: State, id: string, handling: "funnet" | "svinn"): H
     h.aarsak = "Registrert som svinn";
   }
   return h;
+}
+
+/** Behold bilder bare der de trengs (de to siste tellingene per hylle og bilder et avvik viser til), så lagringen ikke vokser. */
+function ryddBilder(s: State, hylle: string) {
+  const viktige = new Set<string>();
+  for (const h of s.hendelser) {
+    if (h.type === "mulig_svinn" || h.type === "svinn") {
+      if (h.tellingId) viktige.add(h.tellingId);
+      if (h.avvik?.forrigeTellingId) viktige.add(h.avvik.forrigeTellingId);
+    }
+  }
+  const avHylla = s.tellinger.filter((t) => t.hylle === hylle).sort((a, b) => b.tid.localeCompare(a.tid));
+  avHylla.slice(2).forEach((t) => {
+    if (!viktige.has(t.id)) delete t.bilde;
+  });
 }

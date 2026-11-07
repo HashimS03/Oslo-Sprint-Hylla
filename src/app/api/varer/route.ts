@@ -1,0 +1,32 @@
+import { NextResponse } from "next/server";
+import { endreState } from "@/lib/store";
+
+export const runtime = "nodejs";
+
+export async function POST(req: Request) {
+  const b = (await req.json()) as {
+    sku: string; navn: string; farge: string; storrelse: string; swatch: string;
+    hylle: string; nivaa?: string; bilder?: string[]; beskrivelse?: string;
+  };
+  if (!b.sku || !b.navn || !b.hylle) return NextResponse.json({ feil: "Navn, SKU og hylle må fylles ut" }, { status: 400 });
+  const sku = b.sku.trim().toUpperCase();
+  try {
+    await endreState((s) => {
+      if (s.varer.some((v) => v.sku === sku)) throw new Error(`SKU ${sku} finnes allerede`);
+      s.varer.push({
+        sku, navn: b.navn.trim(), farge: b.farge, storrelse: b.storrelse, swatch: b.swatch,
+        bilder: (b.bilder ?? []).slice(0, 3), beskrivelse: b.beskrivelse,
+      });
+      const hylleId = b.hylle.trim().toUpperCase();
+      let hylle = s.hyller.find((h) => h.id === hylleId);
+      if (!hylle) {
+        hylle = { id: hylleId, reol: hylleId[0], navn: `Reol ${hylleId[0]}, hylle ${hylleId.slice(1)}`, innhold: [] };
+        s.hyller.push(hylle);
+      }
+      hylle.innhold.push({ sku, nivaa: b.nivaa || "hele hylla" });
+    });
+    return NextResponse.json({ sku });
+  } catch (e) {
+    return NextResponse.json({ feil: e instanceof Error ? e.message : "Feil" }, { status: 400 });
+  }
+}
