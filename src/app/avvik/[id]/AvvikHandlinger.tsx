@@ -26,8 +26,8 @@ export function AvvikHandlinger({ id }: { id: string }) {
     <div className="flex flex-col gap-2">
       <span className="text-[13px] text-dempet">Velg hva kontrollen viste.</span>
       {VALG.map((v) => (
-        <label key={v.id} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${valg === v.id ? "border-2 border-tekst bg-gullys" : "border-kant bg-white hover:border-tekst"}`}>
-          <input type="radio" name="avklaring" value={v.id} checked={valg === v.id} onChange={() => setValg(v.id)} className="mt-1 accent-[#1B2226]" />
+        <label key={v.id} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${valg === v.id ? "border-2 border-tekst bg-gullys" : "border-kant bg-kort hover:border-tekst"}`}>
+          <input type="radio" name="avklaring" value={v.id} checked={valg === v.id} onChange={() => setValg(v.id)} className="mt-1 accent-tekst" />
           <span className="flex flex-col">
             <span className={`text-[14px] font-semibold ${v.id === "svinn" ? "text-rod" : ""}`}>{v.tittel}</span>
             <span className="text-[12.5px] text-dempet">{v.tekst}</span>

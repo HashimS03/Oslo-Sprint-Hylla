@@ -6,7 +6,7 @@ export function KortVisning({ kort }: { kort: Kort }) {
   if (kort.type === "vare") {
     const hovedhylle = kort.hyller.filter((h) => h.antall > 0)[0];
     return (
-      <Link href={`/varer/${kort.sku}`} className="flex flex-col gap-2.5 self-stretch rounded-2xl border-[2.5px] border-tekst bg-white p-3.5">
+      <Link href={`/varer/${kort.sku}`} className="flex flex-col gap-2.5 self-stretch rounded-2xl border-[2.5px] border-tekst bg-kort p-3.5">
         <div className="flex items-center gap-3">
           <span className="h-11 w-11 shrink-0 rounded-[10px] border border-kant" style={{ background: kort.swatch }} />
           <span className="flex-1">
@@ -32,7 +32,7 @@ export function KortVisning({ kort }: { kort: Kort }) {
   }
   if (kort.type === "avvik") {
     return (
-      <Link href={`/avvik/${kort.id}`} className="flex items-center gap-3 self-stretch rounded-2xl border-[1.5px] border-rodkant bg-white p-3.5">
+      <Link href={`/avvik/${kort.id}`} className="flex items-center gap-3 self-stretch rounded-2xl border-[1.5px] border-rodkant bg-kort p-3.5">
         <span className="flex-1">
           <span className="font-mono text-[11px] text-rod">MULIG SVINN · {klokke(kort.tid)}</span>
           <br />

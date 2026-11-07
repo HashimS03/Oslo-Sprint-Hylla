@@ -23,7 +23,7 @@ export default async function Rapport({ searchParams }: { searchParams: Promise<
     <>
       <Topp tittel="Rapport" under={dager ? `Bevegelser og svinn, ${periode === "i dag" ? "i dag" : `siste ${periode}`}.` : "Bevegelser og svinn for hele historikken."}>
         <PeriodeVelger valgt={dager} lag={(d) => `/rapport?dager=${d}`} />
-        <a href={csv("varer")} className="rounded-lg border border-kant bg-white px-3.5 py-2 text-[13.5px] font-semibold hover:border-tekst">Last ned CSV</a>
+        <a href={csv("varer")} className="rounded-lg border border-kant bg-kort px-3.5 py-2 text-[13.5px] font-semibold hover:border-tekst">Last ned CSV</a>
       </Topp>
       <Innhold>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">

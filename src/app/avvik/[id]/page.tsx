@@ -58,7 +58,7 @@ export default async function Avvik({ params }: { params: Promise<{ id: string }
               </div>
             </Panel>
             <Panel tittel="Hendelser rundt avviket">
-              <ul className="divide-y divide-kant text-[13.5px]">
+              <ul className="divide-y divide-linje text-[13.5px]">
                 {relaterte.map((r) => (
                   <li key={r.id} className="flex gap-3 px-4 py-2.5">
                     <span className="w-[92px] shrink-0 font-mono text-[12px] text-dempet">{kortDato(r.tid)} {klokke(r.tid)}</span>
