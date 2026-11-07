@@ -60,16 +60,16 @@ export function lagSeed(): State {
   return {
     versjon: 1,
     varer: [
-      { sku: "BRUS-RED", navn: "Brusboks, rød", farge: "rød", storrelse: "33 cl", leverandor: "Drikkegrossisten", swatch: "#B3362A", bilder: [], beskrivelse: "Rød brusboks av aluminium" },
-      { sku: "VANN-KLAR", navn: "Vannflaske", farge: "klar", storrelse: "50 cl", leverandor: "Drikkegrossisten", swatch: "#9CC7E0", bilder: [], beskrivelse: "Klar plastflaske med vann" },
-      { sku: "SJOK-MEL", navn: "Sjokoladeplate", farge: "blå", storrelse: "100 g", leverandor: "Søtsaker AS", swatch: "#2F5D8A", bilder: [], beskrivelse: "Melkesjokolade i blå innpakning" },
-      { sku: "KORN-PK", navn: "Kornpakke", farge: "gul", storrelse: "500 g", leverandor: "Søtsaker AS", swatch: "#F4C430", bilder: [], beskrivelse: "Gul eske med frokostblanding" },
-      { sku: "KAFFE-KOPP", navn: "Kaffekopp", farge: "brun", storrelse: "30 cl", leverandor: "Kontorlevering", swatch: "#8A5A3B", bilder: [], beskrivelse: "Brun papirkopp med lokk" },
-      { sku: "KRUS-HVIT", navn: "Krus, hvitt", farge: "hvit", storrelse: "35 cl", leverandor: "Kontorlevering", swatch: "#E8E6E1", bilder: [], beskrivelse: "Hvitt keramikkrus" },
-      { sku: "NOTAT-BLA", navn: "Notatbok, blå", farge: "blå", storrelse: "A5", leverandor: "Kontorlevering", swatch: "#2F5D8A", bilder: [], beskrivelse: "Blå notatbok med hardt omslag" },
-      { sku: "PENN-SVART", navn: "Penn, svart", farge: "svart", storrelse: "One size", leverandor: "Kontorlevering", swatch: "#1E1E20", bilder: [], beskrivelse: "Svart kulepenn" },
-      { sku: "EPLE-GRONN", navn: "Eple, grønt", farge: "grønn", storrelse: "Stk", leverandor: "Frukthuset", swatch: "#2F7D55", bilder: [], beskrivelse: "Grønt eple" },
-      { sku: "BANAN", navn: "Banan", farge: "gul", storrelse: "Stk", leverandor: "Frukthuset", swatch: "#E8C547", bilder: [], beskrivelse: "Gul banan" },
+      { sku: "BRUS-RED", navn: "Brusboks, rød", farge: "rød", storrelse: "33 cl", leverandor: "Drikkegrossisten", swatch: "#B3362A", bilder: [], beskrivelse: "Rød brusboks av aluminium", prompt: "red soda can" },
+      { sku: "VANN-KLAR", navn: "Vannflaske", farge: "klar", storrelse: "50 cl", leverandor: "Drikkegrossisten", swatch: "#9CC7E0", bilder: [], beskrivelse: "Klar plastflaske med vann", prompt: "clear plastic water bottle" },
+      { sku: "SJOK-MEL", navn: "Sjokoladeplate", farge: "blå", storrelse: "100 g", leverandor: "Søtsaker AS", swatch: "#2F5D8A", bilder: [], beskrivelse: "Melkesjokolade i blå innpakning", prompt: "chocolate bar in blue wrapper" },
+      { sku: "KORN-PK", navn: "Kornpakke", farge: "gul", storrelse: "500 g", leverandor: "Søtsaker AS", swatch: "#F4C430", bilder: [], beskrivelse: "Gul eske med frokostblanding", prompt: "yellow cereal box" },
+      { sku: "KAFFE-KOPP", navn: "Kaffekopp", farge: "brun", storrelse: "30 cl", leverandor: "Kontorlevering", swatch: "#8A5A3B", bilder: [], beskrivelse: "Brun papirkopp med lokk", prompt: "brown paper coffee cup" },
+      { sku: "KRUS-HVIT", navn: "Krus, hvitt", farge: "hvit", storrelse: "35 cl", leverandor: "Kontorlevering", swatch: "#E8E6E1", bilder: [], beskrivelse: "Hvitt keramikkrus", prompt: "white ceramic mug" },
+      { sku: "NOTAT-BLA", navn: "Notatbok, blå", farge: "blå", storrelse: "A5", leverandor: "Kontorlevering", swatch: "#2F5D8A", bilder: [], beskrivelse: "Blå notatbok med hardt omslag", prompt: "blue notebook" },
+      { sku: "PENN-SVART", navn: "Penn, svart", farge: "svart", storrelse: "One size", leverandor: "Kontorlevering", swatch: "#1E1E20", bilder: [], beskrivelse: "Svart kulepenn", prompt: "black pen" },
+      { sku: "EPLE-GRONN", navn: "Eple, grønt", farge: "grønn", storrelse: "Stk", leverandor: "Frukthuset", swatch: "#2F7D55", bilder: [], beskrivelse: "Grønt eple", prompt: "green apple" },
+      { sku: "BANAN", navn: "Banan", farge: "gul", storrelse: "Stk", leverandor: "Frukthuset", swatch: "#E8C547", bilder: [], beskrivelse: "Gul banan", prompt: "banana" },
     ],
     hyller: [
       {

@@ -12,6 +12,8 @@ export type Vare = {
   /** Referansebilder (data-URL-er) som hjelper telleren å kjenne igjen varen. */
   bilder: string[];
   beskrivelse?: string;
+  /** Kort engelsk beskrivelse brukt som prompt til SAM 3.1 («red soda can»). */
+  prompt?: string;
 };
 
 export type HylleInnhold = { sku: string; nivaa: string };

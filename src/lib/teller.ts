@@ -4,7 +4,8 @@ import type { Hylle, State, TelleResultat } from "./types";
 import { beholdning, sisteTelling, vare } from "./lager";
 
 // En teller tar et hyllebilde og returnerer antall per vare.
-// Fire varianter, valgt med HYLLA_TELLER (sam3 | claude | yolo | demo):
+// Fem varianter, valgt med HYLLA_TELLER (sam31 | sam3 | claude | yolo | demo):
+// - sam31:  Metas SAM 3.1 via Meta Model API (META_API_KEY), én forespørsel per vare, Claude som reserve
 // - sam3:   Metas SAM 3 i en egen tjeneste (se sam3/), satt med SAM3_URL
 // - claude: Claude ser på bildet og teller (når ANTHROPIC_API_KEY finnes)
 // - yolo:   en egen YOLO-tjeneste (se yolo/), satt med YOLO_URL
@@ -18,6 +19,7 @@ export function velgTeller(tvingDemo = false): Teller {
   if (tvingDemo) return demoTeller;
   const valgt = process.env.HYLLA_TELLER;
   if (valgt === "demo") return demoTeller;
+  if (valgt === "sam31" || (!valgt && !process.env.SAM3_URL && metaNokkel())) return sam31Teller;
   if (valgt === "sam3" || (!valgt && process.env.SAM3_URL)) return sam3Teller;
   if (valgt === "claude") return claudeTeller;
   if (valgt === "yolo" || (!valgt && process.env.YOLO_URL && !process.env.ANTHROPIC_API_KEY)) return yoloTeller;
@@ -160,6 +162,96 @@ function eksternTeller(navn: string, urlVar: string): Teller {
 
 export const yoloTeller = eksternTeller("yolo", "YOLO_URL");
 export const sam3Teller = eksternTeller("sam3", "SAM3_URL");
+
+// ---------------- SAM 3.1 via Meta Model API ----------------
+// Dokumentasjon: https://dev.meta.ai/docs/sam/segmenting
+// Én forespørsel per vare med en kort engelsk beskrivelse. Svaret er tekst med tokens som
+// <|box;x1=..;y1=..;x2=..;y2=..;w=..;h=..;c=0.96|>. Vi trenger bare boksene og sikkerheten.
+
+const META_URL = process.env.META_API_URL ?? "https://api.meta.ai/v1/responses";
+const SAM_TERSKEL = Number(process.env.SAM3_TERSKEL ?? 0.5);
+const SAM_LAV_TERSKEL = Number(process.env.SAM3_LAV_TERSKEL ?? 0.3);
+
+function metaNokkel(): string | undefined {
+  return process.env.META_API_KEY ?? process.env.MODEL_API_KEY;
+}
+
+/** Samler all tekst i et svar (vanlig JSON eller server-sent events), uansett hvor den ligger. */
+function samleTekst(raa: string): string {
+  const deler: string[] = [];
+  const gaa = (v: unknown) => {
+    if (typeof v === "string") deler.push(v);
+    else if (Array.isArray(v)) v.forEach(gaa);
+    else if (v && typeof v === "object") Object.values(v).forEach(gaa);
+  };
+  const linjer = raa.split("\n").filter((l) => l.startsWith("data:"));
+  if (linjer.length > 0) {
+    for (const l of linjer) {
+      try { gaa((JSON.parse(l.slice(5)) as { delta?: unknown }).delta); } catch { /* hopp over */ }
+    }
+  } else {
+    try { gaa(JSON.parse(raa)); } catch { deler.push(raa); }
+  }
+  return deler.join("");
+}
+
+/** Gir sikkerheten til hver boks i et SAM 3.1-svar. */
+export function parseBokser(raa: string): number[] {
+  return [...samleTekst(raa).matchAll(/<\|box;([^|]*)\|>/g)].map((m) => {
+    const c = /(?:^|;)c=([0-9.]+)/.exec(m[1]);
+    return c ? Number(c[1]) : 1;
+  });
+}
+
+async function sam31Antall(bilde: string, prompt: string): Promise<number[]> {
+  const res = await fetch(META_URL, {
+    method: "POST",
+    headers: { authorization: `Bearer ${metaNokkel()}`, "content-type": "application/json" },
+    body: JSON.stringify({
+      model: "sam-3.1",
+      input: [{ type: "message", role: "user", content: [{ type: "input_text", text: prompt }, { type: "input_image", image_url: bilde }] }],
+      stream: false,
+      metadata: { include_confidence: "true", mask_encoding: "one_bit" },
+    }),
+    signal: AbortSignal.timeout(40_000),
+  });
+  if (!res.ok) throw new Error(`Meta API svarte ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  return parseBokser(await res.text());
+}
+
+export const sam31Teller: Teller = {
+  navn: "sam3.1",
+  async tell({ state, hylle, bilde }) {
+    if (!metaNokkel()) throw new Error("META_API_KEY er ikke satt");
+    try {
+      const varer = await Promise.all(
+        hylle.innhold.map(async (p) => {
+          const v = vare(state, p.sku);
+          const prompt = v?.prompt ?? [v?.farge, v?.navn].filter(Boolean).join(" ");
+          const c = await sam31Antall(bilde, prompt);
+          const sikre = c.filter((x) => x >= SAM_TERSKEL).length;
+          const med = c.filter((x) => x >= SAM_LAV_TERSKEL).length;
+          const snitt = c.length ? c.reduce((a, b) => a + b, 0) / c.length : 0.9;
+          return {
+            sku: p.sku,
+            antall: sikre,
+            sikkerhet: med > sikre ? Math.min(0.75, snitt) : snitt,
+            alternativ: med > sikre ? med : null,
+            merknad: med > sikre ? "Noen funn er usikre" : "",
+          };
+        }),
+      );
+      return { varer, ukjente: [], bildekvalitet: "god", kommentar: "Telt med SAM 3.1" };
+    } catch (e) {
+      // Reserve: Claude, hvis nøkkel finnes. Ellers kaster vi feilen videre.
+      if (process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN) {
+        console.error("SAM 3.1 feilet, bruker Claude:", e);
+        return claudeTeller.tell({ state, hylle, bilde });
+      }
+      throw e;
+    }
+  },
+};
 
 // ---------------- Demo ----------------
 // Faste tall fra demomanuset, så demoen alltid går selv uten nett eller API-nøkkel.
