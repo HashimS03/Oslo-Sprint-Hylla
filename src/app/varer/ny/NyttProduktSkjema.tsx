@@ -68,7 +68,7 @@ export function NyttProduktSkjema({ hyller }: { hyller: string[] }) {
 
   const felt = "h-[46px] w-full min-w-0 rounded-xl border border-kant bg-white px-3 text-[15px]";
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex flex-1 flex-col">
       <header className="flex items-center gap-2 px-3 pt-4 pb-2">
         <Link href="/varer" aria-label="Avbryt" className="flex h-11 w-11 items-center justify-center"><Ikon navn="lukk" /></Link>
         <h1 className="display text-[26px]">Nytt produkt</h1>
