@@ -66,9 +66,9 @@ export function NyttProduktSkjema({ hyller }: { hyller: string[] }) {
     router.refresh();
   };
 
-  const felt = "h-[46px] w-full min-w-0 rounded-xl border border-kant bg-white px-3 text-[15px]";
+  const felt = "h-[46px] w-full min-w-0 rounded-xl border border-kant bg-kort px-3 text-[15px]";
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex flex-1 flex-col">
       <header className="flex items-center gap-2 px-3 pt-4 pb-2">
         <Link href="/varer" aria-label="Avbryt" className="flex h-11 w-11 items-center justify-center"><Ikon navn="lukk" /></Link>
         <h1 className="display text-[26px]">Nytt produkt</h1>
@@ -124,7 +124,7 @@ export function NyttProduktSkjema({ hyller }: { hyller: string[] }) {
           <span className="text-[13px] font-semibold">Størrelse</span>
           <div className="flex gap-1.5">
             {STR.map((s) => (
-              <button key={s} onClick={() => setStr(s)} className={`h-10 flex-1 rounded-[10px] text-sm ${s === str ? "bg-tekst font-semibold text-bg" : "border border-kant bg-white"}`}>{s === "One size" ? "OS" : s}</button>
+              <button key={s} onClick={() => setStr(s)} className={`h-10 flex-1 rounded-[10px] text-sm ${s === str ? "bg-tekst font-semibold text-bg" : "border border-kant bg-kort"}`}>{s === "One size" ? "OS" : s}</button>
             ))}
           </div>
         </div>

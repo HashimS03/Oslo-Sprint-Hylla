@@ -1,25 +1,59 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #F7F8F7;
+  /* Lys modus. Mørk modus overstyrer de samme variablene under [data-theme="dark"]. */
+  --color-bg: #F3F4F2;
   --color-kort: #FFFFFF;
-  --color-kant: #D3D9D7;
+  --color-meny: #FFFFFF;
+  --color-kant: #C9D1CE;
+  --color-linje: #E4E8E6;
   --color-tekst: #1B2226;
-  --color-dempet: #56636A;
+  --color-dempet: #4E5A61;
   --color-gul: #F4C430;
   --color-gullys: #FCF0C8;
-  --color-gronn: #2F7D55;
-  --color-gronnlys: #DDEFE5;
+  --color-gulkant: #E2C25A;
+  --color-gultekst: #7A5800;
+  --color-aktiv: #1B2226;
+  --color-gronn: #1E6B45;
+  --color-gronnlys: #D5EEDF;
   --color-rod: #B3362A;
   --color-rodkant: #C8402F;
-  --color-rodlys: #F7E1DD;
+  --color-rodlys: #FBE3DF;
+  --color-blaa: #1E3F8A;
+  --color-blaalys: #DCE6FA;
   --color-graa: #E6EAE8;
+  --color-thead: #EEF0EE;
   --color-mork: #111517;
   --color-skifer: #2B3134;
 
   --font-sans: var(--font-plex), system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
   --font-display: var(--font-archivo), system-ui, sans-serif;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #0E1214;
+  --color-kort: #182024;
+  --color-meny: #151B1E;
+  --color-kant: #2E383D;
+  --color-linje: #232C30;
+  --color-tekst: #EEF1EF;
+  --color-dempet: #A3ADB2;
+  --color-gullys: #2A2510;
+  --color-gulkant: #5C4C12;
+  --color-gultekst: #F4C430;
+  --color-aktiv: #F4C430;
+  --color-gronn: #6FE0A5;
+  --color-gronnlys: #143224;
+  --color-rod: #FF7A6B;
+  --color-rodkant: #8A3A30;
+  --color-rodlys: #2B1714;
+  --color-blaa: #9CBCFF;
+  --color-blaalys: #1D2B45;
+  --color-graa: #222B2F;
+  --color-thead: #121719;
+  --color-skifer: #0A0D0F;
 }
 
 html, body { background: var(--color-bg); color: var(--color-tekst); }
@@ -41,16 +75,16 @@ main { animation: inn 180ms ease-out; }
 
 .knapp-gul {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  height: 52px; border-radius: 14px; background: var(--color-gul);
-  border: 2.5px solid var(--color-tekst); font-weight: 600; font-size: 15px; width: 100%;
+  height: 52px; border-radius: 14px; background: var(--color-gul); color: #1B2226;
+  border: 2.5px solid #1B2226; font-weight: 600; font-size: 15px; width: 100%;
 }
 .knapp-gul:disabled { opacity: .5; }
 .knapp-hvit {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  height: 46px; border-radius: 12px; background: #fff;
+  height: 46px; border-radius: 12px; background: var(--color-kort);
   border: 1.5px solid var(--color-tekst); font-weight: 600; font-size: 14px; width: 100%;
 }
-.kort { background: #fff; border: 1px solid var(--color-kant); border-radius: 14px; }
+.kort { background: var(--color-kort); border: 1px solid var(--color-kant); border-radius: 14px; }
 
 @keyframes skann { 0% { top: 8%; } 50% { top: 88%; } 100% { top: 8%; } }
 .skannelinje { animation: skann 2.4s ease-in-out infinite; }
