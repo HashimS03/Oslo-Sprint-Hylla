@@ -1,3 +1,4 @@
+import { samPrompt } from "./prompt";
 import type { State } from "./types";
 import {
   apneAvvik, beholdning, beholdningPerHylle, erIdag, hylleStatus, innkjopForVare, plukketSiden, sisteTelling, totalBeholdning, vare,
@@ -66,6 +67,7 @@ export function vareVisning(s: State, sku: string) {
   const po = innkjopForVare(s, sku)[0];
   return {
     sku: v.sku, navn: v.navn, farge: v.farge, storrelse: v.storrelse, leverandor: v.leverandor ?? null, swatch: v.swatch,
+    prompt: samPrompt(v), egenPrompt: !!v.prompt?.trim(),
     bilde: v.bilder[0] ?? null,
     antall: beholdning(s, sku),
     apneSalg: s.ordrer.filter((o) => o.sku === sku && o.status === "apen").reduce((n, o) => n + o.antall, 0),

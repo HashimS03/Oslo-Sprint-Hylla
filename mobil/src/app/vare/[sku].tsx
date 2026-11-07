@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, Image, View } from "react-native";
+import { Alert, Pressable, Image, TextInput, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import type { VareDetalj } from "@/lib/typer";
 import { useHent } from "@/lib/useHent";
@@ -15,6 +15,18 @@ export default function Vare() {
   const { data: v, feil, last } = useHent<VareDetalj>(`/api/varer/${encodeURIComponent(sku)}`);
   const [solgt, setSolgt] = useState(1);
   const [lagrer, setLagrer] = useState(false);
+  const [prompt, setPrompt] = useState<string | null>(null);
+
+  const lagrePrompt = async () => {
+    if (prompt === null) return;
+    try {
+      await send(`/api/varer/${encodeURIComponent(sku)}`, { prompt });
+      setPrompt(null);
+      await last();
+    } catch (e) {
+      Alert.alert("Kunne ikke lagre", e instanceof Error ? e.message : "");
+    }
+  };
 
   const registrerSalg = async () => {
     setLagrer(true);
@@ -56,6 +68,24 @@ export default function Vare() {
                 <Txt style={{ fontFamily: S.tekstHalvfet }}>{h.antall} stk</Txt>
               </Rad>
             ))}
+          </Kort>
+
+          <Kort style={{ gap: 8 }}>
+            <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 17 }}>Kameraet leter etter</Txt>
+            <Txt style={{ color: F.dempet, fontSize: 14 }}>
+              {v.egenPrompt ? "Din egen beskrivelse." : "Laget automatisk av navnet."} Skriv på engelsk, kort og konkret, f.eks. «blue water bottle».
+            </Txt>
+            <Rad gap={8}>
+              <TextInput
+                value={prompt ?? v.prompt}
+                onChangeText={setPrompt}
+                autoCapitalize="none"
+                returnKeyType="done"
+                onSubmitEditing={lagrePrompt}
+                style={{ flex: 1, height: 46, borderWidth: 1, borderColor: F.kant, borderRadius: 10, backgroundColor: F.hvit, paddingHorizontal: 12, fontFamily: S.mono, fontSize: 15, color: F.tekst }}
+              />
+              {prompt !== null && prompt !== v.prompt && <LenkeKnapp tekst="Lagre" onPress={lagrePrompt} />}
+            </Rad>
           </Kort>
 
           <Kort style={{ gap: 10 }}>
