@@ -28,9 +28,7 @@ export default async function Lokasjoner() {
             <span className="flex items-center gap-1.5"><span className={`inline-block h-2 w-2 rounded-full ${kameraPaa ? "bg-gronn" : "bg-kant"}`} />{kameraPaa ? "kameraet er på" : sistSett ? `kameraet sist sett ${tid(sistSett)}` : "kameraet er ikke koblet til"}</span>
           </span>
         }
-      >
-        <Link href="/tak" className="rounded-lg border border-kant bg-kort px-3.5 py-2 text-[13.5px] font-semibold hover:border-tekst">Åpne takkamera</Link>
-      </Topp>
+      />
       <Innhold>
         {s.hyller.length === 0 && <div className="kort px-4 py-10 text-center text-dempet">Ingen lokasjoner registrert ennå. De opprettes når varer legges inn.</div>}
         {reoler.map((reol) => (

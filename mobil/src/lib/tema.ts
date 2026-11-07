@@ -1,21 +1,32 @@
-// Farger og skrift fra hyllelapp-skissene.
+// Farger og skrift fra dashboardet (mørk modus), så skanneren og dashboardet ser ut som samme program.
+// Verdiene speiler [data-theme="dark"] i src/app/globals.css.
 export const F = {
-  bg: "#F7F8F7",
+  bg: "#0E1214",
+  /** Bakgrunn for kort, felt og lister. */
+  kort: "#182024",
+  meny: "#151B1E",
+  /** Hvit tekst over kamerabilder og mørke flater. */
   hvit: "#FFFFFF",
-  tekst: "#1B2226",
-  dempet: "#56636A",
+  tekst: "#EEF1EF",
+  dempet: "#A3ADB2",
+  /** Mørk tekst og kant på gule knapper, som .knapp-gul i dashboardet. */
+  blekk: "#1B2226",
   gul: "#F4C430",
-  gullys: "#FCF0C8",
-  gronn: "#2F7D55",
-  gronnlys: "#DDEFE5",
-  rod: "#B3362A",
-  rodlys: "#F7E1DD",
-  kant: "#D3D9D7",
-  graa: "#EEF0EF",
-  skifer: "#2B3134",
-  mork: "#111517",
-  blalys: "#DCE6F5",
-  lillalys: "#E7DFF3",
+  gullys: "#2A2510",
+  gulkant: "#5C4C12",
+  gronn: "#6FE0A5",
+  gronnlys: "#143224",
+  rod: "#FF7A6B",
+  rodlys: "#2B1714",
+  rodkant: "#8A3A30",
+  kant: "#2E383D",
+  linje: "#232C30",
+  graa: "#222B2F",
+  skifer: "#0A0D0F",
+  mork: "#0A0D0F",
+  blaa: "#9CBCFF",
+  blalys: "#1D2B45",
+  lillalys: "#2A2140",
 };
 
 export const S = {

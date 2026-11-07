@@ -129,16 +129,16 @@ function Felt({ etikett, verdi, endre, plassholder, store, tall, liten }: { etik
 function Valg({ tekst, aktiv, onPress }: { tekst: string; aktiv: boolean; onPress: () => void }) {
   return (
     <Pressable onPress={onPress} style={[st.valg, aktiv && { backgroundColor: F.tekst, borderColor: F.tekst }]}>
-      <Txt style={{ color: aktiv ? F.hvit : F.tekst, fontSize: 14 }}>{tekst}</Txt>
+      <Txt style={{ color: aktiv ? F.bg : F.tekst, fontSize: 14 }}>{tekst}</Txt>
     </Pressable>
   );
 }
 
 const st = StyleSheet.create({
   etikett: { fontFamily: S.tekstHalvfet, fontSize: 14, marginTop: 4 },
-  input: { height: 48, borderWidth: 1, borderColor: F.kant, borderRadius: 10, backgroundColor: F.hvit, paddingHorizontal: 14, fontFamily: S.tekst, fontSize: 16, color: F.tekst },
-  bilde: { flex: 1, height: 88, borderRadius: 10, borderWidth: 1.5, borderColor: F.kant, backgroundColor: F.hvit, alignItems: "center", justifyContent: "center", gap: 4, overflow: "hidden" },
+  input: { height: 48, borderWidth: 1, borderColor: F.kant, borderRadius: 10, backgroundColor: F.kort, paddingHorizontal: 14, fontFamily: S.tekst, fontSize: 16, color: F.tekst },
+  bilde: { flex: 1, height: 88, borderRadius: 10, borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort, alignItems: "center", justifyContent: "center", gap: 4, overflow: "hidden" },
   bildeEtikett: { position: "absolute", bottom: 0, left: 0, right: 0, backgroundColor: "rgba(17,21,23,0.6)", alignItems: "center", paddingVertical: 2 },
-  valg: { borderWidth: 1, borderColor: F.kant, backgroundColor: F.hvit, borderRadius: 8, paddingHorizontal: 14, height: 40, justifyContent: "center" },
+  valg: { borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort, borderRadius: 8, paddingHorizontal: 14, height: 40, justifyContent: "center" },
   fargeRing: { padding: 3, borderRadius: 20, borderWidth: 2, borderColor: "transparent" },
 });

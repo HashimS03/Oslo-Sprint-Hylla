@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { filTilBilde, tilJpeg } from "@/lib/bilde";
 import type { Bokse, KameraHendelse, Sone } from "@/lib/types";
+import { Panel, Tabell, TomRad, TypeChip } from "@/components/dash";
 
 type SoneInfo = { id: string; navn: string; sone: Sone; skuer: string[]; varer: string[] };
 type Katalog = { sku: string; navn: string }[];
@@ -12,7 +13,6 @@ type SoneSvar = {
   hendelser?: KameraHendelse[]; feil?: string;
 };
 
-const FARGE: Record<string, string> = { uttak: "#B93A2B", plassering: "#2E7D4F", gjenglemt: "#7B3FB0" };
 const STATUS: Record<string, string> = {
   bevegelse: "Bevegelse", stille: "Venter på ro", uendret: "Uendret", teller: "Teller", pause: "Pause", talt: "Talt", feil: "Feil",
 };
@@ -104,88 +104,117 @@ export function TakTest({ kameraId, soner, katalog }: { kameraId: string; soner:
     return () => clearInterval(t);
   }, [auto, kilde, send]);
 
-  return (
-    <main style={{ maxWidth: 1100, margin: "0 auto", padding: 16, fontFamily: "system-ui, sans-serif" }}>
-      <h1 style={{ fontSize: 24, margin: "0 0 4px" }}>Takkamera · {kameraId}</h1>
-      <p style={{ margin: "0 0 16px", color: "#555" }}>Sonene er tegnet over bildet. Hver sone telles for seg, og endringer blir til hendelser for matcheren.</p>
+  const tid = (iso: string) => new Date(iso).toLocaleTimeString("nb-NO", { timeZone: "Europe/Oslo", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const knapp = "flex h-10 items-center rounded-lg border border-kant bg-kort px-3.5 text-[13.5px] font-semibold hover:border-tekst disabled:opacity-50";
 
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-        <button onClick={startKamera}>Start kamera</button>
-        <label style={{ border: "1px solid #888", borderRadius: 4, padding: "2px 8px", cursor: "pointer" }}>
+  return (
+    <>
+      <div className="flex flex-wrap items-center gap-2">
+        <button onClick={startKamera} className="knapp-gul !h-10 !w-auto !rounded-lg !border-2 px-4 !text-[13.5px]">{kilde === "kamera" ? "Kameraet er på" : "Start kamera"}</button>
+        <label className={`${knapp} cursor-pointer`}>
           Last opp bilde
           <input type="file" accept="image/*" hidden onChange={(e) => velgBilde(e.target.files?.[0])} />
         </label>
-        <button onClick={() => send(true)} disabled={kilde === "ingen" || teller}>{teller ? "Teller …" : "Tell nå"}</button>
-        <label><input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} /> Automatisk (kamera)</label>
+        <button onClick={() => send(true)} disabled={kilde === "ingen" || teller} className={knapp}>{teller ? "Teller …" : "Tell nå"}</button>
+        <label className="ml-auto flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-kant bg-kort px-3.5 text-[13.5px]">
+          <input type="checkbox" checked={auto} onChange={(e) => setAuto(e.target.checked)} className="accent-tekst" />
+          Tell automatisk hvert 2. sekund
+        </label>
       </div>
-      {feil && <p style={{ color: "#B93A2B" }}>{feil}</p>}
+      {feil && <div role="alert" className="rounded-lg border border-rodkant bg-rodlys px-4 py-2.5 text-[13.5px] text-rod">{feil}</div>}
 
-      <div style={{ position: "relative", background: "#1B2326", aspectRatio: "16 / 9", overflow: "hidden", borderRadius: 8 }}>
-        {kilde === "kamera" && <video ref={video} playsInline muted style={{ width: "100%", height: "100%", objectFit: "fill" }} />}
-        {kilde === "bilde" && <img src={forhandsvisning} alt="" style={{ width: "100%", height: "100%", objectFit: "fill" }} />}
-        {kilde === "ingen" && <div style={{ color: "#aaa", padding: 24 }}>Start kameraet eller last opp et bilde.</div>}
-        {/* Deteksjoner, som i YOLO: en boks per funn med navn og sikkerhet. Rødt = vare som ikke hører hjemme i sonen. */}
-        {svar.flatMap((s) => (s.funnet ?? []).flatMap((f) => f.bokser.map((b, i) => (
-          <div key={`${s.sone}-${f.sku}-${i}`} style={{
-            position: "absolute", left: `${b.x * 100}%`, top: `${b.y * 100}%`, width: `${b.b * 100}%`, height: `${b.h * 100}%`,
-            border: `2px solid ${f.hjemmehorende ? "#3DDC84" : "#FF5A4F"}`, boxSizing: "border-box", pointerEvents: "none",
-          }}>
-            <span style={{ position: "absolute", top: -18, left: -2, background: f.hjemmehorende ? "#3DDC84" : "#FF5A4F", color: "#000", fontSize: 11, padding: "0 4px", whiteSpace: "nowrap" }}>
-              {f.navn} {Math.round(b.c * 100)} %
-            </span>
+      <Panel tittel="Kamerabilde" handling={<span className="font-mono text-[12px] text-dempet">{kameraId} · {soner.length} soner</span>}>
+        <div className="p-3">
+          <div className="relative aspect-video overflow-hidden rounded-xl bg-skifer">
+            {kilde === "kamera" && <video ref={video} playsInline muted className="h-full w-full object-fill" />}
+            {kilde === "bilde" && <img src={forhandsvisning} alt="Opplastet bilde" className="h-full w-full object-fill" />}
+            {kilde === "ingen" && (
+              <div className="flex h-full flex-col items-center justify-center gap-1 text-center text-white/60">
+                <span className="text-[15px] font-semibold text-white/80">Kameraet er av</span>
+                <span className="text-[13px]">Start kameraet eller last opp et bilde av hyllene.</span>
+              </div>
+            )}
+            {/* En boks per funn med navn og sikkerhet. Rødt = vare som ikke hører hjemme i sonen. */}
+            {svar.flatMap((s) => (s.funnet ?? []).flatMap((f) => f.bokser.map((b, i) => (
+              <div
+                key={`${s.sone}-${f.sku}-${i}`}
+                className={`pointer-events-none absolute box-border border-2 ${f.hjemmehorende ? "border-[#3DDC84]" : "border-[#FF5A4F]"}`}
+                style={{ left: `${b.x * 100}%`, top: `${b.y * 100}%`, width: `${b.b * 100}%`, height: `${b.h * 100}%` }}
+              >
+                <span className={`absolute -top-[18px] -left-[2px] px-1 font-mono text-[10.5px] whitespace-nowrap text-black ${f.hjemmehorende ? "bg-[#3DDC84]" : "bg-[#FF5A4F]"}`}>
+                  {f.navn} {Math.round(b.c * 100)} %
+                </span>
+              </div>
+            ))))}
+            {soner.map((z) => {
+              const s = svar.find((x) => x.sone === z.id);
+              const gang = z.sone.type === "gang";
+              return (
+                <div
+                  key={z.id}
+                  className={`absolute box-border flex flex-col items-start gap-0.5 border-[3px] p-2 text-[12.5px] text-white [text-shadow:0_1px_3px_#000] ${gang ? "border-dashed border-gul/80" : "border-gul"}`}
+                  style={{ left: `${z.sone.x * 100}%`, top: `${z.sone.y * 100}%`, width: `${z.sone.b * 100}%`, height: `${z.sone.h * 100}%` }}
+                >
+                  <span className="rounded-md bg-gul px-1.5 py-px font-display text-[13px] font-extrabold text-[#1B2226] [text-shadow:none]">{z.navn}</span>
+                  {!gang && <span className="opacity-85">{z.varer.join(", ")}</span>}
+                  {s && <span className="font-mono text-[11px] uppercase opacity-90">{STATUS[s.status] ?? s.status}</span>}
+                  {s?.funnet?.filter((f) => f.antall > 0).map((f) => (
+                    <span key={f.sku} className={f.hjemmehorende ? "text-[#9BE3B3]" : "font-semibold text-[#FF9A8F]"}>{f.antall} × {f.navn}{f.hjemmehorende ? "" : " (feil sted)"}</span>
+                  ))}
+                </div>
+              );
+            })}
           </div>
-        ))))}
-        {soner.map((z) => {
-          const s = svar.find((x) => x.sone === z.id);
-          const gang = z.sone.type === "gang";
-          return (
-            <div key={z.id} style={{
-              position: "absolute", left: `${z.sone.x * 100}%`, top: `${z.sone.y * 100}%`, width: `${z.sone.b * 100}%`, height: `${z.sone.h * 100}%`,
-              border: `3px ${gang ? "dashed" : "solid"} #F4C430`, boxSizing: "border-box", color: "#fff", textShadow: "0 1px 3px #000", padding: 6, fontSize: 14,
-            }}>
-              <b>{z.navn}</b>{!gang && <div style={{ opacity: 0.85 }}>{z.varer.join(", ")}</div>}
-              {s && <div>{STATUS[s.status] ?? s.status}</div>}
-              {s?.funnet?.filter((f) => f.antall > 0).map((f) => (
-                <div key={f.sku} style={{ color: f.hjemmehorende ? "#9BE3B3" : "#FF9A8F" }}>{f.antall} × {f.navn}{f.hjemmehorende ? "" : " (feil sted)"}</div>
-              ))}
-            </div>
-          );
-        })}
-      </div>
+        </div>
+      </Panel>
 
-      <h2 style={{ fontSize: 18, margin: "20px 0 8px" }}>Innstillinger per sone</h2>
-      <p style={{ margin: "0 0 8px", color: "#555" }}>Velg hvilke varer hver sone skal klassifisere. T1 kan for eksempel bare være Red Bull og T2 bare Coca-Cola. Endringen nullstiller utgangspunktet for sonen.</p>
-      <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-        {soner.filter((z) => z.sone.type !== "gang").map((z) => (
-          <fieldset key={z.id} disabled={lagrer} style={{ border: "1px solid #bbb", borderRadius: 6, minWidth: 220 }}>
-            <legend><b>{z.navn}</b></legend>
-            {katalog.filter((v) => ["REDBULL", "COLA-BOKS", "BRUS-RED", "VANN-KLAR"].includes(v.sku) || z.skuer.includes(v.sku)).map((v) => (
-              <label key={v.sku} style={{ display: "block" }}>
-                <input
-                  type="checkbox"
-                  checked={z.skuer.includes(v.sku)}
-                  onChange={(e) => lagreSone(z.id, e.target.checked ? [...z.skuer, v.sku] : z.skuer.filter((x) => x !== v.sku))}
-                /> {v.navn}
-              </label>
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+        <Panel tittel="Varer per sone">
+          <div className="flex flex-col gap-3 p-4">
+            <p className="text-[13px] text-dempet">Velg hvilke varer hver sone skal kjenne igjen. Endringen nullstiller utgangspunktet for sonen.</p>
+            {soner.filter((z) => z.sone.type !== "gang").map((z) => (
+              <fieldset key={z.id} disabled={lagrer} className="flex flex-col gap-2 disabled:opacity-60">
+                <legend className="etikett mb-1.5">{z.navn}</legend>
+                <div className="flex flex-wrap gap-1.5">
+                  {katalog.filter((v) => ["REDBULL", "COLA-BOKS", "BRUS-RED", "VANN-KLAR"].includes(v.sku) || z.skuer.includes(v.sku)).map((v) => {
+                    const pa = z.skuer.includes(v.sku);
+                    return (
+                      <label key={v.sku} className={`flex h-9 cursor-pointer items-center gap-2 rounded-lg border px-3 text-[13px] ${pa ? "border-2 border-tekst bg-gullys font-semibold" : "border-kant bg-kort hover:border-tekst"}`}>
+                        <input
+                          type="checkbox"
+                          checked={pa}
+                          onChange={(e) => lagreSone(z.id, e.target.checked ? [...z.skuer, v.sku] : z.skuer.filter((x) => x !== v.sku))}
+                          className="accent-tekst"
+                        />
+                        {v.navn}
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
             ))}
-          </fieldset>
-        ))}
-      </div>
+          </div>
+        </Panel>
 
-      <h2 style={{ fontSize: 18, margin: "20px 0 8px" }}>Kamerahendelser</h2>
-      {hendelser.length === 0 && <p style={{ color: "#777" }}>Ingen ennå. Det første bildet setter bare utgangspunktet.</p>}
-      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-        {hendelser.slice(0, 30).map((h) => (
-          <li key={h.id} style={{ display: "flex", gap: 10, alignItems: "center", padding: "6px 0", borderBottom: "1px solid #ddd" }}>
-            <span style={{ background: FARGE[h.type], color: "#fff", borderRadius: 4, padding: "1px 8px", fontSize: 13 }}>{h.type}</span>
-            <span>{new Date(h.tid).toLocaleTimeString("nb-NO", { timeZone: "Europe/Oslo" })}</span>
-            <span>{h.sone}</span>
-            <span>{h.antall} × {h.sku ?? "ukjent"}</span>
-            {h.hjemmehorende === false && <span style={{ color: "#B93A2B" }}>mulig feilplassert</span>}
-            <span style={{ color: "#777" }}>{Math.round(h.sikkerhet * 100)} %</span>
-          </li>
-        ))}
-      </ul>
-    </main>
+        <Panel tittel="Kamerahendelser" handling={<span className="font-mono text-[12px] text-dempet">Vises også i Hendelser</span>}>
+          <Tabell hode={["Tid", "Hva", "Sone", "Vare", "Antall", "Sikkerhet"]} hoyre={[4, 5]}>
+            {hendelser.slice(0, 30).map((h) => (
+              <tr key={h.id}>
+                <td className="font-mono text-[12px] whitespace-nowrap text-dempet">{tid(h.tid)}</td>
+                <td><TypeChip type={`kamera_${h.type}`} /></td>
+                <td className="font-semibold">{h.sone}</td>
+                <td>
+                  {h.sku ? katalog.find((v) => v.sku === h.sku)?.navn ?? h.sku : <span className="text-dempet">Ukjent</span>}
+                  {h.hjemmehorende === false && <span className="ml-2 text-[12px] font-semibold text-rod">mulig feilplassert</span>}
+                </td>
+                <td className="text-right font-mono">{h.antall}</td>
+                <td className="text-right font-mono text-dempet">{Math.round(h.sikkerhet * 100)} %</td>
+              </tr>
+            ))}
+            {hendelser.length === 0 && <TomRad kolonner={6}>Ingen ennå. Det første bildet setter bare utgangspunktet.</TomRad>}
+          </Tabell>
+        </Panel>
+      </div>
+    </>
   );
 }

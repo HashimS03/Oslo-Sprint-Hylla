@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { router } from "expo-router";
 import { Alert, StyleSheet, TextInput, View } from "react-native";
 import { apiUrl, send, usikkerAdresse } from "@/lib/api";
 import { lagreNavn, useNavn } from "@/lib/navn";
@@ -46,6 +47,11 @@ export default function Innstillinger() {
         <Knapp tekst="Lagre navn" deaktivert={!endret} onPress={() => lagreNavn(nytt)} />
       </View>
 
+      <View style={{ gap: 8, marginTop: 8 }}>
+        <Etikett>Takkamera</Etikett>
+        <Knapp tekst="Takkamera" undertekst="Plukk og plassering, kamerasoner og hyller" ikon="kamera" variant="hvit" pil onPress={() => router.push("/takkamera")} />
+      </View>
+
       <Kort style={{ gap: 6, marginTop: 8 }}>
         <Etikett>Server</Etikett>
         <Mono style={{ fontSize: 14 }}>{apiUrl()}</Mono>
@@ -62,7 +68,7 @@ export default function Innstillinger() {
 
 const st = StyleSheet.create({
   felt: {
-    height: 56, borderWidth: 2, borderColor: F.tekst, borderRadius: 12, backgroundColor: F.hvit, paddingHorizontal: 14,
+    height: 56, borderWidth: 1, borderColor: F.kant, borderRadius: 12, backgroundColor: F.kort, paddingHorizontal: 14,
     fontFamily: S.tekstMedium, fontSize: 18, color: F.tekst,
   },
 });

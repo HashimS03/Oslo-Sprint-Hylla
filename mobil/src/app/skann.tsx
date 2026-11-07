@@ -61,7 +61,7 @@ export default function Skann() {
 
       <View style={st.modus}>
         {(["plukk", "plassering"] as Modus[]).map((m) => (
-          <Pressable key={m} onPress={() => setModus(m)} style={[st.valg, m === modus && { backgroundColor: F.gul }]}>
+          <Pressable key={m} onPress={() => setModus(m)} style={[st.valg, m === modus && { backgroundColor: F.gullys, borderColor: F.gul }]}>
             <Txt style={{ fontFamily: S.tekstHalvfet }}>{m === "plukk" ? "Plukk" : "Plassering"}</Txt>
           </Pressable>
         ))}
@@ -195,7 +195,7 @@ function Leser({
 
 const st = StyleSheet.create({
   modus: { flexDirection: "row", gap: 8 },
-  valg: { flex: 1, alignItems: "center", paddingVertical: 12, borderRadius: 10, borderWidth: 1.5, borderColor: F.tekst, backgroundColor: F.hvit },
+  valg: { flex: 1, alignItems: "center", paddingVertical: 12, borderRadius: 10, borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort },
   ordreTopp: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
   leser: { flex: 1, backgroundColor: F.mork },
   leserTopp: { flexDirection: "row", justifyContent: "space-between", padding: 16 },

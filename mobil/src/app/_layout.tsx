@@ -32,7 +32,7 @@ export default function RotLayout() {
 
   return (
     <>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: F.bg } }}>
         {/* Scannerappen */}
         <Stack.Screen name="index" />

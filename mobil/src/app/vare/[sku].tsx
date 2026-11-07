@@ -88,7 +88,7 @@ export default function Vare() {
 }
 
 const st = StyleSheet.create({
-  bilde: { height: 160, borderRadius: 14, borderWidth: 1.5, borderColor: F.tekst, alignItems: "center", justifyContent: "center", overflow: "hidden" },
+  bilde: { height: 160, borderRadius: 14, borderWidth: 1, borderColor: F.kant, alignItems: "center", justifyContent: "center", overflow: "hidden" },
   swatch: { width: 84, height: 84, borderRadius: 18, borderWidth: 2, borderColor: F.tekst },
   antall: { flexDirection: "row", alignItems: "center" },
 });

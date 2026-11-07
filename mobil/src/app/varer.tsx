@@ -70,11 +70,11 @@ export default function Varer() {
 const st = StyleSheet.create({
   sokRad: {
     flexDirection: "row", alignItems: "center", gap: 10, marginHorizontal: 16, marginTop: 14, height: 56,
-    borderWidth: 2, borderColor: F.tekst, borderRadius: 12, backgroundColor: F.hvit, paddingHorizontal: 14,
+    borderWidth: 1, borderColor: F.kant, borderRadius: 12, backgroundColor: F.kort, paddingHorizontal: 14,
   },
   sok: { flex: 1, height: "100%", fontFamily: S.tekstMedium, fontSize: 17, color: F.tekst },
   rad: {
-    flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: F.hvit, borderWidth: 1.5, borderColor: F.tekst,
+    flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: F.kort, borderWidth: 1, borderColor: F.kant,
     borderRadius: 12, padding: 12, minHeight: 72,
   },
 });
