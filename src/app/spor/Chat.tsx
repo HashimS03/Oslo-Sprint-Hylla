@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Kort } from "@/lib/types";
 import { KortVisning } from "@/components/KortVisning";
 import { Ikon } from "@/components/ui";
+import { les } from "@/lib/tale";
 
 export type Melding = { id: number; rolle: "bruker" | "hylla"; tekst: string; kort?: Kort[] };
 export type Sender = (tekst: string) => void;
@@ -117,16 +118,6 @@ type Gjenkjenner = {
   onend: () => void;
   onerror: (e: { error: string }) => void;
 };
-
-function les(tekst: string) {
-  if (typeof window === "undefined" || !window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(tekst);
-  u.lang = "nb-NO";
-  const stemme = window.speechSynthesis.getVoices().find((v) => v.lang.startsWith("nb") || v.lang.startsWith("no"));
-  if (stemme) u.voice = stemme;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(u);
-}
 
 function NettleserStemme({ onTekst, opptatt }: { onTekst: (t: string) => void; opptatt: boolean }) {
   const [lytter, setLytter] = useState(false);

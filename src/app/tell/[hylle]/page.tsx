@@ -20,6 +20,7 @@ export default async function TellHylle({ params }: { params: Promise<{ hylle: s
       forrige={forrige ? { tid: klokke(forrige.tid), bilde: forrige.bilde } : null}
       ekteTeller={ekteTeller}
       sporNaarUsikker={s.innstillinger.sporNaarUsikker}
+      svarHoyt={s.innstillinger.svarHoyt}
     />
   );
 }

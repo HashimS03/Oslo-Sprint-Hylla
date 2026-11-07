@@ -6,6 +6,7 @@ import type { Forslag, ForslagEndring } from "@/lib/types";
 import { dataUrlTilJpeg, filTilJpeg, tilJpeg } from "@/lib/bilde";
 import { fortegn } from "@/lib/format";
 import { Ikon } from "@/components/ui";
+import { klargjorLyd, siHoyt } from "@/lib/tale";
 
 type Props = {
   hylle: { id: string; navn: string };
@@ -13,6 +14,8 @@ type Props = {
   forrige: { tid: string; bilde?: string } | null;
   ekteTeller: boolean;
   sporNaarUsikker: boolean;
+  /** Les opp hva tellingen endret etter lagring (innstillingen «Svar høyt»). */
+  svarHoyt: boolean;
 };
 
 type Steg = "kamera" | "analyserer" | "resultat" | "feil";
@@ -249,27 +252,38 @@ function justert(e: ForslagEndring, valgt: number | undefined): ForslagEndring {
   return { ...e, na: valgt, deler: deler.filter((d) => d.endring !== 0) };
 }
 
-function Resultat({ hylle, forslag, bilde, sporNaarUsikker, onNyttBilde }: Props & { forslag: Forslag; bilde: string | null; onNyttBilde: () => void }) {
+function Resultat({ hylle, forslag, bilde, sporNaarUsikker, svarHoyt, onNyttBilde }: Props & { forslag: Forslag; bilde: string | null; onNyttBilde: () => void }) {
   const router = useRouter();
   const [valg, setValg] = useState<Record<string, number>>({});
   const [lagrer, setLagrer] = useState(false);
+  const [lagreFeil, setLagreFeil] = useState("");
   const usikre = sporNaarUsikker ? forslag.endringer.filter((e) => e.alternativ !== null && e.sikkerhet < 0.8) : [];
   const endringer = forslag.endringer.map((e) => justert(e, valg[e.sku])).filter((e) => e.deler.length > 0);
   const tid = new Date(forslag.tid).toLocaleTimeString("nb-NO", { timeZone: "Europe/Oslo", hour: "2-digit", minute: "2-digit" });
   const snittSikkerhet = forslag.endringer.length ? Math.round((forslag.endringer.reduce((s, e) => s + e.sikkerhet, 0) / forslag.endringer.length) * 100) : 100;
 
   const lagre = async () => {
+    // Må skje i selve trykket, ellers stopper mobilnettleseren opplesningen etterpå.
+    const lyd = svarHoyt ? klargjorLyd() : null;
     setLagrer(true);
-    const liten = bilde ? await dataUrlTilJpeg(bilde, 720) : undefined;
-    const res = await fetch("/api/tell/lagre", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ forslag, korrigert: valg, bilde: liten, kilde: "mobil" }),
-    });
-    if (res.ok) {
+    setLagreFeil("");
+    try {
+      const liten = bilde ? await dataUrlTilJpeg(bilde, 720) : undefined;
+      const res = await fetch("/api/tell/lagre", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ forslag, korrigert: valg, bilde: liten, kilde: "mobil", medLyd: svarHoyt }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { oppsummering?: string; lyd?: string; feil?: string };
+      if (!res.ok) throw new Error(data.feil ?? "Klarte ikke å lagre tellingen");
+      // Hylla sier selv hva hyllebildet endret (og varsler om mulig svinn).
+      if (svarHoyt && data.oppsummering) siHoyt(data.oppsummering, data.lyd, lyd);
       router.push("/logg?lagret=1");
       router.refresh();
-    } else setLagrer(false);
+    } catch (e) {
+      setLagreFeil(e instanceof Error ? e.message : "Klarte ikke å lagre tellingen");
+      setLagrer(false);
+    }
   };
 
   return (
@@ -352,6 +366,7 @@ function Resultat({ hylle, forslag, bilde, sporNaarUsikker, onNyttBilde }: Props
       </main>
 
       <div className="flex flex-col gap-2 px-5 pt-2 pb-8">
+        {lagreFeil && <div className="rounded-xl bg-rodlys px-3 py-2.5 text-[13px] text-rod">{lagreFeil}. Prøv igjen.</div>}
         <button className="knapp-gul" onClick={lagre} disabled={lagrer}>{lagrer ? "Lagrer …" : "Lagre i loggen"}</button>
         <Link href="/" className="flex h-10 items-center justify-center text-sm text-dempet">Forkast</Link>
       </div>
