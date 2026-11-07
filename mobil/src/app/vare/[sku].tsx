@@ -12,7 +12,7 @@ import { Chip, Display, Feilboks, Knapp, Kort, LenkeKnapp, Laster, Mono, Rad, Se
 
 export default function Vare() {
   const { sku } = useLocalSearchParams<{ sku: string }>();
-  const { data: v, feil, last } = useHent<VareDetalj>(`/api/varer/${encodeURIComponent(sku)}`);
+  const { data: v, feil, last } = useHent<VareDetalj>(`/api/varer/${encodeURIComponent(sku)}`, { hvert: 3000 });
   const [solgt, setSolgt] = useState(1);
   const [lagrer, setLagrer] = useState(false);
   const [prompt, setPrompt] = useState<string | null>(null);

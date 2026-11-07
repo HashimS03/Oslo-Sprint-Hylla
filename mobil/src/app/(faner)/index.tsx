@@ -11,7 +11,7 @@ import { Display, Etikett, Feilboks, Knapp, LenkeKnapp, Rad, Seksjon, Txt } from
 
 export default function Hjem() {
   const inn = useSafeAreaInsets();
-  const { data, feil, laster, last } = useHent<Oversikt>("/api/oversikt");
+  const { data, feil, laster, last } = useHent<Oversikt>("/api/oversikt", { hvert: 3000 });
   const avvik = data?.apneAvvik.length ?? 0;
   const ikkeTalt = data ? data.antallHyller - data.taltIdag : 0;
   const ting = avvik + (ikkeTalt > 0 ? 1 : 0);

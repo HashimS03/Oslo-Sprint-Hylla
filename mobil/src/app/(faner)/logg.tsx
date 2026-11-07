@@ -24,7 +24,7 @@ export default function Logg() {
     const t = setTimeout(() => router.setParams({ lagret: undefined }), 6000);
     return () => clearTimeout(t);
   }, [lagret]);
-  const { data, feil, last } = useHent<{ rader: Rad[]; apneAvvik: number }>(`/api/logg${filter ? `?type=${filter}` : ""}`);
+  const { data, feil, last } = useHent<{ rader: Rad[]; apneAvvik: number }>(`/api/logg${filter ? `?type=${filter}` : ""}`, { hvert: 3000 });
 
   const dager = new Map<string, Rad[]>();
   for (const r of data?.rader ?? []) {

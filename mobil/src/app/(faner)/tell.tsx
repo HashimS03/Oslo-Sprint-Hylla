@@ -9,7 +9,7 @@ import { Ikon } from "@/components/Ikon";
 import { Chip, Etikett, Feilboks, HylleFlis, Knapp, Kort, Laster, Rad, Skjerm, Txt } from "@/components/ui";
 
 export default function VelgHylle() {
-  const { data, feil, last } = useHent<{ hyller: HylleRad[] }>("/api/hyller");
+  const { data, feil, last } = useHent<{ hyller: HylleRad[] }>("/api/hyller", { hvert: 5000 });
   const [sok, setSok] = useState("");
 
   const hyller = useMemo(() => {

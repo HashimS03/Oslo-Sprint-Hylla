@@ -10,7 +10,7 @@ import { Display, Feilboks, Knapp, Laster, Mono, Rad, Skjerm, Swatch, Txt } from
 const LAV = 5;
 
 export default function Varer() {
-  const { data, feil, last } = useHent<{ varer: VareRad[] }>("/api/varer");
+  const { data, feil, last } = useHent<{ varer: VareRad[] }>("/api/varer", { hvert: 4000 });
   const [sok, setSok] = useState("");
   const varer = useMemo(() => {
     const q = sok.trim().toLowerCase();
