@@ -28,6 +28,17 @@ npm run dev
 | `SAM3_URL` | Telling med Metas SAM 3 i stedet for Claude, se [sam3/README.md](sam3/README.md) |
 | `YOLO_URL`, `HYLLA_TELLER=yolo` | Valgfri YOLO-teller, se [yolo/README.md](yolo/README.md) |
 
+### Sikkerhet før dere deployer
+
+Appen har ingen brukere, så den er beskyttet med én felles PIN-kode:
+
+1. **Sett `HYLLA_PIN` i Vercel** (minst 6 tegn). Da må nettleseren taste koden én gang, og alle API-kall uten kode avvises. Uten `HYLLA_PIN` er appen åpen for alle, og «Nullstill demo» / «Tøm lageret» er skrudd av i produksjon.
+2. **Sett `HYLLA_WEBHOOK_SECRET`** hvis dere bruker ElevenLabs-agenten.
+3. **Sett utgiftstak** hos Anthropic, ElevenLabs og Meta. Appen har en enkel grense på antall kall per minutt, men den gjelder per serverinstans.
+4. Andre nettsider får ikke kalle API-et. Trenger Expo i nettleser en egen adresse, legg den i `HYLLA_TILLATTE_ADRESSER`.
+
+Logikken ligger i [src/middleware.ts](src/middleware.ts) og [src/lib/tilgang.ts](src/lib/tilgang.ts).
+
 **Mobilappen:** start backenden med `npm run dev`, så `cd mobil && npm install && npx expo start` og skann QR-koden med Expo Go. Detaljer i [mobil/README.md](mobil/README.md).
 
 Kamera på telefonen i web-appen krever HTTPS. Lokalt kan dere bruke `npx next dev --experimental-https` eller deploye til Vercel.
