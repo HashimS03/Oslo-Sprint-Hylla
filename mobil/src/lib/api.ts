@@ -27,7 +27,7 @@ export async function hent<T>(sti: string): Promise<T> {
     return await svar<T>(await fetch(apiUrl() + sti, { headers: { accept: "application/json" } }));
   } catch (e) {
     if (e instanceof ApiFeil) throw e;
-    throw new ApiFeil(`Får ikke kontakt med Hylla-serveren på ${apiUrl()}`, 0);
+    throw new ApiFeil(`Får ikke kontakt med Hylla-serveren på ${apiUrl()} (${e instanceof Error ? e.message : String(e)})`, 0);
   }
 }
 
@@ -36,7 +36,7 @@ export async function send<T>(sti: string, body: unknown): Promise<T> {
     return await svar<T>(await fetch(apiUrl() + sti, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }));
   } catch (e) {
     if (e instanceof ApiFeil) throw e;
-    throw new ApiFeil(`Får ikke kontakt med Hylla-serveren på ${apiUrl()}`, 0);
+    throw new ApiFeil(`Får ikke kontakt med Hylla-serveren på ${apiUrl()} (${e instanceof Error ? e.message : String(e)})`, 0);
   }
 }
 
@@ -45,6 +45,6 @@ export async function sendSkjema<T>(sti: string, skjema: FormData): Promise<T> {
     return await svar<T>(await fetch(apiUrl() + sti, { method: "POST", body: skjema }));
   } catch (e) {
     if (e instanceof ApiFeil) throw e;
-    throw new ApiFeil(`Får ikke kontakt med Hylla-serveren på ${apiUrl()}`, 0);
+    throw new ApiFeil(`Kunne ikke sende opptaket til ${apiUrl()} (${e instanceof Error ? e.message : String(e)})`, 0);
   }
 }
