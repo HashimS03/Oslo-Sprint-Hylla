@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="nb">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Hylla</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --gul: #f4c430;
+        --blekk: #1b2326;
+        --hvit: #ffffff;
+        --appbg: #f7f8f7;
+        --rod: #b93a2b;
+        --gronn: #2e7d4f;
+        --font: "Inter", sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--gul); }
+      #root { position: relative; width: 1920px; height: 1080px; font-family: var(--font); color: var(--blekk); overflow: hidden; }
+      #bg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: var(--gul); z-index: 0; }
+      .scene { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; z-index: 1; }
+      .rv { clip-path: inset(0 100% 0 0); }
+      .big { font-weight: 900; letter-spacing: -0.03em; line-height: 0.95; }
+      .txt { font-weight: 700; letter-spacing: -0.015em; line-height: 1.08; }
+      .abs { position: absolute; }
+
+      /* S1 */
+      #s1 { background: #d9dcda; }
+      #s1-h1 { left: 120px; top: 250px; font-size: 176px; white-space: nowrap; }
+      #s1-sub { left: 124px; top: 470px; font-size: 86px; }
+      #cb { left: 1090px; top: 70px; width: 640px; height: 900px; background: var(--gul); border: 6px solid var(--blekk); border-radius: 28px; box-shadow: 14px 14px 0 var(--blekk); }
+      #cb-clip { left: 220px; top: -28px; width: 200px; height: 56px; background: #8b9396; border: 6px solid var(--blekk); border-radius: 12px; }
+      #cb-paper { left: 36px; top: 54px; width: 568px; height: 800px; background: var(--hvit); border: 4px solid var(--blekk); }
+      .row { position: absolute; left: 0; width: 568px; height: 70px; border-bottom: 3px solid #cfd3d1; font-size: 34px; font-weight: 700; }
+      .row .n { position: absolute; left: 20px; top: 16px; }
+      .row .q { position: absolute; left: 400px; top: 16px; font-weight: 900; }
+      .row svg { position: absolute; left: 470px; top: 10px; }
+      #pencil { left: 520px; top: 110px; width: 260px; height: 22px; background: #f4c430; border: 4px solid var(--blekk); border-radius: 4px; }
+      #pencil i { position: absolute; left: -26px; top: -4px; width: 0; height: 0; border-top: 11px solid transparent; border-bottom: 11px solid transparent; border-right: 26px solid var(--blekk); }
+
+      /* S2 */
+      #s2-l { left: 0; top: 0; width: 960px; height: 1080px; background: var(--hvit); }
+      #s2-r { left: 960px; top: 0; width: 960px; height: 1080px; background: var(--gul); }
+      .s2lab { top: 90px; font-size: 76px; width: 960px; text-align: left; padding-left: 120px; }
+      .s2num { top: 130px; font-size: 640px; width: 960px; text-align: left; padding-left: 110px; line-height: 1; }
+      #s2-band { left: 0; top: 860px; width: 1920px; height: 150px; background: var(--blekk); }
+      #s2-band-t { left: 120px; top: 868px; font-size: 100px; color: var(--hvit); }
+      #s2-pen { left: 120px; top: 900px; font-size: 0; }
+
+      /* Table */
+      #tbl { left: 1040px; top: 90px; width: 760px; height: 760px; z-index: 2; }
+      #tbl-top { left: 0; top: 0; width: 760px; height: 760px; background: #eceeec; border: 8px solid var(--blekk); border-radius: 36px; box-shadow: 14px 14px 0 var(--blekk); }
+      #tbl-cam { left: 28px; top: 26px; padding: 8px 20px; background: var(--blekk); color: var(--hvit); border-radius: 40px; font-size: 30px; font-weight: 800; }
+      .it { position: absolute; }
+      #scan { left: 0; top: 70px; width: 760px; height: 10px; background: var(--blekk); }
+      .chip { position: absolute; padding: 4px 18px; background: var(--blekk); color: var(--hvit); border-radius: 40px; font-size: 44px; font-weight: 900; }
+      #chip-count { left: 0; top: 790px; font-size: 52px; padding: 8px 28px; background: var(--blekk); }
+      #ring { left: 330px; top: 410px; width: 100px; height: 140px; border: 10px solid var(--rod); border-radius: 50px; }
+
+      /* S3 */
+      #s3-h { left: 120px; top: 170px; font-size: 260px; white-space: nowrap; }
+      .s3l { left: 124px; font-size: 90px; }
+
+      /* S4 */
+      .s4w { left: 120px; top: 230px; width: 880px; font-size: 156px; }
+      .s4s { left: 124px; top: 640px; width: 880px; font-size: 64px; }
+
+      /* S5 */
+      #s5-t { left: 120px; top: 270px; width: 690px; font-size: 100px; }
+      .card { border: 6px solid var(--blekk); border-radius: 36px; box-shadow: 14px 14px 0 var(--blekk); overflow: hidden; background: var(--appbg); }
+      .card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+      #s5-home { left: 800px; top: 130px; width: 500px; height: 530px; }
+      #s5-avvik { left: 1330px; top: 280px; width: 490px; height: 578px; }
+
+      /* S6 */
+      .s6l { left: 120px; width: 1700px; font-size: 104px; }
+      #s6-mark { left: 120px; top: 250px; width: 160px; height: 160px; background: var(--blekk); border-radius: 30px; }
+      #s6-mark i { position: absolute; left: 36px; width: 88px; height: 12px; background: var(--gul); }
+      #s6-name { left: 330px; top: 220px; font-size: 300px; }
+      #s6-bar { left: 124px; top: 600px; width: 760px; height: 130px; background: repeating-linear-gradient(90deg, var(--blekk) 0 6px, transparent 6px 10px, var(--blekk) 10px 12px, transparent 12px 20px, var(--blekk) 20px 28px, transparent 28px 32px); }
+      #s6-tag { left: 124px; top: 770px; font-size: 76px; }
+
+      #wipe { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: var(--blekk); z-index: 9; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="54" data-width="1920" data-height="1080">
+      <div id="bg"></div>
+
+      <!-- S1: Hver dag -->
+      <div id="s1" class="scene clip" data-start="0" data-duration="7" data-track-index="1">
+        <div id="s1-h1" class="abs big rv">Hver dag.</div>
+        <div id="s1-sub" class="abs txt rv">teller noen alt,<br />for hånd.</div>
+        <div id="cb" class="abs">
+          <div id="cb-clip" class="abs"></div>
+          <div id="cb-paper" class="abs">
+            <div class="row" style="top: 20px"><span class="n">Brusboks, rød</span><span class="q">4</span><svg width="70" height="50" viewBox="0 0 70 50"><path class="tk" d="M6 26 L24 44 L62 6" fill="none" stroke="#2e7d4f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            <div class="row" style="top: 90px"><span class="n">Vannflaske</span><span class="q">3</span><svg width="70" height="50" viewBox="0 0 70 50"><path class="tk" d="M6 26 L24 44 L62 6" fill="none" stroke="#2e7d4f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            <div class="row" style="top: 160px"><span class="n">Sjokoladeplate</span><span class="q">5</span><svg width="70" height="50" viewBox="0 0 70 50"><path class="tk" d="M6 26 L24 44 L62 6" fill="none" stroke="#2e7d4f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            <div class="row" style="top: 230px"><span class="n">Kornpakke</span><span class="q">2</span><svg width="70" height="50" viewBox="0 0 70 50"><path class="tk" d="M6 26 L24 44 L62 6" fill="none" stroke="#2e7d4f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            <div class="row" style="top: 300px"><span class="n">Kaffekopp</span><span class="q">3</span><svg width="70" height="50" viewBox="0 0 70 50"><path class="tk" d="M6 26 L24 44 L62 6" fill="none" stroke="#2e7d4f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            <div class="row" style="top: 370px"><span class="n">Krus, hvitt</span><span class="q">3</span><svg width="70" height="50" viewBox="0 0 70 50"><path class="tk" d="M6 26 L24 44 L62 6" fill="none" stroke="#2e7d4f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            <div class="row" style="top: 440px"><span class="n">Notatbok, blå</span><span class="q">4</span><svg width="70" height="50" viewBox="0 0 70 50"><path class="tk" d="M6 26 L24 44 L62 6" fill="none" stroke="#2e7d4f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            <div class="row" style="top: 510px"><span class="n">Penn, svart</span><span class="q">3</span><svg width="70" height="50" viewBox="0 0 70 50"><path class="tk" d="M6 26 L24 44 L62 6" fill="none" stroke="#2e7d4f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            <div class="row" style="top: 580px"><span class="n">Eple, grønt</span><span class="q">4</span><svg width="70" height="50" viewBox="0 0 70 50"><path class="tk" d="M6 26 L24 44 L62 6" fill="none" stroke="#2e7d4f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            <div class="row" style="top: 650px"><span class="n">Banan</span><span class="q">3</span><svg width="70" height="50" viewBox="0 0 70 50"><path class="tk" d="M6 26 L24 44 L62 6" fill="none" stroke="#2e7d4f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+            <div id="pencil" class="abs"><i></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S2: Tallene stemmer ikke -->
+      <div id="s2" class="scene clip" data-start="7" data-duration="6" data-track-index="1">
+        <div id="s2-l" class="abs"></div>
+        <div id="s2-r" class="abs"></div>
+        <div id="s2-ll" class="abs big s2lab">Systemet sier</div>
+        <div id="s2-n1" class="abs big s2num" style="left: 0">3</div>
+        <div id="s2-rl" class="abs big s2lab" style="left: 960px">Hylla har</div>
+        <div id="s2-n2" class="abs big s2num" style="left: 960px">2</div>
+        <div id="s2-band" class="abs"></div>
+        <div id="s2-band-t" class="abs big rv">Ingen vet hvorfor.</div>
+      </div>
+
+      <!-- S3 + S4: bordet, samme objekt gjennom begge scenene -->
+      <div id="tbl" class="abs clip" data-start="13" data-duration="25" data-track-index="2">
+        <div id="tbl-top" class="abs"></div>
+        <div id="tbl-cam" class="abs">T1 · kameratelefon</div>
+        <div id="it0" class="it" style="left: 75px; top: 210px; width: 70px; height: 100px; background: #b3362a; border-radius: 16px"></div>
+        <div id="it1" class="it" style="left: 217px; top: 208px; width: 56px; height: 104px; background: #9cc7e0; border-radius: 24px"></div>
+        <div id="it2" class="it" style="left: 345px; top: 210px; width: 70px; height: 100px; background: #2f5d8a; border-radius: 6px"></div>
+        <div id="it3" class="it" style="left: 473px; top: 208px; width: 84px; height: 104px; background: #f4c430; border: 4px solid var(--blekk); border-radius: 6px"></div>
+        <div id="it4" class="it" style="left: 612px; top: 212px; width: 76px; height: 96px; background: #8a5a3b; border-radius: 14px"></div>
+        <div id="it5" class="it" style="left: 64px; top: 434px; width: 92px; height: 92px; background: #e8e6e1; border: 4px solid #bdb9b0; border-radius: 46px"></div>
+        <div id="it6" class="it" style="left: 205px; top: 428px; width: 80px; height: 104px; background: #2f5d8a; border-radius: 8px"></div>
+        <div id="it7" class="it" style="left: 369px; top: 424px; width: 22px; height: 112px; background: #1e1e20; border-radius: 11px"></div>
+        <div id="it8" class="it" style="left: 471px; top: 436px; width: 88px; height: 88px; background: #2f7d55; border-radius: 44px"></div>
+        <div id="it9" class="it" style="left: 592px; top: 460px; width: 116px; height: 40px; background: #e8c547; border: 4px solid var(--blekk); border-radius: 20px"></div>
+        <div id="cup1" class="it" style="left: 520px; top: 612px; width: 76px; height: 96px; background: #8a5a3b; border-radius: 14px"></div>
+        <div id="cup2" class="it" style="left: 628px; top: 612px; width: 76px; height: 96px; background: #8a5a3b; border-radius: 14px"></div>
+        <div id="ring" class="abs"></div>
+        <div id="scan" class="abs"></div>
+        <div id="chip-a" class="chip" style="left: 40px; top: 330px">−1 · plukk</div>
+        <div id="chip-b" class="chip" style="left: 190px; top: 630px">+2 · mottak</div>
+        <div id="chip-c" class="chip" style="left: 110px; top: 580px; background: var(--rod)">−1 · mulig svinn</div>
+        <div id="chip-count" class="chip">10 varer talt</div>
+      </div>
+
+      <div id="s3" class="scene clip" data-start="13" data-duration="6" data-track-index="1">
+        <div id="s3-h" class="abs big rv">Hylla.</div>
+        <div id="s3-l1" class="abs txt s3l rv" style="top: 470px">En telefon</div>
+        <div id="s3-l2" class="abs txt s3l rv" style="top: 570px">over bordet.</div>
+        <div id="s3-l3" class="abs big s3l rv" style="top: 700px">Ingen teller.</div>
+      </div>
+
+      <div id="s4" class="scene clip" data-start="19" data-duration="19" data-track-index="1">
+        <div id="s4a-w" class="abs big s4w rv">Plukk.</div>
+        <div id="s4a-s" class="abs txt s4s rv">Ordre 20501 forklarer det.</div>
+        <div id="s4b-w" class="abs big s4w rv">Leveranse.</div>
+        <div id="s4b-s" class="abs txt s4s rv">Restlevering på PO-3001.</div>
+        <div id="s4c-w" class="abs big s4w rv" style="color: var(--rod)">Mulig svinn.</div>
+        <div id="s4c-s" class="abs txt s4s rv">Ingen ordre forklarer det.</div>
+      </div>
+
+      <!-- S5: ekte skjermer -->
+      <div id="s5" class="scene clip" data-start="38" data-duration="7" data-track-index="1">
+        <div id="s5-t" class="abs big rv">Du ser bare det som ikke stemmer.</div>
+        <div id="s5-home" class="abs card"><img src="assets/home.png" alt="Hylla, hjem" /></div>
+        <div id="s5-avvik" class="abs card"><img src="assets/avvik.png" alt="Hylla, avvik" /></div>
+      </div>
+
+      <!-- S6: påstanden og sluttkort -->
+      <div id="s6" class="scene clip" data-start="45" data-duration="9" data-track-index="1">
+        <div id="s6-l1" class="abs big s6l rv" style="top: 140px">Systemet vet hva som<br />skal være der.</div>
+        <div id="s6-l2" class="abs big s6l rv" style="top: 450px">Kameraet ser hva som er der.</div>
+        <div id="s6-l3" class="abs big s6l rv" style="top: 630px">Hylla forklarer forskjellen.</div>
+        <div id="s6-mark" class="abs"><i style="top: 44px"></i><i style="top: 74px"></i><i style="top: 104px"></i></div>
+        <div id="s6-name" class="abs big rv">Hylla</div>
+        <div id="s6-bar" class="abs rv"></div>
+        <div id="s6-tag" class="abs txt rv">Lagertelling som forklarer seg selv.</div>
+      </div>
+
+      <audio id="snd-tick0" src="assets/sfx/sfx_001.mp3" data-start="1.760" data-duration="0.37" data-volume="1.8" data-track-index="10"></audio>
+      <audio id="snd-tick1" src="assets/sfx/sfx_001.mp3" data-start="2.260" data-duration="0.37" data-volume="1.5" data-track-index="10"></audio>
+      <audio id="snd-tick2" src="assets/sfx/sfx_001.mp3" data-start="2.760" data-duration="0.37" data-volume="1.8" data-track-index="10"></audio>
+      <audio id="snd-tick3" src="assets/sfx/sfx_001.mp3" data-start="3.260" data-duration="0.37" data-volume="1.5" data-track-index="10"></audio>
+      <audio id="snd-tick4" src="assets/sfx/sfx_001.mp3" data-start="3.760" data-duration="0.37" data-volume="1.8" data-track-index="10"></audio>
+      <audio id="snd-tick5" src="assets/sfx/sfx_001.mp3" data-start="4.260" data-duration="0.37" data-volume="1.5" data-track-index="10"></audio>
+      <audio id="snd-tick6" src="assets/sfx/sfx_001.mp3" data-start="4.760" data-duration="0.37" data-volume="1.8" data-track-index="10"></audio>
+      <audio id="snd-tick7" src="assets/sfx/sfx_001.mp3" data-start="5.260" data-duration="0.37" data-volume="1.5" data-track-index="10"></audio>
+      <audio id="snd-tick8" src="assets/sfx/sfx_001.mp3" data-start="5.760" data-duration="0.37" data-volume="1.8" data-track-index="10"></audio>
+      <audio id="snd-tick9" src="assets/sfx/sfx_001.mp3" data-start="6.260" data-duration="0.37" data-volume="1.5" data-track-index="10"></audio>
+      <audio id="snd-wipe0" src="assets/sfx/sfx_002.mp3" data-start="6.771" data-duration="0.57" data-volume="0.8" data-track-index="11" data-playback-rate="1"></audio>
+      <audio id="snd-wipe1" src="assets/sfx/sfx_002.mp3" data-start="12.757" data-duration="0.57" data-volume="0.8" data-track-index="11" data-playback-rate="0.92"></audio>
+      <audio id="snd-wipe2" src="assets/sfx/sfx_002.mp3" data-start="18.783" data-duration="0.57" data-volume="0.8" data-track-index="11" data-playback-rate="1.08"></audio>
+      <audio id="snd-wipe3" src="assets/sfx/sfx_002.mp3" data-start="37.765" data-duration="0.57" data-volume="0.8" data-track-index="11" data-playback-rate="0.96"></audio>
+      <audio id="snd-wipe4" src="assets/sfx/sfx_002.mp3" data-start="44.778" data-duration="0.57" data-volume="0.8" data-track-index="11" data-playback-rate="1.04"></audio>
+      <audio id="snd-pop0" src="assets/sfx/sfx_003.mp3" data-start="7.363" data-duration="0.7" data-volume="1.5" data-track-index="12"></audio>
+      <audio id="snd-pop1" src="assets/sfx/sfx_003.mp3" data-start="8.663" data-duration="0.7" data-volume="1.5" data-track-index="12"></audio>
+      <audio id="snd-pop2" src="assets/sfx/sfx_003.mp3" data-start="18.013" data-duration="0.7" data-volume="1.5" data-track-index="12"></audio>
+      <audio id="snd-pop3" src="assets/sfx/sfx_003.mp3" data-start="21.663" data-duration="0.7" data-volume="1.5" data-track-index="12"></audio>
+      <audio id="snd-pop4" src="assets/sfx/sfx_003.mp3" data-start="27.713" data-duration="0.7" data-volume="1.5" data-track-index="12"></audio>
+      <audio id="snd-pop5" src="assets/sfx/sfx_003.mp3" data-start="33.413" data-duration="0.7" data-volume="1.5" data-track-index="12"></audio>
+      <audio id="snd-cup1" src="assets/sfx/sfx_001.mp3" data-start="26.910" data-duration="0.37" data-volume="1.6" data-track-index="10"></audio>
+      <audio id="snd-cup2" src="assets/sfx/sfx_001.mp3" data-start="27.460" data-duration="0.37" data-volume="1.4" data-track-index="10"></audio>
+      <audio id="snd-hit" src="assets/sfx/sfx_004.mp3" data-start="50.460" data-duration="2.1" data-volume="0.55" data-track-index="13"></audio>
+
+      <div id="wipe"></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      const IN = "inset(0 0% 0 0)";
+      const OUT = "inset(0 100% 0 0)";
+      const rv = (sel, t, d = 0.5) => tl.fromTo(sel, { clipPath: OUT }, { clipPath: IN, duration: d, ease: "power3.out" }, t);
+      const hide = (sel, t, d = 0.3) => tl.to(sel, { clipPath: "inset(0 0 0 100%)", duration: d, ease: "power3.in" }, t);
+
+      // Bakgrunn mellom scener
+      tl.set("#bg", { backgroundColor: "#f4c430" }, 0);
+      tl.set("#bg", { backgroundColor: "#f7f8f7" }, 19);
+      tl.set("#bg", { backgroundColor: "#f4c430" }, 38);
+
+      // Scenebytte: blekkplate feier over
+      tl.set("#wipe", { xPercent: -101 }, 0);
+      [7, 13, 19, 38, 45].forEach((T) => {
+        tl.fromTo("#wipe", { xPercent: -101 }, { xPercent: 0, duration: 0.2, ease: "power2.in" }, T - 0.2);
+        tl.to("#wipe", { xPercent: 101, duration: 0.25, ease: "power2.out" }, T);
+      });
+
+      // ---------- S1: Hver dag ----------
+      tl.set("#s1-h1", { clipPath: IN }, 0);
+      rv("#s1-sub", 0.5, 0.7);
+      tl.fromTo("#cb", { y: 0, rotation: 7 }, { y: 0, rotation: 3, duration: 0.9, ease: "power3.out" }, 0);
+      tl.to("#cb", { scale: 1.05, duration: 5.5, ease: "none" }, 1.1);
+      tl.set(".tk", { strokeDasharray: 120, strokeDashoffset: 120 }, 0);
+      tl.fromTo("#pencil", { y: 0, rotation: -28, x: 0 }, { y: 0, rotation: -28, duration: 0.01 }, 0);
+      const rows = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      rows.forEach((i) => {
+        const t = 1.6 + i * 0.5;
+        tl.to("#pencil", { x: -30, y: i * 70, duration: 0.2, ease: "power2.inOut" }, t);
+        tl.to(document.querySelectorAll(".tk")[i], { strokeDashoffset: 0, duration: 0.25, ease: "power2.out" }, t + 0.15);
+      });
+
+      // ---------- S2: Tallene stemmer ikke ----------
+      tl.fromTo("#s2-ll, #s2-n1", { opacity: 0, scale: 1.5, transformOrigin: "0 50%" }, { opacity: 1, scale: 1, duration: 0.35, ease: "power4.out" }, 7.3);
+      tl.fromTo("#s2-rl, #s2-n2", { opacity: 0, scale: 1.5, transformOrigin: "0 50%" }, { opacity: 1, scale: 1, duration: 0.35, ease: "power4.out" }, 8.6);
+      tl.fromTo("#s2-band", { clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0% 0 0 0)", duration: 0.35, ease: "power3.out" }, 10.4);
+      rv("#s2-band-t", 10.7, 0.6);
+
+      // ---------- S3: Hylla + bordet ----------
+      tl.fromTo("#tbl", { x: 900 }, { x: 0, duration: 0.7, ease: "power3.out" }, 13.15);
+      rv("#s3-h", 13.5, 0.6);
+      rv("#s3-l1", 14.4, 0.4);
+      rv("#s3-l2", 14.7, 0.4);
+      rv("#s3-l3", 15.5, 0.5);
+      tl.set("#scan", { opacity: 0 }, 0);
+      tl.fromTo("#scan", { opacity: 1, y: 60 }, { opacity: 1, y: 660, duration: 1.3, ease: "power1.inOut" }, 16.4);
+      tl.to("#scan", { opacity: 0, duration: 0.15 }, 17.7);
+      tl.fromTo("#chip-count", { opacity: 0, scale: 1.4, transformOrigin: "0 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "power4.out" }, 17.9);
+      tl.set("#chip-a, #chip-b, #chip-c, #ring, #cup1, #cup2", { opacity: 0 }, 0);
+
+      // ---------- S4: tre forklaringer ----------
+      // a) plukk
+      rv("#s4a-w", 19.4, 0.5);
+      rv("#s4a-s", 20.0, 0.5);
+      tl.to("#chip-count", { opacity: 0, duration: 0.2 }, 19.5);
+      tl.to("#it0", { y: -14, scale: 1.15, duration: 0.35, ease: "power2.out" }, 20.6);
+      tl.to("#it0", { y: -520, opacity: 0, duration: 0.7, ease: "power2.in" }, 21.0);
+      tl.fromTo("#chip-a", { opacity: 0, scale: 1.4, transformOrigin: "0 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "power4.out" }, 21.6);
+      hide("#s4a-w", 24.4);
+      hide("#s4a-s", 24.5);
+      tl.to("#chip-a", { opacity: 0, duration: 0.25 }, 24.6);
+      // b) leveranse
+      rv("#s4b-w", 25.0, 0.5);
+      rv("#s4b-s", 25.6, 0.5);
+      tl.fromTo("#cup1", { y: -700, opacity: 1 }, { y: 0, opacity: 1, duration: 0.55, ease: "power2.in" }, 26.4);
+      tl.fromTo("#cup2", { y: -700, opacity: 1 }, { y: 0, opacity: 1, duration: 0.55, ease: "power2.in" }, 26.9);
+      tl.fromTo("#chip-b", { opacity: 0, scale: 1.4, transformOrigin: "0 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "power4.out" }, 27.7);
+      hide("#s4b-w", 30.6);
+      hide("#s4b-s", 30.7);
+      tl.to("#chip-b", { opacity: 0, duration: 0.25 }, 30.8);
+      // c) mulig svinn
+      rv("#s4c-w", 31.2, 0.5);
+      rv("#s4c-s", 31.9, 0.5);
+      tl.to("#it7", { scale: 0.3, opacity: 0, duration: 0.5, ease: "power2.in" }, 32.7);
+      tl.fromTo("#ring", { opacity: 1, scale: 0.7 }, { opacity: 1, scale: 1.2, duration: 0.35, ease: "power3.out" }, 33.2);
+      tl.to("#ring", { opacity: 0, duration: 0.5 }, 34.0);
+      tl.fromTo("#chip-c", { opacity: 0, scale: 1.4, transformOrigin: "0 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "power4.out" }, 33.4);
+
+      tl.to("#tbl", { scale: 1.04, transformOrigin: "50% 50%", duration: 3.4, ease: "none" }, 34.4);
+
+      // ---------- S5: ekte skjermer ----------
+      rv("#s5-t", 38.4, 0.7);
+      tl.fromTo("#s5-home", { y: 140, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 39.2);
+      tl.fromTo("#s5-avvik", { y: 140, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 40.0);
+
+      tl.to("#s5-home", { scale: 1.03, duration: 4.1, ease: "none" }, 40.7);
+      tl.to("#s5-avvik", { scale: 1.03, duration: 4.1, ease: "none" }, 40.7);
+
+      // ---------- S6: påstand + sluttkort ----------
+      rv("#s6-l1", 45.4, 0.7);
+      rv("#s6-l2", 47.0, 0.6);
+      rv("#s6-l3", 48.4, 0.6);
+      ["#s6-l1", "#s6-l2", "#s6-l3"].forEach((s, i) => hide(s, 49.9 + i * 0.05, 0.3));
+      tl.fromTo("#s6-mark", { scale: 0, rotation: -20, opacity: 0, transformOrigin: "50% 50%" }, { scale: 1, rotation: 0, opacity: 1, duration: 0.5, ease: "back.out(1.6)" }, 50.4);
+      rv("#s6-name", 50.6, 0.5);
+      rv("#s6-bar", 50.9, 0.5);
+      rv("#s6-tag", 51.2, 0.5);
+      tl.set("#s6-mark", { opacity: 0 }, 0);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

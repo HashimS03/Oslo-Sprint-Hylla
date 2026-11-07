@@ -1,0 +1,481 @@
+{
+  "ok": true,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 8,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "timeline_track_too_dense",
+        "severity": "warning",
+        "message": "Track 1 has 6 timed elements in this HTML file. Smaller sub-compositions keep timelines easier to read, iterate on, and diff.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/film/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move coherent scene groups into separate .html files under compositions/ and mount them from the parent with data-composition-src so the timeline stays easier to inspect, revise, and validate."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s1\"> is a timeline element that contains nested <div id=\"s1-h1\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s1",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/film/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s1\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s2\"> is a timeline element that contains nested <div id=\"s2-l\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s2",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/film/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s2\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"tbl\"> is a timeline element that contains nested <div id=\"tbl-top\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#tbl",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/film/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"tbl\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s3\"> is a timeline element that contains nested <div id=\"s3-h\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s3",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/film/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s3\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s4\"> is a timeline element that contains nested <div id=\"s4a-w\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s4",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/film/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s4\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s5\"> is a timeline element that contains nested <div id=\"s5-t\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s5",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/film/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s5\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"s6\"> is a timeline element that contains nested <div id=\"s6-l1\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#s6",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/film/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"s6\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      }
+    ],
+    "filesScanned": 1
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 1,
+    "findings": [
+      {
+        "code": "canvas_overflow",
+        "severity": "info",
+        "time": 8.667,
+        "selector": "#s2-n2",
+        "message": "Text extends outside the composition canvas.",
+        "rect": {
+          "left": 1089.12,
+          "top": -4.26,
+          "right": 1552.26,
+          "bottom": 904.26,
+          "width": 463.14,
+          "height": 908.52
+        },
+        "containerSelector": "#root",
+        "text": "2",
+        "fixHint": "Move the text inward, reduce its size, or mark intentional off-canvas animation with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "top": 4.26
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1089.12,
+          "y": -4.26,
+          "width": 463.14,
+          "height": 908.52
+        },
+        "firstSeen": 8.667,
+        "lastSeen": 8.667,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          8.667
+        ]
+      }
+    ],
+    "duration": 52,
+    "samples": [
+      2.889,
+      8.667,
+      14.444,
+      20.222,
+      26,
+      31.778,
+      37.556,
+      43.333,
+      49.111
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 1,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": true,
+    "samples": [
+      2.889,
+      14.444,
+      26,
+      37.556,
+      49.111
+    ],
+    "checked": 35,
+    "passed": 35
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 5,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "film_silent",
+        "severity": "warning",
+        "message": "This 52 s film has no sound source (no <audio>, no <video> with sound): add a music bed and sounds on the visible actions unless the person asked for silence; see references/sound.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 3.38 s (34.38–37.75 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 34.375,
+        "seconds": 3.375,
+        "floorSeconds": 3,
+        "until": 37.75
+      },
+      {
+        "code": "dead_stretch",
+        "severity": "warning",
+        "message": "Nothing on screen changes for 4.13 s (40.63–44.75 s): start the next move within 3 s, or put data-hold on the element whose stillness is deliberate; see references/motion.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 40.625,
+        "seconds": 4.125,
+        "floorSeconds": 3,
+        "until": 44.75
+      },
+      {
+        "code": "line_unread",
+        "severity": "warning",
+        "message": "The film's last line \"Hylla\" (1 word) is on screen 1.36 s (±0.01 s), under the 2.00 s a closing line needs: hold it about 0.5 s + 0.3 s a word and at least 2 s before the film ends; see references/motion.md.",
+        "text": "Hylla",
+        "selector": "#s6-name",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 330,
+          "y": 181,
+          "width": 731.6700000000001,
+          "height": 363
+        },
+        "time": 50.641,
+        "words": 1,
+        "seconds": 1.363,
+        "floorSeconds": 2,
+        "measured": [
+          {
+            "time": 50.375,
+            "opacity": null,
+            "heightPx": null
+          },
+          {
+            "time": 50.5,
+            "opacity": null,
+            "heightPx": null
+          },
+          {
+            "time": 50.625,
+            "opacity": null,
+            "heightPx": null
+          },
+          {
+            "time": 50.75,
+            "opacity": 1,
+            "heightPx": 363
+          },
+          {
+            "time": 50.875,
+            "opacity": 1,
+            "heightPx": 363
+          },
+          {
+            "time": 51,
+            "opacity": 1,
+            "heightPx": 363
+          },
+          {
+            "time": 51.125,
+            "opacity": 1,
+            "heightPx": 363
+          },
+          {
+            "time": 51.5,
+            "opacity": 1,
+            "heightPx": 363
+          },
+          {
+            "time": 51.625,
+            "opacity": 1,
+            "heightPx": 363
+          },
+          {
+            "time": 51.75,
+            "opacity": 1,
+            "heightPx": 363
+          },
+          {
+            "time": 51.875,
+            "opacity": 1,
+            "heightPx": 363
+          }
+        ]
+      },
+      {
+        "code": "line_unread",
+        "severity": "warning",
+        "message": "The film's last line \"Lagertelling som forklarer seg selv.\" (5 words) is on screen 0.77 s (±0.01 s), under the 2.00 s a closing line needs: hold it about 0.5 s + 0.3 s a word and at least 2 s before the film ends; see references/motion.md.",
+        "text": "Lagertelling som forklarer seg selv.",
+        "selector": "#s6-tag",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 124,
+          "y": 765,
+          "width": 1266.38,
+          "height": 92
+        },
+        "time": 51.234,
+        "words": 5,
+        "seconds": 0.77,
+        "floorSeconds": 2,
+        "measured": [
+          {
+            "time": 50.875,
+            "opacity": null,
+            "heightPx": null
+          },
+          {
+            "time": 51,
+            "opacity": null,
+            "heightPx": null
+          },
+          {
+            "time": 51.125,
+            "opacity": null,
+            "heightPx": null
+          },
+          {
+            "time": 51.25,
+            "opacity": 1,
+            "heightPx": 92
+          },
+          {
+            "time": 51.375,
+            "opacity": 1,
+            "heightPx": 92
+          },
+          {
+            "time": 51.5,
+            "opacity": 1,
+            "heightPx": 92
+          },
+          {
+            "time": 51.625,
+            "opacity": 1,
+            "heightPx": 92
+          },
+          {
+            "time": 51.75,
+            "opacity": 1,
+            "heightPx": 92
+          },
+          {
+            "time": 51.875,
+            "opacity": 1,
+            "heightPx": 92
+          }
+        ]
+      }
+    ],
+    "enabled": true,
+    "step": 0.125,
+    "samples": 416
+  },
+  "audio": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 1,
+    "findings": [
+      {
+        "code": "audio_none",
+        "severity": "info",
+        "message": "The film has no sound: no clip in it plays audio.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0
+      }
+    ]
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}

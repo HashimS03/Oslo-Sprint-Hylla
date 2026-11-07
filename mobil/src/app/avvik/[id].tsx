@@ -36,7 +36,6 @@ export default function Avvik() {
       bunn={
         a && apen ? (
           <>
-            <Knapp tekst="Tell på nytt" ikon="kamera" onPress={() => router.push({ pathname: "/tell/[hylle]", params: { hylle: a.hylle } })} />
             <Knapp tekst="Marker funnet" variant="mork" laster={jobber === "funnet"} onPress={() => lukk("funnet")} />
             <View style={{ alignItems: "center", paddingVertical: 4 }}>
               <LenkeKnapp

@@ -51,8 +51,7 @@ export default function Hjem() {
 
       <Rad gap={8}>
         <Tall tall={data ? String(data.varerPaaLager) : "–"} tekst="varer på lager" />
-        <Tall tall={data ? `${data.taltIdag}/${data.antallHyller}` : "–"} tekst="hyller talt" onPress={() => router.navigate("/tell")} />
-        <Tall
+                <Tall
           tall={String(avvik)}
           tekst="mulig svinn"
           rod={avvik > 0}
@@ -60,7 +59,7 @@ export default function Hjem() {
         />
       </Rad>
 
-      <Knapp tekst="Tell en hylle" ikon="kamera" pil onPress={() => router.navigate("/tell")} />
+      <Knapp tekst="Skann" ikon="skann" pil onPress={() => router.navigate("/skann")} />
       <Knapp tekst="Spør Hylla" undertekst="Hold inne og snakk" ikon="mikrofon" variant="mork" onPress={() => router.navigate("/spor")} />
 
       <Seksjon tittel="Siste hendelser" hoyre={<LenkeKnapp tekst="Se alle" onPress={() => router.navigate("/logg")} />}>

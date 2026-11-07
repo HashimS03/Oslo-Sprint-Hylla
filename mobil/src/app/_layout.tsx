@@ -27,7 +27,6 @@ export default function RotLayout() {
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: F.bg } }}>
         <Stack.Screen name="(faner)" />
-        <Stack.Screen name="tell/[hylle]" options={{ gestureEnabled: false }} />
         <Stack.Screen name="kamera/[hylle]" options={{ gestureEnabled: false, contentStyle: { backgroundColor: F.mork } }} />
       </Stack>
     </>
