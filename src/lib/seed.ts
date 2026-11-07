@@ -53,7 +53,7 @@ export function lagSeed(): State {
     h(3, 9, 0, T, "EPLE-GRONN", 6, "mottak", "Mottak PO-3010", "PO-3010"),
     h(1, 16, 0, T, "EPLE-GRONN", -2, "plukk", "Plukk, 2 ordrer", "20497–20498"),
     h(3, 9, 0, T, "BANAN", 5, "mottak", "Mottak PO-3010", "PO-3010"),
-    h(0, 8, 30, T, "BANAN", -2, "plukk", "Plukk, 2 ordrer", "20499–20500"),
+    h(0, 7, 45, T, "BANAN", -2, "plukk", "Plukk, 2 ordrer", "20499–20500"), // før tellingen kl. 08:00
   ];
   // Beholdning etter dette: brus 4, vann 3, sjokolade 5, korn 2, kaffekopp 3, krus 3, notatbok 4, penn 3, eple 4, banan 3.
 

@@ -39,7 +39,7 @@ Slik teller du:
 - Hvis du ikke kan se hele stabelen eller er i tvil om ett plagg, gi ditt beste anslag i "antall", sett "sikkerhet" lavere og legg det nest mest sannsynlige tallet i "alternativ". Ellers er "alternativ" null.
 - "merknad" er en kort setning på norsk, for eksempel "stabel 3 er delvis skjult".
 - Varer du ser som ikke står på listen, beskriver du kort i "ukjente".
-- Du får forrige telling som hjelp, men tell det du faktisk ser. Ikke juster mot forrige tall.`;
+- Du får ikke vite hvor mange som skal stå her. Tell bare det du faktisk ser.`;
 
 const SKJEMA = {
   type: "object",
@@ -79,7 +79,8 @@ function bildeBlokk(dataUrl: string): Anthropic.Beta.BetaImageBlockParam {
 export const claudeTeller: Teller = {
   navn: "claude",
   async tell({ state, hylle, bilde }) {
-    const client = new Anthropic();
+    // Tidsavbrudd, så en treg telling ikke låser skjermen til Vercel stopper kallet etter 60 s.
+    const client = new Anthropic({ timeout: 40_000, maxRetries: 1 });
     const forrige = sisteTelling(state, hylle.id);
     const content: Anthropic.Beta.BetaContentBlockParam[] = [];
 
@@ -95,7 +96,8 @@ export const claudeTeller: Teller = {
     const liste = hylle.innhold
       .map((p) => {
         const v = vare(state, p.sku);
-        return `- ${p.sku}: ${v?.navn ?? p.sku}, ${v?.beskrivelse ?? ""}. Ligger ${p.nivaa} på hylla. Forrige antall: ${beholdning(state, p.sku, hylle.id)}`;
+        // Bevisst uten forventet antall: da kan ikke tellingen dras mot loggen og skjule svinn.
+        return `- ${p.sku}: ${v?.navn ?? p.sku}, ${v?.beskrivelse ?? ""}. Ligger ${p.nivaa} på hylla.`;
       })
       .join("\n");
 
@@ -153,7 +155,8 @@ function eksternTeller(navn: string, urlVar: string): Teller {
             ...(process.env[urlVar.replace(/_URL$/, "_TOKEN")] ? { authorization: `Bearer ${process.env[urlVar.replace(/_URL$/, "_TOKEN")]}` } : {}),
           },
           body: JSON.stringify({ hylle: hylle.id, bilde, varer }),
-          signal: AbortSignal.timeout(55_000),
+          // Kort nok til at /api/tell rekker å prøve Claude som reserve innen 60 s.
+          signal: AbortSignal.timeout(20_000),
         });
       } catch {
         throw new Error(`Får ikke kontakt med ${navn}-tjenesten på ${url}`);
@@ -217,7 +220,7 @@ async function sam31Antall(bilde: string, prompt: string): Promise<number[]> {
       stream: false,
       metadata: { include_confidence: "true", mask_encoding: "one_bit" },
     }),
-    signal: AbortSignal.timeout(40_000),
+    signal: AbortSignal.timeout(20_000),
   });
   if (!res.ok) throw new Error(`Meta API svarte ${res.status}: ${(await res.text()).slice(0, 200)}`);
   return parseBokser(await res.text());

@@ -133,13 +133,18 @@ export function forklar(s: State, hylle: string, sku: string, diff: number): For
   const deler: ForslagEndring["deler"] = [];
   let rest = diff;
   if (rest > 0) {
-    for (const po of s.innkjop.filter((i) => i.sku === sku && i.mottatt < i.bestilt)) {
+    // Bare innkjøp til denne hylla, eldste først. Ellers blir en vare som er satt på feil hylle
+    // et falskt mottak her og et falskt svinn på riktig hylle.
+    const apne = s.innkjop
+      .filter((i) => i.sku === sku && i.hylle === hylle && i.mottatt < i.bestilt)
+      .sort((a, b) => a.bestiltDato.localeCompare(b.bestiltDato));
+    for (const po of apne) {
       if (rest <= 0) break;
       const n = Math.min(rest, po.bestilt - po.mottatt);
       deler.push({ type: "mottak", endring: n, aarsak: `Restlevering på ${po.id}`, ref: po.id });
       rest -= n;
     }
-    if (rest > 0) deler.push({ type: "korrigering", endring: rest, aarsak: "Flere enn ventet, ingen åpen innkjøpsordre" });
+    if (rest > 0) deler.push({ type: "korrigering", endring: rest, aarsak: "Ukjent mottak: ingen åpen innkjøpsordre til denne hylla. Sjekk om varen er flyttet hit eller kommet i retur" });
   } else {
     for (const o of s.ordrer.filter((x) => x.sku === sku && x.hylle === hylle && x.status === "apen")) {
       if (rest >= 0) break;

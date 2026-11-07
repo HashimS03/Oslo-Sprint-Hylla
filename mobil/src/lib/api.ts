@@ -55,11 +55,17 @@ async function kall<T>(sti: string, init: RequestInit, nettverksfeil: string): P
   const pin = await lesPin();
   const headers = new Headers(init.headers);
   if (pin) headers.set("x-hylla-secret", pin);
+  // Tidsavbrudd litt over serverens grense (60 s), så skjermen aldri henger for alltid.
+  const avbryt = new AbortController();
+  const tidsur = setTimeout(() => avbryt.abort(), 70_000);
   try {
-    return await svar<T>(await fetch(apiUrl() + sti, { ...init, headers }));
+    return await svar<T>(await fetch(apiUrl() + sti, { ...init, headers, signal: avbryt.signal }));
   } catch (e) {
     if (e instanceof ApiFeil) throw e;
+    if (avbryt.signal.aborted) throw new ApiFeil("Serveren svarte ikke på 70 sekunder. Prøv igjen.", 0);
     throw new ApiFeil(`${nettverksfeil} (${e instanceof Error ? e.message : String(e)})`, 0);
+  } finally {
+    clearTimeout(tidsur);
   }
 }
 

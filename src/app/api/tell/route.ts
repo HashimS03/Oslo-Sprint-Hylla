@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { hentState } from "@/lib/store";
 import { lagForslag } from "@/lib/lager";
-import { velgTeller } from "@/lib/teller";
+import { claudeTeller, velgTeller } from "@/lib/teller";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -14,10 +14,20 @@ export async function POST(req: Request) {
   if (!hylle) return NextResponse.json({ feil: `Ukjent hylle ${hylleId}` }, { status: 404 });
   if (!bilde && !demo) return NextResponse.json({ feil: "Mangler bilde" }, { status: 400 });
 
-  const teller = velgTeller(demo || !bilde);
+  let teller = velgTeller(demo || !bilde);
   const start = Date.now();
   try {
-    const resultat = await teller.tell({ state, hylle, bilde: bilde ?? "" });
+    let resultat;
+    try {
+      resultat = await teller.tell({ state, hylle, bilde: bilde ?? "" });
+    } catch (e) {
+      // Reserve: hvis SAM 3- eller YOLO-tjenesten er nede eller treg, teller Claude i stedet.
+      const harClaude = !!(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
+      if ((teller.navn !== "sam3" && teller.navn !== "yolo") || !harClaude || !bilde) throw e;
+      console.error(`${teller.navn} feilet, bruker Claude:`, e);
+      teller = claudeTeller;
+      resultat = await teller.tell({ state, hylle, bilde });
+    }
     const forslag = lagForslag(state, hylle.id, resultat, teller.navn, Math.round((Date.now() - start) / 100) / 10);
     return NextResponse.json({ forslag });
   } catch (e) {
