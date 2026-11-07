@@ -12,6 +12,9 @@ const FARGER = [
   { navn: "rød", hex: "#B3362A" },
   { navn: "blå", hex: "#2F5D8A" },
   { navn: "grønn", hex: "#2F7D55" },
+  { navn: "gul", hex: "#F4C430" },
+  { navn: "oransje", hex: "#E07B2A" },
+  { navn: "brun", hex: "#8A5A3B" },
 ];
 const STR = ["S", "M", "L", "XL", "One size"];
 
@@ -24,6 +27,8 @@ export function NyttProduktSkjema({ hyller }: { hyller: string[] }) {
   const [str, setStr] = useState("M");
   const [farge, setFarge] = useState(FARGER[2]);
   const [bilder, setBilder] = useState<string[]>([]);
+  const [antall, setAntall] = useState("");
+  const [prompt, setPrompt] = useState("");
   const [feil, setFeil] = useState("");
   const [lagrer, setLagrer] = useState(false);
 
@@ -46,6 +51,8 @@ export function NyttProduktSkjema({ hyller }: { hyller: string[] }) {
         farge: farge.navn,
         swatch: farge.hex,
         bilder,
+        antall: Number(antall) || 0,
+        prompt,
         beskrivelse: `${navn}, ${farge.navn}, størrelse ${str}`,
       }),
     });
@@ -103,6 +110,16 @@ export function NyttProduktSkjema({ hyller }: { hyller: string[] }) {
             <datalist id="hyller">{hyller.map((h) => <option key={h} value={h} />)}</datalist>
           </div>
         </div>
+        <div className="grid grid-cols-2 gap-2.5">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="antall" className="text-[13px] font-semibold">Antall på hylla nå</label>
+            <input id="antall" inputMode="numeric" value={antall} onChange={(e) => setAntall(e.target.value.replace(/\D/g, ""))} placeholder="0" className={felt} />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="prompt" className="text-[13px] font-semibold">På engelsk (for kameraet)</label>
+            <input id="prompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="red soda can" className={felt} />
+          </div>
+        </div>
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px] font-semibold">Størrelse</span>
           <div className="flex gap-1.5">
@@ -113,7 +130,7 @@ export function NyttProduktSkjema({ hyller }: { hyller: string[] }) {
         </div>
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px] font-semibold">Farge</span>
-          <div className="flex gap-2.5">
+          <div className="flex flex-wrap gap-2.5">
             {FARGER.map((f) => (
               <button key={f.navn} onClick={() => setFarge(f)} aria-label={f.navn} className="h-[34px] w-[34px] rounded-full border border-[#BDBAB4]" style={{ background: f.hex, outline: f === farge ? "2.5px solid #1B2226" : "none", outlineOffset: 2 }} />
             ))}

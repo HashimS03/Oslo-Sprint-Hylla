@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { lagSeed } from "./seed";
+import { lagSeed, lagStart, lagTom } from "./seed";
 import type { State } from "./types";
 
 // Lagring av hele lagerets tilstand.
@@ -31,15 +31,15 @@ export function lagringstype(): "supabase" | "minne" {
 export async function hentState(): Promise<State> {
   const sb = supabase();
   if (!sb) {
-    if (!g.__hyllaState) g.__hyllaState = lagSeed();
+    if (!g.__hyllaState) g.__hyllaState = lagStart();
     return g.__hyllaState;
   }
   const { data, error } = await sb.from("hylla_state").select("data").eq("id", RAD_ID).maybeSingle();
   if (error) throw new Error(`Supabase: ${error.message}`);
   if (data?.data) return data.data as State;
-  const seed = lagSeed();
-  await lagreState(seed);
-  return seed;
+  const start = lagStart();
+  await lagreState(start);
+  return start;
 }
 
 export async function lagreState(state: State): Promise<void> {
@@ -67,6 +67,7 @@ export function endreState<T>(fn: (s: State) => T | Promise<T>): Promise<T> {
   return neste;
 }
 
-export async function nullstill(): Promise<void> {
-  await lagreState(lagSeed());
+/** Tilbake til demodataene, eller et helt tomt lager med `tom`. */
+export async function nullstill(tom = false): Promise<void> {
+  await lagreState(tom ? lagTom() : lagSeed());
 }
