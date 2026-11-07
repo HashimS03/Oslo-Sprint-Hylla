@@ -16,7 +16,7 @@ export default function FaneLayout() {
       )}
     >
       <Tabs.Screen name="index" />
-      <Tabs.Screen name="tell" />
+      <Tabs.Screen name="skann" />
       <Tabs.Screen name="spor" />
       <Tabs.Screen name="logg" />
       <Tabs.Screen name="varer" />
