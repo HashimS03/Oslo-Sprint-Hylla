@@ -37,7 +37,7 @@
         "expo-camera",
         {
           "cameraPermission": "Hylla bruker kameraet til å telle varene på hylla.",
-          "microphonePermission": false,
+          "microphonePermission": "Hylla bruker mikrofonen når du holder inne og spør.",
           "recordAudioAndroid": false
         }
       ],
