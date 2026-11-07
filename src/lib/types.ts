@@ -83,6 +83,10 @@ export type Hendelse = {
   tellingId?: string;
   /** Bare for type mulig_svinn. */
   avvik?: { status: AvvikStatus; forrigeTellingId?: string; lukketTid?: string };
+  /** Navnet til den ansatte som meldte avviket fra scannerappen. */
+  meldtAv?: string;
+  /** Fritekst fra den ansatte (scannerappen). */
+  notat?: string;
 };
 
 export type Telling = {
@@ -144,6 +148,8 @@ export type State = {
   ordrer: Ordre[];
   kameraer: Kamera[];
   innstillinger: Innstillinger;
+  /** Oppgaver til de ansatte (scannerappen). Valgfri, så eldre lagrede tilstander fortsatt virker. */
+  oppgaver?: Oppgave[];
   /** Oppdrag sendt til skannerne. Mangler i eldre lagrede tilstander. */
   oppdrag?: Oppdrag[];
   /** Hendelser fra takkamera, nyeste sist. Matcheren leser dem og sammenligner med skanninger. */
@@ -214,6 +220,30 @@ export type MatcherAvvik = {
   status: "apen" | "loest" | "falsk_alarm";
   /** Meldingen som sendes til skanneren (pip + tekst). */
   varsel?: { melding: string };
+};
+
+// ---------- Oppgaver (scannerappen) ----------
+
+export type OppgaveStatus = "ny" | "pagar" | "ferdig";
+export type OppgaveType = "pafyll" | "sjekk" | "avvik" | "annet";
+
+export type Oppgave = {
+  id: string;
+  tittel: string;
+  beskrivelse?: string;
+  type: OppgaveType;
+  hylle?: string;
+  sku?: string;
+  /** Kobling til en mulig_svinn-hendelse. Når oppgaven blir ferdig, lukkes avviket. */
+  avvikId?: string;
+  prioritet: "hoy" | "normal";
+  status: OppgaveStatus;
+  opprettet: string; // ISO
+  opprettetAv: "driftsleder" | "ansatt" | "takkamera";
+  tattAv?: string;
+  ferdigTid?: string;
+  /** Hva den ansatte svarte for en avvik-oppgave. */
+  utfall?: "funnet" | "svinn";
 };
 
 // ---------- Telling ----------

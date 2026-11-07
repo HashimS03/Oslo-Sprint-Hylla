@@ -19,7 +19,7 @@ export type HylleRad = {
   innhold: { sku: string; nivaa: string; navn: string; antall: number }[];
 };
 
-export type HylleDetalj = HylleRad & { forrige: { tid: string; bilde: string | null } | null; sporNaarUsikker: boolean };
+export type HylleDetalj = HylleRad & { forrige: { tid: string; bilde: string | null } | null; sporNaarUsikker: boolean; svarHoyt?: boolean };
 
 export type Avvik = LoggRad & {
   nivaa: string | null; status: string; lukketTid: string | null;
@@ -54,6 +54,8 @@ export type InnstillingerSvar = {
 export type ForslagEndring = {
   sku: string; navn: string; nivaa: string; swatch: string; forrige: number; na: number;
   sikkerhet: number; alternativ: number | null;
+  /** Tellingen er for usikker til å kalle noe svinn. Lagres ikke før brukeren bekrefter tallet. */
+  tellIgjen?: string;
   deler: { type: HendelseType; endring: number; aarsak: string; ref?: string }[];
 };
 
@@ -69,3 +71,27 @@ export type Kort =
   | { type: "logg"; tittel: string; rader: { tid: string; tekst: string; endring: number; type: HendelseType }[] };
 
 export type SporSvar = { sporsmal?: string; svar: string; kort: Kort[]; kilde: string; lyd?: string; feil?: string; trengerTekst?: boolean };
+
+// ---------- Scannerappen ----------
+
+export type OppgaveStatus = "ny" | "pagar" | "ferdig";
+
+export type Oppgave = {
+  id: string; tittel: string; beskrivelse?: string; type: "pafyll" | "sjekk" | "avvik" | "annet";
+  hylle?: string; sku?: string; avvikId?: string; prioritet: "hoy" | "normal"; status: OppgaveStatus;
+  opprettet: string; opprettetAv: "driftsleder" | "ansatt" | "takkamera"; tattAv?: string; ferdigTid?: string;
+  utfall?: "funnet" | "svinn";
+  vareNavn: string | null; swatch: string | null; hylleNavn: string | null;
+};
+
+export type OppgaverSvar = { oppgaver: Oppgave[]; nye: number };
+
+/** Varen slik scannerappen ser den (GET /api/skann/[kode]). Uten avvik og historikk. */
+export type SkannVare = {
+  sku: string; navn: string; farge: string; storrelse: string; swatch: string; bilde: string | null;
+  beskrivelse: string | null; antall: number;
+  hyller: { id: string; navn: string; nivaa: string | null; antall: number }[];
+  oppgaver: Oppgave[];
+};
+
+export type AvvikGrunn = "mangler" | "skadet" | "feil_plass" | "annet";
