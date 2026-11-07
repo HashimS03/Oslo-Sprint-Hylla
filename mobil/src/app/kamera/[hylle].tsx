@@ -6,19 +6,32 @@ import { useKeepAwake } from "expo-keep-awake";
 import * as Battery from "expo-battery";
 import * as Device from "expo-device";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import type { Forslag, InnstillingerSvar } from "@/lib/typer";
-import { hent, send } from "@/lib/api";
+import type { Forslag } from "@/lib/typer";
+import { send } from "@/lib/api";
 import { tilJpeg } from "@/lib/bilde";
 import { F, S } from "@/lib/tema";
 import { fortegn, klokke } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
 import { Display, Knapp, Mono, Rad, Txt } from "@/components/ui";
 
-type Hendelse = { tid: string; tekst: string; endring?: number };
+type Hendelse = { tid: string; tekst: string; endring?: number; ny?: boolean };
+type Status = "starter" | "bevegelse" | "stille" | "uendret" | "teller" | "pause" | "feil";
+type RammeSvar = { status: Status | "talt"; bevegelse: number; endring: number; forslag?: Forslag; feil?: string };
+
+const STATUS_TEKST: Record<Status, string> = {
+  starter: "Starter …",
+  bevegelse: "Ser bevegelse",
+  stille: "Venter på ro",
+  uendret: "Alt som før",
+  teller: "Teller …",
+  pause: "Kort pause",
+  feil: "Feil",
+};
 
 /**
- * Kameratelefonen: står på stativ foran én hylle, holder skjermen våken,
- * tar bilde med jevne mellomrom og sender det til /api/kamera/bilde, som teller og lagrer.
+ * Kameratelefonen («RFID-kameraet»): står på stativ foran bordet eller hylla, holder skjermen våken
+ * og sender et bilde til /api/kamera/ramme hvert sekund. Backend teller bare når noe er flyttet og bildet har roet seg,
+ * og lagrer endringene i loggen med en gang.
  */
 export default function KameraStasjon() {
   useKeepAwake();
@@ -27,11 +40,10 @@ export default function KameraStasjon() {
   const [tillatelse, spor] = useCameraPermissions();
   const kamera = useRef<CameraView>(null);
   const [klar, setKlar] = useState(false);
-  const [intervall, setIntervall] = useState(10);
-  const [neste, setNeste] = useState<number>(Date.now() + 15_000);
-  const [jobber, setJobber] = useState(false);
+  const [status, setStatus] = useState<Status>("starter");
+  const [mal, setMal] = useState({ bevegelse: 0, endring: 0 });
   const [logg, setLogg] = useState<Hendelse[]>([]);
-  const [nå, setNå] = useState(Date.now());
+  const tving = useRef(false);
   const kameraId = `kam_${hylle.toLowerCase()}_${(Device.modelName ?? "telefon").toLowerCase().replace(/[^a-z0-9]+/g, "")}`;
   const navn = `${hylle} · ${Device.modelName ?? "kameratelefon"}`;
 
@@ -47,50 +59,60 @@ export default function KameraStasjon() {
     }).catch(() => {});
   }, [kameraId, navn, hylle]);
 
-  // Meld fra at kameraet lever, og hent intervallet fra innstillingene.
+  // Meld fra at kameraet lever.
   useEffect(() => {
     pling();
-    hent<InnstillingerSvar>("/api/innstillinger").then((d) => setIntervall(d.innstillinger.kameraIntervallMin)).catch(() => {});
     const t = setInterval(pling, 60_000);
     return () => clearInterval(t);
   }, [pling]);
 
-  useEffect(() => {
-    const t = setInterval(() => setNå(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, []);
+  const leggTilLogg = useCallback((h: Hendelse) => setLogg((l) => [h, ...l].slice(0, 6)), []);
 
-  const tell = useCallback(async () => {
-    if (!kamera.current || jobber) return;
-    setJobber(true);
-    setNeste(Date.now() + intervall * 60_000);
-    try {
-      const b = await kamera.current.takePictureAsync({ quality: 0.8, shutterSound: false });
-      const [bilde, liten] = await Promise.all([tilJpeg(b.uri, 1600, 0.75), tilJpeg(b.uri, 480, 0.55)]);
-      const res = await send<{ forslag: Forslag; endret: boolean }>("/api/kamera/bilde", { kameraId, hylle, bilde, liten });
+  // Én runde: ta bilde, send det, og vis hva backend gjorde.
+  const runde = useCallback(async () => {
+    if (!kamera.current) return;
+    const b = await kamera.current.takePictureAsync({ quality: 0.5, shutterSound: false, skipProcessing: true });
+    const [bilde, liten] = await Promise.all([tilJpeg(b.uri, 1024, 0.65), tilJpeg(b.uri, 320, 0.5)]);
+    const tvang = tving.current;
+    tving.current = false;
+    const res = await send<RammeSvar>("/api/kamera/ramme", { kameraId, hylle, bilde, liten, tving: tvang });
+    setStatus(res.status === "talt" ? "uendret" : res.status);
+    setMal({ bevegelse: res.bevegelse, endring: res.endring });
+    if (res.status === "talt" && res.forslag) {
       const endringer = res.forslag.endringer.filter((e) => e.deler.length > 0);
       const svinn = endringer.some((e) => e.deler.some((d) => d.type === "mulig_svinn"));
-      setLogg((l) => [
-        {
-          tid: new Date().toISOString(),
-          tekst: endringer.length === 0 ? "Ingen endring" : `${endringer.map((e) => `${e.navn} ${fortegn(e.na - e.forrige)}`).join(", ")}${svinn ? " · mulig svinn" : ""}`,
-          endring: endringer.reduce((s, e) => s + e.na - e.forrige, 0),
-        },
-        ...l,
-      ].slice(0, 6));
-    } catch (e) {
-      setLogg((l) => [{ tid: new Date().toISOString(), tekst: e instanceof Error ? e.message : "Tellingen feilet" }, ...l].slice(0, 6));
-    } finally {
-      setJobber(false);
+      leggTilLogg({
+        tid: new Date().toISOString(),
+        tekst: endringer.length === 0 ? "Talt, ingen endring" : `${endringer.map((e) => `${e.navn} ${fortegn(e.na - e.forrige)}`).join(", ")}${svinn ? " · mulig svinn" : ""}`,
+        endring: endringer.reduce((sum, e) => sum + e.na - e.forrige, 0),
+      });
+      if (res.forslag.ukjente.length > 0) {
+        leggTilLogg({ tid: new Date().toISOString(), tekst: `Ny vare? ${res.forslag.ukjente.join(", ")}`, ny: true });
+      }
+    } else if (res.status === "feil") {
+      leggTilLogg({ tid: new Date().toISOString(), tekst: res.feil ?? "Tellingen feilet" });
     }
-  }, [jobber, intervall, kameraId, hylle]);
+  }, [kameraId, hylle, leggTilLogg]);
 
-  // Tar bilde når nedtellingen er ferdig.
+  // Kjører rundene etter hverandre så lenge skjermen er åpen.
   useEffect(() => {
-    if (klar && !jobber && nå >= neste) tell();
-  }, [nå, neste, klar, jobber, tell]);
+    if (!klar) return;
+    let stopp = false;
+    (async () => {
+      while (!stopp) {
+        try {
+          await runde();
+        } catch (e) {
+          setStatus("feil");
+          leggTilLogg({ tid: new Date().toISOString(), tekst: e instanceof Error ? e.message : "Fikk ikke kontakt med backend" });
+          await new Promise((r) => setTimeout(r, 4000));
+        }
+        await new Promise((r) => setTimeout(r, 700));
+      }
+    })();
+    return () => { stopp = true; };
+  }, [klar, runde, leggTilLogg]);
 
-  const igjen = Math.max(0, Math.round((neste - nå) / 1000));
   const avslutt = () =>
     Alert.alert("Stoppe kameraet?", `Hylle ${hylle} blir ikke fulgt med på lenger.`, [
       { text: "Fortsett", style: "cancel" },
@@ -125,20 +147,27 @@ export default function KameraStasjon() {
 
       <View style={[st.panel, { paddingBottom: inn.bottom + 16 }]}>
         <Rad style={{ justifyContent: "space-between" }}>
-          <View>
-            <Txt style={{ color: "#C9D0CE", fontSize: 13 }}>{jobber ? "Teller nå …" : "Neste bilde om"}</Txt>
-            <Display style={{ color: F.hvit, fontSize: 34 }}>{jobber ? "…" : `${Math.floor(igjen / 60)}:${String(igjen % 60).padStart(2, "0")}`}</Display>
+          <View style={{ flex: 1 }}>
+            <Txt style={{ color: "#C9D0CE", fontSize: 13 }}>Kameraet følger med</Txt>
+            <Display style={{ color: F.hvit, fontSize: 30 }}>{STATUS_TEKST[status]}</Display>
           </View>
-          <Pressable onPress={tell} disabled={!klar || jobber} style={({ pressed }) => [st.tellNa, pressed && { opacity: 0.7 }, (!klar || jobber) && { opacity: 0.5 }]}>
+          <Pressable onPress={() => { tving.current = true; }} disabled={!klar || status === "teller"} style={({ pressed }) => [st.tellNa, pressed && { opacity: 0.7 }, (!klar || status === "teller") && { opacity: 0.5 }]}>
             <Ikon navn="kamera" size={20} />
             <Txt style={{ fontFamily: S.tekstHalvfet }}>Tell nå</Txt>
           </Pressable>
         </Rad>
-        <Mono style={{ color: "#9AA3A6" }}>{navn} · hvert {intervall}. minutt · skjermen holdes våken</Mono>
+        <Mono style={{ color: "#9AA3A6" }}>
+          {navn} · bevegelse {Math.round(mal.bevegelse * 100)} % · endring {Math.round(mal.endring * 100)} %
+        </Mono>
         {logg.map((h, i) => (
           <Rad key={i} style={{ opacity: i === 0 ? 1 : 0.6 }}>
             <Mono style={{ color: "#C9D0CE", width: 42 }}>{klokke(h.tid)}</Mono>
-            <Txt style={{ color: F.hvit, fontSize: 14, flex: 1 }} numberOfLines={1}>{h.tekst}</Txt>
+            <Txt style={{ color: h.ny ? F.gul : F.hvit, fontSize: 14, flex: 1 }} numberOfLines={1}>{h.tekst}</Txt>
+            {h.ny && (
+              <Pressable hitSlop={8} onPress={() => router.push("/ny-vare")}>
+                <Txt style={{ color: F.gul, fontFamily: S.tekstHalvfet, fontSize: 14 }}>Legg til</Txt>
+              </Pressable>
+            )}
           </Rad>
         ))}
       </View>

@@ -45,7 +45,7 @@ export function NullstillDemo() {
       <span>
         <b className="font-semibold text-rod">{ferdig ? "Demoen er nullstilt" : "Nullstill demo"}</b>
         <br />
-        <span className="text-xs text-dempet">B3 tilbake til 13 svarte og 16 hvite</span>
+        <span className="text-xs text-dempet">Bord 1 tilbake til startbeholdningen</span>
       </span>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B3362A" strokeWidth="2.2" aria-hidden="true"><path d="M4 4v6h6" /><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9" /></svg>
     </button>

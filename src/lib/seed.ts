@@ -1,9 +1,8 @@
 import type { State, Hendelse } from "./types";
 
-// Demodata som passer med demomanuset:
-// B3 øverst: 13 svarte t-skjorter M ved tellingen 08:12 (45 mottatt på PO-2291, 32 plukket).
-// B3 nederst: 16 hvite t-skjorter M. Ingen åpne plukkordrer på hvit M.
-// Når demobildet telles: svart 18 (+5 restlevering), hvit 14 (−2 mulig svinn).
+// Demodata for bordet i pitchen: 10 produkter på ett bord (hylle T1).
+// Demoskript: ta bort en brusboks (plukkordre finnes, blir plukk), ta bort en penn (ingen ordre, mulig svinn),
+// legg til to kaffekopper (restlevering på PO-3001).
 
 /** Tidspunkt i norsk tid (CET, UTC+1 i november) `dager` dager tilbake. */
 export function osloTid(t: number, m: number, dager = 0): string {
@@ -34,65 +33,62 @@ function h(
 
 export function lagSeed(): State {
   n = 0;
+  const T = "T1";
   const hendelser: Hendelse[] = [
-    // Svart t-skjorte M
-    h(3, 10, 5, "B3", "TS-BLK-M", 45, "mottak", "Mottak PO-2291", "PO-2291"),
-    h(2, 13, 20, "B3", "TS-BLK-M", -14, "plukk", "Plukk, 6 ordrer", "10440–10445"),
-    h(1, 11, 40, "B3", "TS-BLK-M", -12, "plukk", "Plukk, 5 ordrer", "10458–10462"),
-    h(1, 16, 20, "B3", "TS-BLK-M", -6, "plukk", "Plukk, 3 ordrer", "10469–10471"),
-    // Hvit t-skjorte M
-    h(12, 9, 30, "B3", "TS-WHT-M", 40, "mottak", "Mottak PO-2264", "PO-2264"),
-    h(6, 14, 0, "B3", "TS-WHT-M", -24, "plukk", "Plukk, 11 ordrer", "10380–10390"),
-    // B2
-    h(9, 9, 0, "B2", "TS-WHT-S", 20, "mottak", "Mottak PO-2270", "PO-2270"),
-    h(2, 12, 0, "B2", "TS-WHT-S", -8, "plukk", "Plukk, 4 ordrer", "10450–10453"),
-    h(0, 8, 40, "B2", "TS-WHT-S", -3, "plukk", "Plukk, ordre 10479", "10479"),
-    h(9, 9, 0, "B2", "TS-BLK-L", 15, "mottak", "Mottak PO-2270", "PO-2270"),
-    h(2, 12, 30, "B2", "TS-BLK-L", -12, "plukk", "Plukk, 7 ordrer", "10446–10452"),
-    // A4
-    h(14, 10, 0, "A4", "LU-BLK", 30, "mottak", "Mottak PO-2251", "PO-2251"),
-    h(3, 15, 0, "A4", "LU-BLK", -7, "plukk", "Plukk, 4 ordrer", "10430–10433"),
-    h(0, 8, 55, "A4", "LU-BLK", -1, "plukk", "Plukk, ordre 10482", "10482"),
-    h(14, 10, 0, "A4", "SK-RED", 15, "mottak", "Mottak PO-2251", "PO-2251"),
-    h(1, 9, 30, "A4", "SK-RED", -4, "plukk", "Plukk, 2 ordrer", "10464–10466"),
-    // C1
-    h(1, 11, 5, "C1", "HG-GRY-L", 12, "mottak", "Mottak PO-2288", "PO-2288"),
+    h(6, 9, 0, T, "BRUS-RED", 8, "mottak", "Mottak PO-2990", "PO-2990"),
+    h(2, 13, 0, T, "BRUS-RED", -4, "plukk", "Plukk, 3 ordrer", "20480–20482"),
+    h(6, 9, 0, T, "VANN-KLAR", 6, "mottak", "Mottak PO-2990", "PO-2990"),
+    h(3, 11, 0, T, "VANN-KLAR", -3, "plukk", "Plukk, 2 ordrer", "20470–20471"),
+    h(6, 9, 0, T, "SJOK-MEL", 8, "mottak", "Mottak PO-2990", "PO-2990"),
+    h(1, 14, 0, T, "SJOK-MEL", -3, "plukk", "Plukk, 3 ordrer", "20490–20492"),
+    h(6, 9, 0, T, "KORN-PK", 4, "mottak", "Mottak PO-2990", "PO-2990"),
+    h(2, 10, 0, T, "KORN-PK", -2, "plukk", "Plukk, 2 ordrer", "20483–20484"),
+    h(4, 10, 0, T, "KAFFE-KOPP", 3, "mottak", "Mottak PO-3001", "PO-3001"),
+    h(5, 9, 0, T, "KRUS-HVIT", 5, "mottak", "Mottak PO-2990", "PO-2990"),
+    h(1, 12, 0, T, "KRUS-HVIT", -2, "plukk", "Plukk, 2 ordrer", "20493–20494"),
+    h(5, 9, 0, T, "NOTAT-BLA", 6, "mottak", "Mottak PO-2990", "PO-2990"),
+    h(2, 15, 0, T, "NOTAT-BLA", -2, "plukk", "Plukk, 2 ordrer", "20485–20486"),
+    h(5, 9, 0, T, "PENN-SVART", 5, "mottak", "Mottak PO-2990", "PO-2990"),
+    h(1, 10, 30, T, "PENN-SVART", -2, "plukk", "Plukk, 2 ordrer", "20495–20496"),
+    h(3, 9, 0, T, "EPLE-GRONN", 6, "mottak", "Mottak PO-3010", "PO-3010"),
+    h(1, 16, 0, T, "EPLE-GRONN", -2, "plukk", "Plukk, 2 ordrer", "20497–20498"),
+    h(3, 9, 0, T, "BANAN", 5, "mottak", "Mottak PO-3010", "PO-3010"),
+    h(0, 8, 30, T, "BANAN", -2, "plukk", "Plukk, 2 ordrer", "20499–20500"),
   ];
+  // Beholdning etter dette: brus 4, vann 3, sjokolade 5, korn 2, kaffekopp 3, krus 3, notatbok 4, penn 3, eple 4, banan 3.
 
   return {
     versjon: 1,
     varer: [
-      { sku: "TS-BLK-M", navn: "Svart t-skjorte M", farge: "svart", storrelse: "M", leverandor: "Nordtex", swatch: "#1E1E20", bilder: [], beskrivelse: "Svart bomulls t-skjorte, brettet og stablet" },
-      { sku: "TS-WHT-M", navn: "Hvit t-skjorte M", farge: "hvit", storrelse: "M", leverandor: "Nordtex", swatch: "#E8E6E1", bilder: [], beskrivelse: "Hvit bomulls t-skjorte, brettet og stablet" },
-      { sku: "TS-WHT-S", navn: "Hvit t-skjorte S", farge: "hvit", storrelse: "S", leverandor: "Nordtex", swatch: "#E8E6E1", bilder: [], beskrivelse: "Hvit bomulls t-skjorte, brettet" },
-      { sku: "TS-BLK-L", navn: "Svart t-skjorte L", farge: "svart", storrelse: "L", leverandor: "Nordtex", swatch: "#1E1E20", bilder: [], beskrivelse: "Svart bomulls t-skjorte, brettet" },
-      { sku: "LU-BLK", navn: "Lue, sort", farge: "sort", storrelse: "One size", leverandor: "Fjellstrikk", swatch: "#2B3134", bilder: [], beskrivelse: "Strikket sort lue" },
-      { sku: "SK-RED", navn: "Skjerf, rød", farge: "rød", storrelse: "One size", leverandor: "Fjellstrikk", swatch: "#B3362A", bilder: [], beskrivelse: "Rødt strikkeskjerf, rullet" },
-      { sku: "HG-GRY-L", navn: "Hettegenser grå L", farge: "grå", storrelse: "L", leverandor: "Nordtex", swatch: "#9AA3A6", bilder: [], beskrivelse: "Grå hettegenser, brettet" },
+      { sku: "BRUS-RED", navn: "Brusboks, rød", farge: "rød", storrelse: "33 cl", leverandor: "Drikkegrossisten", swatch: "#B3362A", bilder: [], beskrivelse: "Rød brusboks av aluminium", prompt: "red soda can" },
+      { sku: "VANN-KLAR", navn: "Vannflaske", farge: "klar", storrelse: "50 cl", leverandor: "Drikkegrossisten", swatch: "#9CC7E0", bilder: [], beskrivelse: "Klar plastflaske med vann", prompt: "clear plastic water bottle" },
+      { sku: "SJOK-MEL", navn: "Sjokoladeplate", farge: "blå", storrelse: "100 g", leverandor: "Søtsaker AS", swatch: "#2F5D8A", bilder: [], beskrivelse: "Melkesjokolade i blå innpakning", prompt: "chocolate bar in blue wrapper" },
+      { sku: "KORN-PK", navn: "Kornpakke", farge: "gul", storrelse: "500 g", leverandor: "Søtsaker AS", swatch: "#F4C430", bilder: [], beskrivelse: "Gul eske med frokostblanding", prompt: "yellow cereal box" },
+      { sku: "KAFFE-KOPP", navn: "Kaffekopp", farge: "brun", storrelse: "30 cl", leverandor: "Kontorlevering", swatch: "#8A5A3B", bilder: [], beskrivelse: "Brun papirkopp med lokk", prompt: "brown paper coffee cup" },
+      { sku: "KRUS-HVIT", navn: "Krus, hvitt", farge: "hvit", storrelse: "35 cl", leverandor: "Kontorlevering", swatch: "#E8E6E1", bilder: [], beskrivelse: "Hvitt keramikkrus", prompt: "white ceramic mug" },
+      { sku: "NOTAT-BLA", navn: "Notatbok, blå", farge: "blå", storrelse: "A5", leverandor: "Kontorlevering", swatch: "#2F5D8A", bilder: [], beskrivelse: "Blå notatbok med hardt omslag", prompt: "blue notebook" },
+      { sku: "PENN-SVART", navn: "Penn, svart", farge: "svart", storrelse: "One size", leverandor: "Kontorlevering", swatch: "#1E1E20", bilder: [], beskrivelse: "Svart kulepenn", prompt: "black pen" },
+      { sku: "EPLE-GRONN", navn: "Eple, grønt", farge: "grønn", storrelse: "Stk", leverandor: "Frukthuset", swatch: "#2F7D55", bilder: [], beskrivelse: "Grønt eple", prompt: "green apple" },
+      { sku: "BANAN", navn: "Banan", farge: "gul", storrelse: "Stk", leverandor: "Frukthuset", swatch: "#E8C547", bilder: [], beskrivelse: "Gul banan", prompt: "banana" },
     ],
     hyller: [
-      { id: "B3", reol: "B", navn: "Reol B, hylle 3", innhold: [{ sku: "TS-BLK-M", nivaa: "øverst" }, { sku: "TS-WHT-M", nivaa: "nederst" }] },
-      { id: "B2", reol: "B", navn: "Reol B, hylle 2", innhold: [{ sku: "TS-WHT-S", nivaa: "øverst" }, { sku: "TS-BLK-L", nivaa: "nederst" }] },
-      { id: "A4", reol: "A", navn: "Reol A, hylle 4", innhold: [{ sku: "LU-BLK", nivaa: "venstre" }, { sku: "SK-RED", nivaa: "høyre" }] },
-      { id: "C1", reol: "C", navn: "Reol C, hylle 1", innhold: [{ sku: "HG-GRY-L", nivaa: "hele hylla" }] },
+      {
+        id: T, reol: "T", navn: "Bord 1",
+        innhold: ["BRUS-RED", "VANN-KLAR", "SJOK-MEL", "KORN-PK", "KAFFE-KOPP", "KRUS-HVIT", "NOTAT-BLA", "PENN-SVART", "EPLE-GRONN", "BANAN"].map((sku) => ({ sku, nivaa: "hele bordet" })),
+      },
     ],
     hendelser,
     tellinger: [
-      { id: "t_b3_0812", tid: osloTid(8, 12), hylle: "B3", kilde: "mobil", antall: { "TS-BLK-M": 13, "TS-WHT-M": 16 }, teller: "demo" },
-      { id: "t_b2_0840", tid: osloTid(8, 40), hylle: "B2", kilde: "mobil", antall: { "TS-WHT-S": 9, "TS-BLK-L": 3 }, teller: "demo" },
-      { id: "t_a4_0855", tid: osloTid(8, 55), hylle: "A4", kilde: "kamera", antall: { "LU-BLK": 22, "SK-RED": 11 }, teller: "demo" },
+      { id: "t_t1_0800", tid: osloTid(8, 0), hylle: T, kilde: "mobil", antall: { "BRUS-RED": 4, "VANN-KLAR": 3, "SJOK-MEL": 5, "KORN-PK": 2, "KAFFE-KOPP": 3, "KRUS-HVIT": 3, "NOTAT-BLA": 4, "PENN-SVART": 3, "EPLE-GRONN": 4, "BANAN": 3 }, teller: "demo" },
     ],
     innkjop: [
-      { id: "PO-2291", sku: "TS-BLK-M", hylle: "B3", bestilt: 50, mottatt: 45, bestiltDato: osloTid(9, 0, 5), leverandor: "Nordtex" },
-      { id: "PO-2264", sku: "TS-WHT-M", hylle: "B3", bestilt: 40, mottatt: 40, bestiltDato: osloTid(9, 0, 15), leverandor: "Nordtex" },
-      { id: "PO-2288", sku: "HG-GRY-L", hylle: "C1", bestilt: 12, mottatt: 12, bestiltDato: osloTid(9, 0, 4), leverandor: "Nordtex" },
+      { id: "PO-3001", sku: "KAFFE-KOPP", hylle: T, bestilt: 5, mottatt: 3, bestiltDato: osloTid(9, 0, 5), leverandor: "Kontorlevering" },
     ],
     ordrer: [
-      { id: "10490", sku: "TS-BLK-L", hylle: "B2", antall: 1, tid: osloTid(9, 10), status: "apen" },
+      { id: "20501", sku: "BRUS-RED", hylle: T, antall: 1, tid: osloTid(8, 45), status: "apen" },
     ],
     kameraer: [
-      { id: "kam_b3", navn: "B3 · iPhone 11", hylle: "B3", sistSett: osloTid(9, 0), bilderIdag: 0, lader: true },
-      { id: "kam_a4", navn: "A4 · Samsung A52", hylle: "A4", sistSett: osloTid(8, 57), bilderIdag: 9, lader: false, batteri: 4 },
+      { id: "kam_t1", navn: "T1 · kameratelefon", hylle: T, sistSett: osloTid(8, 50), bilderIdag: 0, lader: true },
     ],
     innstillinger: {
       lager: "Lager Nydalen",
