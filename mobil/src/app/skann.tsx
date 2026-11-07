@@ -49,7 +49,7 @@ export default function Skann() {
   const ferdig = linjer.length > 0 && linjer.every((k) => (plukket[k] ?? 0) >= ordre[k]);
 
   return (
-    <Skjerm tittel="Skann" tilbake={false}>
+    <Skjerm tittel="Plukk og plassering">
       {feil && <Feilboks melding={feil} igjen={last} />}
       {!data && !feil && <Laster />}
 
