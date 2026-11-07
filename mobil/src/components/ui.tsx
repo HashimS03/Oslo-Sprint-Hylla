@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { F, S } from "@/lib/tema";
 import { Ikon, type IkonNavn } from "./Ikon";
-import { StatiskFaner, type FaneNavn } from "./Faner";
 
 // ---------- Tekst ----------
 
@@ -23,12 +22,12 @@ export const Etikett = ({ style, children, ...p }: T) => (
 
 /**
  * Felles ramme: overskrift med tilbakepil og strek, innhold som ruller, og et valgfritt fast felt nederst.
- * `fane` viser fanelinja nederst på skjermer som ligger utenfor fanene (vare, avvik, innstillinger …).
+ * `fane` er utgått (appen har ingen faner lenger) og blir ignorert. Den finnes bare så eldre skjermer fortsatt kompilerer.
  */
 export function Skjerm({
-  tittel, tilbake = true, hoyre, children, bunn, fane, rull = true, innholdStil,
+  tittel, tilbake = true, hoyre, children, bunn, rull = true, innholdStil,
 }: {
-  tittel?: string; tilbake?: boolean; hoyre?: ReactNode; children: ReactNode; bunn?: ReactNode; fane?: FaneNavn;
+  tittel?: string; tilbake?: boolean; hoyre?: ReactNode; children: ReactNode; bunn?: ReactNode; fane?: string;
   rull?: boolean; innholdStil?: StyleProp<ViewStyle>;
 }) {
   const inn = useSafeAreaInsets();
@@ -56,8 +55,7 @@ export function Skjerm({
       ) : (
         <View style={[{ flex: 1 }, innholdStil]}>{children}</View>
       )}
-      {bunn && <View style={[st.bunn, !fane && { paddingBottom: Math.max(inn.bottom, 12) }]}>{bunn}</View>}
-      {fane && <StatiskFaner aktiv={fane} />}
+      {bunn && <View style={[st.bunn, { paddingBottom: Math.max(inn.bottom, 12) }]}>{bunn}</View>}
     </View>
   );
 }

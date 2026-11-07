@@ -10,10 +10,24 @@ export function apiUrl(): string {
   return vert ? `http://${vert}:3000` : "http://localhost:3000";
 }
 
+/**
+ * Feilmelding hvis adressen ikke er trygg, ellers null.
+ * I en ferdig app (release-bygg, `__DEV__` er false) krever vi https://, så
+ * dataene ikke sendes ukryptert. Vanlig http er bare lov mens dere utvikler.
+ */
+export function usikkerAdresse(): string | null {
+  if (__DEV__) return null;
+  const env = process.env.EXPO_PUBLIC_API_URL;
+  if (!env) return "Appen mangler serveradresse. Sett EXPO_PUBLIC_API_URL til en https://-adresse før dere bygger appen.";
+  if (!/^https:\/\//i.test(env)) return `Serveradressen må starte med https:// i den ferdige appen (nå: ${env}).`;
+  return null;
+}
+
 export class ApiFeil extends Error {
   constructor(melding: string, public status: number, public data?: unknown) {
     super(melding);
   }
+
 }
 
 async function svar<T>(res: Response): Promise<T> {
@@ -22,31 +36,39 @@ async function svar<T>(res: Response): Promise<T> {
   return data as T;
 }
 
-export async function hent<T>(sti: string): Promise<T> {
+/** Felles for alle kall: sjekker adressen og gjør om nettverksfeil til ApiFeil. */
+async function kall<T>(sti: string, init: RequestInit, nettverksfeil: string): Promise<T> {
+  const usikker = usikkerAdresse();
+  if (usikker) throw new ApiFeil(usikker, 0);
+  const headers = new Headers(init.headers);
+  // Tidsavbrudd litt over serverens grense (60 s), så skjermen aldri henger for alltid.
+  const avbryt = new AbortController();
+  const tidsur = setTimeout(() => avbryt.abort(), 70_000);
   try {
-    return await svar<T>(await fetch(apiUrl() + sti, { headers: { accept: "application/json" } }));
+    return await svar<T>(await fetch(apiUrl() + sti, { ...init, headers, signal: avbryt.signal }));
   } catch (e) {
     if (e instanceof ApiFeil) throw e;
-    throw new ApiFeil(`Får ikke kontakt med Hylla-serveren på ${apiUrl()} (${e instanceof Error ? e.message : String(e)})`, 0);
+    if (avbryt.signal.aborted) throw new ApiFeil("Serveren svarte ikke på 70 sekunder. Prøv igjen.", 0);
+    throw new ApiFeil(`${nettverksfeil} (${e instanceof Error ? e.message : String(e)})`, 0);
+  } finally {
+    clearTimeout(tidsur);
   }
 }
 
-export async function send<T>(sti: string, body: unknown): Promise<T> {
-  try {
-    return await svar<T>(await fetch(apiUrl() + sti, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }));
-  } catch (e) {
-    if (e instanceof ApiFeil) throw e;
-    throw new ApiFeil(`Får ikke kontakt med Hylla-serveren på ${apiUrl()} (${e instanceof Error ? e.message : String(e)})`, 0);
-  }
+export function hent<T>(sti: string): Promise<T> {
+  return kall<T>(sti, { headers: { accept: "application/json" } }, `Får ikke kontakt med Hylla-serveren på ${apiUrl()}`);
 }
 
-export async function sendSkjema<T>(sti: string, skjema: FormData): Promise<T> {
-  try {
-    return await svar<T>(await fetch(apiUrl() + sti, { method: "POST", body: skjema }));
-  } catch (e) {
-    if (e instanceof ApiFeil) throw e;
-    throw new ApiFeil(`Kunne ikke sende opptaket til ${apiUrl()} (${e instanceof Error ? e.message : String(e)})`, 0);
-  }
+export function send<T>(sti: string, body: unknown): Promise<T> {
+  return kall<T>(
+    sti,
+    { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) },
+    `Får ikke kontakt med Hylla-serveren på ${apiUrl()}`,
+  );
+}
+
+export function sendSkjema<T>(sti: string, skjema: FormData): Promise<T> {
+  return kall<T>(sti, { method: "POST", body: skjema }, `Kunne ikke sende opptaket til ${apiUrl()}`);
 }
 
 export async function patch<T>(sti: string, body: unknown): Promise<T> {

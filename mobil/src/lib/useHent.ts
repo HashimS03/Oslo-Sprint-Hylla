@@ -19,7 +19,10 @@ export function useHent<T>(sti: string | null) {
         setFeil(null);
       }
     } catch (e) {
-      if (aktiv.current) setFeil(e instanceof Error ? e.message : "Noe gikk galt");
+      if (aktiv.current) {
+        // Ved nettverksfeil beholder vi det vi hadde, så skjermen ikke blir tom i et dødt hjørne av lageret.
+        setFeil(e instanceof Error ? e.message : "Noe gikk galt");
+      }
     } finally {
       if (aktiv.current) setLaster(false);
     }

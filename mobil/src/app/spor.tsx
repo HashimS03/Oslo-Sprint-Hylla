@@ -1,11 +1,9 @@
 import { useRef, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View, type ScrollViewInstance } from "react-native";
-import {
-  createAudioPlayer, requestRecordingPermissionsAsync, RecordingPresets, setAudioModeAsync, useAudioRecorder, type AudioPlayer,
-} from "expo-audio";
-import { File, Paths } from "expo-file-system";
-import * as Speech from "expo-speech";
+import { requestRecordingPermissionsAsync, RecordingPresets, setAudioModeAsync, useAudioRecorder } from "expo-audio";
+import { File } from "expo-file-system";
 import * as Haptics from "expo-haptics";
+import { lesHoyt, stoppOpplesning } from "@/lib/opplesning";
 import type { Kort, SporSvar } from "@/lib/typer";
 import { ApiFeil, send, sendSkjema } from "@/lib/api";
 import { F, S } from "@/lib/tema";
@@ -15,7 +13,7 @@ import { Etikett, Rad, Skjerm, Txt } from "@/components/ui";
 
 type Melding = { id: number; rolle: "bruker" | "hylla"; tekst: string; kort?: Kort[]; lyd?: string };
 
-const FORSLAG = ["Hvor mange kaffekopper har vi igjen?", "Hva er mulig svinn i dag?", "Når kom PO-3001?"];
+const FORSLAG = ["Hvor står kaffekoppene?", "Hvor mange brusbokser har vi?", "Når kommer flere kaffekopper?"];
 
 let nesteId = 1;
 const klokkeMs = () => Date.now();
@@ -28,36 +26,9 @@ export default function SporHylla() {
   const rull = useRef<ScrollViewInstance>(null);
   const opptaker = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const startTid = useRef(0);
-  const spiller = useRef<AudioPlayer | null>(null);
 
   const historikk = () => meldinger.filter((m) => m.tekst).slice(-10).map((m) => ({ rolle: m.rolle, tekst: m.tekst }));
   const leggTil = (m: Omit<Melding, "id">) => setMeldinger((ms) => [...ms, { ...m, id: nesteId++ }]);
-
-  /** Spiller ElevenLabs-lyden hvis vi fikk den, ellers leser telefonen opp selv. */
-  const lesHoyt = (svar: string, lyd?: string) => {
-    Speech.stop();
-    spiller.current?.remove();
-    spiller.current = null;
-    if (lyd?.startsWith("data:") && Platform.OS === "web") {
-      const p = createAudioPlayer(lyd);
-      spiller.current = p;
-      p.play();
-      return;
-    }
-    if (lyd?.startsWith("data:")) {
-      try {
-        const fil = new File(Paths.cache, `hylla-${klokkeMs()}.mp3`);
-        fil.writeSync(lyd.slice(lyd.indexOf(",") + 1), { encoding: "base64" });
-        const p = createAudioPlayer(fil.uri);
-        spiller.current = p;
-        p.play();
-        return;
-      } catch {
-        /* faller tilbake til telefonens stemme */
-      }
-    }
-    Speech.speak(svar, { language: "nb-NO" });
-  };
 
   const sporTekst = async (sporsmal: string) => {
     if (!sporsmal.trim() || tenker) return;
@@ -81,8 +52,7 @@ export default function SporHylla() {
       leggTil({ rolle: "hylla", tekst: "Jeg trenger tilgang til mikrofonen for å høre deg. Du kan også skrive spørsmålet." });
       return;
     }
-    Speech.stop();
-    spiller.current?.pause();
+    stoppOpplesning();
     await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
     await opptaker.prepareToRecordAsync();
     opptaker.record();
@@ -127,11 +97,11 @@ export default function SporHylla() {
   };
 
   return (
-    <Skjerm tittel="Spør Hylla" tilbake={false} rull={false}>
+    <Skjerm tittel="Spør Hylla" rull={false}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView ref={rull} contentContainerStyle={st.liste} onContentSizeChange={() => rull.current?.scrollToEnd({ animated: true })} keyboardShouldPersistTaps="handled">
           {meldinger.length === 0 && (
-            <Txt style={{ color: F.dempet, fontSize: 15, marginBottom: 4 }}>Spør om beholdning, innkjøp, plukk eller svinn. Hylla svarer høyt og viser tallene her.</Txt>
+            <Txt style={{ color: F.dempet, fontSize: 15, marginBottom: 4 }}>Spør om en vare, hvor den står eller hvor mange det er. Hold inne mikrofonen og snakk, eller skriv.</Txt>
           )}
           {meldinger.map((m) =>
             m.rolle === "bruker" ? (

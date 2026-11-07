@@ -36,7 +36,7 @@ export function KortVisning({ kort }: { kort: KortData }) {
   }
   if (kort.type === "avvik") {
     return (
-      <Kort farge={F.rodlys} style={{ borderColor: F.rod }} onPress={() => router.push({ pathname: "/avvik/[id]", params: { id: kort.id } })}>
+      <Kort farge={F.rodlys} style={{ borderColor: F.rod }} onPress={() => router.push({ pathname: "/vare/[sku]", params: { sku: kort.sku } })}>
         <Rad gap={12}>
           <View style={{ flex: 1, gap: 2 }}>
             <Mono style={{ color: F.rod, fontSize: 11 }}>MULIG SVINN · {kort.hylle} · {klokke(kort.tid)}</Mono>

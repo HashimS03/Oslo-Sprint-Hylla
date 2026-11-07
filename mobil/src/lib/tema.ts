@@ -14,6 +14,8 @@ export const F = {
   graa: "#EEF0EF",
   skifer: "#2B3134",
   mork: "#111517",
+  blalys: "#DCE6F5",
+  lillalys: "#E7DFF3",
 };
 
 export const S = {
