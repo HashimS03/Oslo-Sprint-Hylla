@@ -37,6 +37,19 @@ export default function Innstillinger() {
       },
     ]);
 
+  const tom = () =>
+    Alert.alert("Tømme lageret?", "Alle varer, hyller og all historikk slettes. Du starter helt på nytt.", [
+      { text: "Avbryt", style: "cancel" },
+      {
+        text: "Tøm", style: "destructive", onPress: async () => {
+          setNullstiller(true);
+          await send("/api/demo/nullstill", { tom: true }).catch(() => {});
+          setNullstiller(false);
+          last();
+        },
+      },
+    ]);
+
   return (
     <Skjerm tittel="Innstillinger" fane="index">
       {feil && <Feilboks melding={feil} igjen={last} />}
@@ -86,6 +99,7 @@ export default function Innstillinger() {
 
       <View style={{ alignItems: "center", paddingVertical: 8 }}>
         <LenkeKnapp tekst={nullstiller ? "Nullstiller …" : "Nullstill demoen"} style={{ color: F.rod }} onPress={nullstill} />
+        <LenkeKnapp tekst="Tøm lageret helt" style={{ color: F.rod }} onPress={tom} />
       </View>
     </Skjerm>
   );

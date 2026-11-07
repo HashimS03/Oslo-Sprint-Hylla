@@ -38,6 +38,9 @@ export default function Varer() {
           </Pressable>
         ))}
       </View>
+      {data && data.varer.length === 0 && (
+        <Txt style={{ color: F.dempet }}>Ingen varer ennå. Trykk «Legg til produkt» for å registrere den første.</Txt>
+      )}
     </Skjerm>
   );
 }

@@ -15,6 +15,7 @@ export default function Hjem() {
   const avvik = data?.apneAvvik.length ?? 0;
   const ikkeTalt = data ? data.antallHyller - data.taltIdag : 0;
   const ting = avvik + (ikkeTalt > 0 ? 1 : 0);
+  const kommIGang = !!data && (data.antallHyller === 0 || data.varerPaaLager === 0);
 
   return (
     <ScrollView
@@ -40,7 +41,7 @@ export default function Hjem() {
         <Display style={st.heroTekst}>
           {hilsen()}
           {"\n"}
-          {!data ? "Henter lageret …" : ting === 0 ? "Alt ser bra ut i dag." : `${ting} ting trenger deg i dag.`}
+          {!data ? "Henter lageret …" : kommIGang ? "La oss sette opp lageret." : ting === 0 ? "Alt ser bra ut i dag." : `${ting} ting trenger deg i dag.`}
         </Display>
         <View style={st.strekkode}>
           {Array.from({ length: 28 }).map((_, i) => <View key={i} style={{ width: i % 3 === 0 ? 3 : 1.5, height: 14, backgroundColor: F.tekst }} />)}
@@ -48,6 +49,14 @@ export default function Hjem() {
       </View>
 
       {feil && <Feilboks melding={feil} igjen={last} />}
+
+      {data && kommIGang && (
+        <Seksjon tittel="Kom i gang">
+          <Steg nr={1} tekst="Lag en hylle" ferdig={data.antallHyller > 0} onPress={() => router.push("/ny-hylle")} />
+          <Steg nr={2} tekst="Legg inn varene på hylla" ferdig={data.varerPaaLager > 0} aktiv={data.antallHyller > 0} onPress={() => router.push("/ny-vare")} />
+          <Steg nr={3} tekst="Skann varene" ferdig={false} aktiv={data.varerPaaLager > 0} onPress={() => router.navigate("/skann")} />
+        </Seksjon>
+      )}
 
       <Rad gap={8}>
         <Tall tall={data ? String(data.varerPaaLager) : "–"} tekst="varer på lager" />
@@ -67,6 +76,19 @@ export default function Hjem() {
         {data && data.siste.length === 0 && <Txt style={{ color: F.dempet }}>Ingen hendelser ennå.</Txt>}
       </Seksjon>
     </ScrollView>
+  );
+}
+
+function Steg({ nr, tekst, ferdig, aktiv = true, onPress }: { nr: number; tekst: string; ferdig: boolean; aktiv?: boolean; onPress: () => void }) {
+  const na = aktiv && !ferdig;
+  return (
+    <Pressable onPress={onPress} style={({ pressed }) => [st.steg, na && { borderColor: F.tekst, borderWidth: 2, backgroundColor: F.gullys }, pressed && { opacity: 0.7 }]}>
+      <View style={[st.stegNr, ferdig && { backgroundColor: F.tekst }]}>
+        {ferdig ? <Ikon navn="hake" size={16} farge={F.hvit} /> : <Txt style={{ fontSize: 14, fontWeight: "600" }}>{nr}</Txt>}
+      </View>
+      <Txt style={{ flex: 1, fontSize: 16, color: ferdig ? F.dempet : F.tekst, textDecorationLine: ferdig ? "line-through" : "none" }}>{tekst}</Txt>
+      {!ferdig && <Ikon navn="pil" size={20} farge={na ? F.tekst : F.dempet} />}
+    </Pressable>
   );
 }
 
@@ -90,5 +112,7 @@ const st = StyleSheet.create({
   hero: { backgroundColor: F.gul, borderWidth: 2, borderColor: F.tekst, borderRadius: 12, padding: 20, gap: 14, marginTop: 4 },
   heroTekst: { fontSize: 30, lineHeight: 33, letterSpacing: -1.2 },
   strekkode: { flexDirection: "row", gap: 2.5, marginTop: 6 },
+  steg: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: F.hvit, borderWidth: 1, borderColor: F.kant, borderRadius: 12, padding: 14 },
+  stegNr: { width: 28, height: 28, borderRadius: 14, borderWidth: 1.5, borderColor: F.tekst, alignItems: "center", justifyContent: "center" },
   tall: { flex: 1, backgroundColor: F.hvit, borderWidth: 1, borderColor: F.kant, borderRadius: 12, padding: 12, gap: 6, minHeight: 92, justifyContent: "space-between" },
 });

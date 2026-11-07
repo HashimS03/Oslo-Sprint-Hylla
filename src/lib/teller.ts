@@ -2,6 +2,7 @@ import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import type { Hylle, State, TelleResultat } from "./types";
 import { beholdning, sisteTelling, vare } from "./lager";
+import { samPrompter } from "./prompt";
 
 // En teller tar et hyllebilde og returnerer antall per vare.
 // Fem varianter, valgt med HYLLA_TELLER (sam31 | sam3 | claude | yolo | demo):
@@ -227,12 +228,23 @@ export const sam31Teller: Teller = {
       const varer = await Promise.all(
         hylle.innhold.map(async (p) => {
           const v = vare(state, p.sku);
-          const prompt = v?.prompt ?? [v?.farge, v?.navn].filter(Boolean).join(" ");
-          const c = await sam31Antall(bilde, prompt);
+          // Prøv søketekstene etter tur til en av dem finner noe sikkert. Den beste vinner.
+          let prompt = "";
+          let c: number[] = [];
+          for (const p of samPrompter(v)) {
+            const funn = await sam31Antall(bilde, p);
+            const sikreHer = funn.filter((x) => x >= SAM_TERSKEL).length;
+            if (!prompt || sikreHer > c.filter((x) => x >= SAM_TERSKEL).length) {
+              prompt = p;
+              c = funn;
+            }
+            if (sikreHer > 0) break;
+          }
           const sikre = c.filter((x) => x >= SAM_TERSKEL).length;
           const med = c.filter((x) => x >= SAM_LAV_TERSKEL).length;
           const snitt = c.length ? c.reduce((a, b) => a + b, 0) / c.length : 0.9;
           return {
+            prompt,
             sku: p.sku,
             antall: sikre,
             sikkerhet: med > sikre ? Math.min(0.75, snitt) : snitt,
@@ -241,7 +253,9 @@ export const sam31Teller: Teller = {
           };
         }),
       );
-      return { varer, ukjente: [], bildekvalitet: "god", kommentar: "Telt med SAM 3.1" };
+      // Viser hva vi lette etter, så det er lett å se om søketeksten bør endres.
+      const kommentar = varer.map((x) => `«${x.prompt}» ${x.antall}${x.alternativ !== null ? ` (kanskje ${x.alternativ})` : ""}`).join(", ");
+      return { varer: varer.map((x) => ({ sku: x.sku, antall: x.antall, sikkerhet: x.sikkerhet, alternativ: x.alternativ, merknad: x.merknad })), ukjente: [], bildekvalitet: "god", kommentar };
     } catch (e) {
       // Reserve: Claude, hvis nøkkel finnes. Ellers kaster vi feilen videre.
       if (process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN) {
@@ -270,6 +284,10 @@ export const demoTeller: Teller = {
   async tell({ state, hylle }) {
     await new Promise((r) => setTimeout(r, 2500));
     const tall = DEMO[hylle.id] ?? {};
+    if (!hylle.innhold.some((p) => tall[p.sku])) {
+      // Demoen har bare faste tall for demovarene. For egne varer ville den bare gjentatt forrige antall.
+      throw new Error("Ingen ekte teller er satt opp. Sett META_API_KEY, ANTHROPIC_API_KEY eller SAM3_URL i .env");
+    }
     return {
       varer: hylle.innhold.map((p) => {
         const d = tall[p.sku];

@@ -119,12 +119,30 @@ export function lagSeed(): State {
     matcherAvvik: [],
     matchet: {},
     soneStand: { T1: { REDBULL: 6 }, T2: { "COLA-BOKS": 6 }, GANG: {} },
-    innstillinger: {
-      lager: "Lager Nydalen",
-      svinnTerskel: 1,
-      sporNaarUsikker: true,
-      svarHoyt: true,
-      kameraIntervallMin: 5,
-    },
+    innstillinger: standardInnstillinger(),
   };
+}
+
+function standardInnstillinger(): State["innstillinger"] {
+  return { lager: "Lager Nydalen", svinnTerskel: 1, sporNaarUsikker: true, svarHoyt: true, kameraIntervallMin: 5 };
+}
+
+/** Et helt tomt lager: ingen varer, hyller eller historikk. Hyllene lages når du registrerer varer. */
+export function lagTom(): State {
+  return {
+    versjon: 1,
+    varer: [],
+    hyller: [],
+    hendelser: [],
+    tellinger: [],
+    innkjop: [],
+    ordrer: [],
+    kameraer: [],
+    innstillinger: standardInnstillinger(),
+  };
+}
+
+/** Startdata for en ny database: tomt lager med HYLLA_START=tom, ellers demodataene. */
+export function lagStart(): State {
+  return process.env.HYLLA_START === "tom" ? lagTom() : lagSeed();
 }

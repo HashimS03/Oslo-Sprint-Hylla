@@ -8,6 +8,7 @@ export async function tellOgLagre(opts: { kameraId: string; hylle: string; bilde
   const state = await hentState();
   const hylle = state.hyller.find((h) => h.id === opts.hylle);
   if (!hylle) throw new Error(`Ukjent hylle ${opts.hylle}`);
+  if (hylle.innhold.length === 0) throw new Error(`Hylle ${hylle.id} har ingen varer ennå. Legg til varene som står der først.`);
   const teller = velgTeller(!!opts.demo);
   const start = Date.now();
   const resultat = await teller.tell({ state, hylle, bilde: opts.bilde });

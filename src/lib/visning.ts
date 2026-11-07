@@ -1,3 +1,4 @@
+import { samPrompt } from "./prompt";
 import type { State } from "./types";
 import {
   apneAvvik, beholdning, beholdningPerHylle, erIdag, hylleStatus, innkjopForVare, plukketSiden, sisteTelling, totalBeholdning, vare,
@@ -41,7 +42,7 @@ export function hylleVisning(s: State, id: string) {
 
 export function avvikVisning(s: State, id: string) {
   const h = s.hendelser.find((x) => x.id === id);
-  if (!h || (h.type !== "mulig_svinn" && h.type !== "svinn")) return null;
+  if (!h || (!h.avvik && h.type !== "mulig_svinn" && h.type !== "svinn")) return null;
   const etter = s.tellinger.find((t) => t.id === h.tellingId);
   const for_ = s.tellinger.find((t) => t.id === h.avvik?.forrigeTellingId);
   const plass = s.hyller.find((x) => x.id === h.hylle)?.innhold.find((i) => i.sku === h.sku)?.nivaa;
@@ -66,8 +67,10 @@ export function vareVisning(s: State, sku: string) {
   const po = innkjopForVare(s, sku)[0];
   return {
     sku: v.sku, navn: v.navn, farge: v.farge, storrelse: v.storrelse, leverandor: v.leverandor ?? null, swatch: v.swatch,
+    prompt: samPrompt(v), egenPrompt: !!v.prompt?.trim(),
     bilde: v.bilder[0] ?? null,
     antall: beholdning(s, sku),
+    apneSalg: s.ordrer.filter((o) => o.sku === sku && o.status === "apen").reduce((n, o) => n + o.antall, 0),
     perHylle: beholdningPerHylle(s, sku).map((x) => ({ ...x, nivaa: s.hyller.find((h) => h.id === x.hylle)?.innhold.find((i) => i.sku === sku)?.nivaa ?? null })),
     innkjop: po ? {
       id: po.id, bestilt: po.bestilt, mottatt: po.mottatt, bestiltDato: po.bestiltDato, plukket: plukketSiden(s, sku, po.bestiltDato),
