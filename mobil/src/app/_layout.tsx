@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useFonts, Archivo_700Bold, Archivo_800ExtraBold } from "@expo-google-fonts/archivo";
 import { IBMPlexSans_400Regular, IBMPlexSans_500Medium, IBMPlexSans_600SemiBold, IBMPlexSans_700Bold } from "@expo-google-fonts/ibm-plex-sans";
 import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from "@expo-google-fonts/ibm-plex-mono";
-import { F } from "@/lib/tema";
+import { F, lastTema, useTema } from "@/lib/tema";
 import { lastNavn, useNavn } from "@/lib/navn";
 
 SplashScreen.preventAutoHideAsync();
@@ -17,13 +17,16 @@ export default function RotLayout() {
     IBMPlexMono_400Regular, IBMPlexMono_500Medium,
   });
   const { lastet: navnLastet } = useNavn();
+  const tema = useTema();
+  const [temaLastet, setTemaLastet] = useState(false);
 
-  // Hent navnet til den ansatte fra telefonen én gang ved oppstart.
+  // Hent navnet til den ansatte og valgt modus (mørk/lys) fra telefonen én gang ved oppstart.
   useEffect(() => {
     lastNavn();
+    lastTema().finally(() => setTemaLastet(true));
   }, []);
 
-  const klar = (fonter || !!feil) && navnLastet;
+  const klar = (fonter || !!feil) && navnLastet && temaLastet;
   useEffect(() => {
     if (klar) SplashScreen.hideAsync();
   }, [klar]);
@@ -32,8 +35,10 @@ export default function RotLayout() {
 
   return (
     <>
-      <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: F.bg } }}>
+      <StatusBar style={tema === "lys" ? "dark" : "light"} />
+      {/* key: alt tegnes på nytt med de nye fargene når mørk/lys byttes. React Compiler husker
+          ellers ferdige komponenter, så en vanlig re-render ville latt deler av appen bli i gammel modus. */}
+      <Stack key={tema} screenOptions={{ headerShown: false, contentStyle: { backgroundColor: F.bg } }}>
         {/* Scannerappen */}
         <Stack.Screen name="index" />
         <Stack.Screen name="scann" options={{ contentStyle: { backgroundColor: F.mork } }} />

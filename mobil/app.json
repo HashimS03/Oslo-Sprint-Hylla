@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/hylla-ikon.png",
     "scheme": "hylla",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "no.oslosprint.hylla"

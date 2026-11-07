@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import type { Oppgave } from "@/lib/typer";
 import { send } from "@/lib/api";
 import { hentNavn } from "@/lib/navn";
 import { useHent } from "@/lib/useHent";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { klokke } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
 import { Display, Etikett, Feilboks, HylleFlis, Knapp, Kort, Laster, Mono, Rad, Skjerm, Swatch, Txt } from "@/components/ui";
@@ -129,7 +129,7 @@ function Status({ o }: { o: Oppgave }) {
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   merke: { backgroundColor: F.rod, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
   status: { borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, borderWidth: 1, borderColor: F.kant, alignSelf: "flex-start" },
-});
+}));

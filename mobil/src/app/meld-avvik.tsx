@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, TextInput, View } from "react-native";
+import { Pressable, TextInput, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import type { AvvikGrunn, SkannVare } from "@/lib/typer";
 import { send } from "@/lib/api";
 import { hentNavn } from "@/lib/navn";
 import { useHent } from "@/lib/useHent";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { Ikon, type IkonNavn } from "@/components/Ikon";
 import { Display, Feilboks, Knapp, Laster, Rad, Skjerm, Swatch, Txt } from "@/components/ui";
 
@@ -158,7 +158,7 @@ export default function MeldAvvik() {
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   grunner: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 12 },
   grunn: {
     width: "48%", height: 100, borderRadius: 14, borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort,
@@ -172,4 +172,4 @@ const st = StyleSheet.create({
   },
   ferdig: { alignItems: "center", gap: 16, paddingTop: 48 },
   hake: { width: 110, height: 110, borderRadius: 55, backgroundColor: F.gronnlys, borderWidth: 1, borderColor: F.kant, alignItems: "center", justifyContent: "center" },
-});
+}));

@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { OppgaverSvar } from "@/lib/typer";
 import { lagreNavn, useNavn } from "@/lib/navn";
 import { useHent } from "@/lib/useHent";
 import { useOppdater } from "@/lib/useOppdater";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { Ikon } from "@/components/Ikon";
 import { StorKnapp } from "@/components/StorKnapp";
 import { Logo } from "@/components/Logo";
@@ -83,7 +83,7 @@ function HvemErDu() {
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   skjerm: { flex: 1, backgroundColor: F.bg },
   innhold: { padding: 20 },
   merke: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 8 },
@@ -95,4 +95,4 @@ const st = StyleSheet.create({
     height: 60, borderWidth: 1, borderColor: F.kant, borderRadius: 12, backgroundColor: F.kort, paddingHorizontal: 16,
     fontFamily: S.tekstMedium, fontSize: 20, color: F.tekst,
   },
-});
+}));

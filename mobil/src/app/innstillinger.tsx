@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { router } from "expo-router";
-import { Alert, StyleSheet, TextInput, View } from "react-native";
+import { Alert, Pressable, TextInput, View } from "react-native";
 import { apiUrl, send, usikkerAdresse } from "@/lib/api";
 import { lagreNavn, useNavn } from "@/lib/navn";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil, settTema, useTema, type Tema } from "@/lib/tema";
 import { Etikett, Feilboks, Knapp, Kort, Mono, Skjerm, Txt } from "@/components/ui";
 
 /** Innstillinger: navnet ditt, hvilken server appen snakker med, og nullstilling av demoen. */
 export default function Innstillinger() {
+  const tema = useTema();
   const { navn } = useNavn();
   const [nytt, setNytt] = useState(navn ?? "");
   const [nullstiller, setNullstiller] = useState(false);
@@ -48,6 +49,23 @@ export default function Innstillinger() {
       </View>
 
       <View style={{ gap: 8, marginTop: 8 }}>
+        <Etikett>Utseende</Etikett>
+        <View style={st.velger}>
+          {([["mork", "Mørk"], ["lys", "Lys"]] as [Tema, string][]).map(([t, navn]) => (
+            <Pressable
+              key={t}
+              onPress={() => settTema(t)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: tema === t }}
+              style={[st.valg, tema === t && st.valgt]}
+            >
+              <Txt style={[st.valgTekst, tema === t && { color: F.blekk }]}>{navn}</Txt>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+
+      <View style={{ gap: 8, marginTop: 8 }}>
         <Etikett>Takkamera</Etikett>
         <Knapp tekst="Takkamera" undertekst="Plukk og plassering, kamerasoner og hyller" ikon="kamera" variant="hvit" pil onPress={() => router.push("/takkamera")} />
       </View>
@@ -66,9 +84,13 @@ export default function Innstillinger() {
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   felt: {
     height: 56, borderWidth: 1, borderColor: F.kant, borderRadius: 12, backgroundColor: F.kort, paddingHorizontal: 14,
     fontFamily: S.tekstMedium, fontSize: 18, color: F.tekst,
   },
-});
+  velger: { flexDirection: "row", gap: 4, padding: 4, borderWidth: 1, borderColor: F.kant, borderRadius: 14, backgroundColor: F.kort },
+  valg: { flex: 1, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  valgt: { backgroundColor: F.gul },
+  valgTekst: { fontFamily: S.tekstHalvfet, fontSize: 16, color: F.dempet },
+}));

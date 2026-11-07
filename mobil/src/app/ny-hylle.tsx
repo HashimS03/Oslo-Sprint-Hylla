@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { StyleSheet, TextInput, View } from "react-native";
+import { TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { send } from "@/lib/api";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { Feilboks, Knapp, Skjerm, Txt } from "@/components/ui";
 
 export default function NyHylle() {
@@ -44,7 +44,7 @@ export default function NyHylle() {
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   etikett: { fontFamily: S.tekstHalvfet, fontSize: 14 },
   input: { height: 48, borderWidth: 1, borderColor: F.kant, borderRadius: 10, backgroundColor: F.kort, paddingHorizontal: 14, fontFamily: S.tekst, fontSize: 16, color: F.tekst },
-});
+}));

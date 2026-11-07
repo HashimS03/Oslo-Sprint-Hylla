@@ -1,8 +1,8 @@
 import { type ReactNode } from "react";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, Text, View, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { Ikon, type IkonNavn } from "./Ikon";
 
 // ---------- Tekst ----------
@@ -104,13 +104,13 @@ export function LenkeKnapp({ tekst, onPress, style }: { tekst: string; onPress: 
   );
 }
 
-const CHIP: Record<string, { bg: string; farge: string; tekst?: string }> = {
+const chipFarger = (): Record<string, { bg: string; farge: string; tekst?: string }> => ({
   ok: { bg: F.gronnlys, farge: F.gronn },
   avvik: { bg: F.rodlys, farge: F.rod },
   ikke_talt: { bg: F.graa, farge: F.dempet, tekst: "ikke talt" },
   mottak: { bg: F.gronnlys, farge: F.gronn, tekst: "MOTTAK" },
   mottatt: { bg: F.gronnlys, farge: F.gronn, tekst: "MOTTATT" },
-  restordre: { bg: F.gullys, farge: F.gul, tekst: "RESTORDRE" },
+  restordre: { bg: F.gullys, farge: F.gultekst, tekst: "RESTORDRE" },
   plukk: { bg: F.graa, farge: F.dempet, tekst: "PLUKK" },
   mulig_svinn: { bg: F.rodlys, farge: F.rod, tekst: "MULIG SVINN" },
   svinn: { bg: F.rodlys, farge: F.rod, tekst: "SVINN" },
@@ -119,10 +119,11 @@ const CHIP: Record<string, { bg: string; farge: string; tekst?: string }> = {
   aktiv: { bg: F.gronnlys, farge: F.gronn },
   offline: { bg: F.rodlys, farge: F.rod },
   hylle: { bg: F.graa, farge: F.tekst },
-};
+});
 
 export function Chip({ status, tekst }: { status: string; tekst?: string }) {
-  const c = CHIP[status] ?? CHIP.ikke_talt;
+  const chip = chipFarger();
+  const c = chip[status] ?? chip.ikke_talt;
   return (
     <View style={[st.chip, { backgroundColor: c.bg }]}>
       <Mono style={{ color: c.farge, fontSize: 11 }}>{tekst ?? c.tekst ?? status}</Mono>
@@ -177,7 +178,7 @@ export function Laster() {
   );
 }
 
-export const st = StyleSheet.create({
+export const st = lagStil(() => ({
   tekst: { fontFamily: S.tekst, fontSize: 15, color: F.tekst },
   display: { fontFamily: S.display, color: F.tekst, letterSpacing: -0.8 },
   mono: { fontFamily: S.mono, color: F.tekst, fontSize: 12 },
@@ -198,4 +199,4 @@ export const st = StyleSheet.create({
   knappTekst: { fontFamily: S.tekstHalvfet, fontSize: 16 },
   chip: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
   flis: { backgroundColor: F.gullys, borderWidth: 1, borderColor: F.gulkant, borderRadius: 6, alignItems: "center", justifyContent: "center" },
-});
+}));
