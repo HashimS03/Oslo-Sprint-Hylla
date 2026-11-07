@@ -12,7 +12,7 @@ export default async function Kamera({ searchParams }: { searchParams: Promise<{
       hylle={hy.id}
       kameraId={id}
       intervallMin={s.innstillinger.kameraIntervallMin}
-      demo={!(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN || process.env.YOLO_URL) || process.env.HYLLA_TELLER === "demo"}
+      demo={!(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN || process.env.YOLO_URL || process.env.SAM3_URL) || process.env.HYLLA_TELLER === "demo"}
     />
   );
 }
