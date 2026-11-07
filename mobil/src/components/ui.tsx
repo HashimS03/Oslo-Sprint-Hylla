@@ -1,9 +1,8 @@
 import { type ReactNode } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { router, usePathname } from "expo-router";
+import { router } from "expo-router";
 import { F, S } from "@/lib/tema";
-import { PIN_MELDING } from "@/lib/api";
 import { Ikon, type IkonNavn } from "./Ikon";
 import { StatiskFaner, type FaneNavn } from "./Faner";
 
@@ -162,12 +161,10 @@ export function Seksjon({ tittel, hoyre, children }: { tittel: string; hoyre?: R
 }
 
 export function Feilboks({ melding, igjen }: { melding: string; igjen?: () => void }) {
-  const sti = usePathname();
   return (
     <Kort farge={F.rodlys} style={{ borderColor: F.rod, gap: 8 }}>
       <Txt style={{ fontFamily: S.tekstHalvfet, color: F.rod }}>Noe gikk galt</Txt>
       <Txt style={{ color: F.tekst }}>{melding}</Txt>
-      {melding === PIN_MELDING && sti !== "/innstillinger" && <LenkeKnapp tekst="Gå til Innstillinger" onPress={() => router.push("/innstillinger")} />}
       {igjen && <LenkeKnapp tekst="Prøv igjen" onPress={igjen} />}
     </Kort>
   );

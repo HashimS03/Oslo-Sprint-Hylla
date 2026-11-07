@@ -25,7 +25,7 @@ export function usikkerAdresse(): string | null {
   return null;
 }
 
-export const PIN_MELDING = "Serveren krever tilgangskode. Gå til Innstillinger og skriv inn tilgangskoden (PIN) dere har fått.";
+export const PIN_MELDING = "Serveren krever PIN-kode. Skriv den inn på PIN-skjermen.";
 
 export class ApiFeil extends Error {
   constructor(melding: string, public status: number, public data?: unknown) {

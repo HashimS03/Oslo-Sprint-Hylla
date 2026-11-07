@@ -33,9 +33,12 @@ Ellers viser appen en feilmelding i stedet for å sende data ukryptert. `http://
 
 ### Tilgangskode (PIN)
 
-Hvis backenden har `HYLLA_PIN` satt, må appen sende koden med hvert kall (i headeren `x-hylla-secret`).
-Åpne **Innstillinger → Tilgang** i appen, skriv inn koden og trykk «Lagre». Koden lagres kryptert på telefonen med `expo-secure-store`.
-Mangler koden, eller er den feil, sier appen «Serveren krever tilgangskode» og viser vei til Innstillinger.
+Hvis backenden har `HYLLA_PIN` satt, viser appen skjermen **«Skriv inn PIN-koden»** når den starter (`src/app/tilgang.tsx`).
+Riktig kode lagres kryptert på telefonen med `expo-secure-store` og sendes med hvert kall i headeren `x-hylla-secret`.
+Blir koden ugyldig senere (fjernet eller byttet på serveren), låses appen og PIN-skjermen kommer igjen.
+
+**Koden endres bare på serveren**, i `HYLLA_PIN` (`.env.local` lokalt, eller i Vercel). Den kan ikke endres i appen.
+Under **Innstillinger → Tilgang** finnes bare «Lås appen», som fjerner koden fra telefonen.
 
 Ikke legg koden i `.env` som `EXPO_PUBLIC_…`: alt med det navnet bygges inn i appen og kan leses av alle som har den.
 
