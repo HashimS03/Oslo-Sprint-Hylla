@@ -32,8 +32,8 @@ const MODELL = process.env.HYLLA_MODELL ?? "claude-opus-5-5";
 const SYSTEM = `Du teller varer på lagerhyller fra ett bilde tatt med mobil.
 
 Slik teller du:
-- Tell hver vare for seg. Varene ligger brettet og stablet. Tell plagg i hver stabel, og legg sammen.
-- Bruk kantene av plaggene (de lyse eller mørke stripene i stabelen) for å telle lagene.
+- Tell hver vare for seg. Varene kan stå ved siden av hverandre på et bord eller ligge stablet. Tell hver gjenstand, og tell stabler lag for lag.
+- Se på form, farge og innpakning for å skille varene fra hverandre.
 - Hvis du ikke kan se hele stabelen eller er i tvil om ett plagg, gi ditt beste anslag i "antall", sett "sikkerhet" lavere og legg det nest mest sannsynlige tallet i "alternativ". Ellers er "alternativ" null.
 - "merknad" er en kort setning på norsk, for eksempel "stabel 3 er delvis skjult".
 - Varer du ser som ikke står på listen, beskriver du kort i "ukjente".
@@ -165,9 +165,11 @@ export const sam3Teller = eksternTeller("sam3", "SAM3_URL");
 // Faste tall fra demomanuset, så demoen alltid går selv uten nett eller API-nøkkel.
 
 const DEMO: Record<string, Record<string, [number, number, number | null, string]>> = {
-  B3: {
-    "TS-BLK-M": [18, 0.96, null, ""],
-    "TS-WHT-M": [14, 0.74, 15, "Stabel 3 er delvis skjult"],
+  // Bord 1: en brusboks plukket (ordre 20501), en penn borte uten ordre (mulig svinn), to kaffekopper kom (PO-3001).
+  T1: {
+    "BRUS-RED": [3, 0.96, null, ""],
+    "PENN-SVART": [2, 0.74, 3, "Pennene ligger delvis oppå hverandre"],
+    "KAFFE-KOPP": [5, 0.95, null, ""],
   },
 };
 

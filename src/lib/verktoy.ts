@@ -109,7 +109,7 @@ export const VERKTOY = [
   {
     name: "finn_vare",
     description: "Søk etter varer på navn, farge, størrelse eller SKU. Bruk dette først når brukeren nevner en vare med ord, for å finne SKU-en.",
-    input_schema: { type: "object", properties: { sok: { type: "string", description: "Søketekst, f.eks. 'svart t-skjorte M'" } }, required: ["sok"], additionalProperties: false },
+    input_schema: { type: "object", properties: { sok: { type: "string", description: "Søketekst, f.eks. 'kaffekopp'" } }, required: ["sok"], additionalProperties: false },
   },
   {
     name: "hent_beholdning",

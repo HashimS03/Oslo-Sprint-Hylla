@@ -15,7 +15,7 @@ import { Etikett, Rad, Skjerm, Txt } from "@/components/ui";
 
 type Melding = { id: number; rolle: "bruker" | "hylla"; tekst: string; kort?: Kort[]; lyd?: string };
 
-const FORSLAG = ["Hvor mange av den svarte t-skjorten vi bestilte forrige uke har vi igjen?", "Hva er mulig svinn i dag?", "Når kom PO-2291?"];
+const FORSLAG = ["Hvor mange kaffekopper har vi igjen?", "Hva er mulig svinn i dag?", "Når kom PO-3001?"];
 
 let nesteId = 1;
 const klokkeMs = () => Date.now();

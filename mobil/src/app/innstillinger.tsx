@@ -59,7 +59,7 @@ export default function Innstillinger() {
           hoyre={
             <Rad gap={14}>
               <Txt style={{ color: F.dempet }}>{data?.stemme ?? "–"}</Txt>
-              <LenkeKnapp tekst="Hør" onPress={() => Speech.speak("Du har atten svarte t-skjorter på hylle B3.", { language: "nb-NO" })} />
+              <LenkeKnapp tekst="Hør" onPress={() => Speech.speak("Du har tre brusbokser på Bord 1.", { language: "nb-NO" })} />
             </Rad>
           }
         />

@@ -4,7 +4,7 @@ import { KameraStasjon } from "./KameraStasjon";
 export const dynamic = "force-dynamic";
 
 export default async function Kamera({ searchParams }: { searchParams: Promise<{ hylle?: string; id?: string }> }) {
-  const { hylle = "B3", id } = await searchParams;
+  const { hylle = "T1", id } = await searchParams;
   const s = await hentState();
   const hy = s.hyller.find((h) => h.id === hylle.toUpperCase()) ?? s.hyller[0];
   return (
