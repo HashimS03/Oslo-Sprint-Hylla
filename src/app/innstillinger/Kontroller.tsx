@@ -45,9 +45,33 @@ export function NullstillDemo() {
       <span>
         <b className="font-semibold text-rod">{ferdig ? "Demoen er nullstilt" : "Nullstill demo"}</b>
         <br />
-        <span className="text-xs text-dempet">B3 tilbake til 13 svarte og 16 hvite</span>
+        <span className="text-xs text-dempet">Bord 1 tilbake til startbeholdningen</span>
       </span>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B3362A" strokeWidth="2.2" aria-hidden="true"><path d="M4 4v6h6" /><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9" /></svg>
+    </button>
+  );
+}
+
+export function TomLager() {
+  const router = useRouter();
+  const [ferdig, setFerdig] = useState(false);
+  return (
+    <button
+      onClick={async () => {
+        if (!confirm("Tømme lageret? Alle varer, hyller og all historikk slettes.")) return;
+        await fetch("/api/demo/nullstill", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ tom: true }) });
+        setFerdig(true);
+        router.refresh();
+        setTimeout(() => setFerdig(false), 2500);
+      }}
+      className="flex items-center justify-between rounded-[14px] border-[1.5px] border-rodkant bg-white px-3.5 py-[13px] text-left"
+    >
+      <span>
+        <b className="font-semibold text-rod">{ferdig ? "Lageret er tomt" : "Tøm lageret"}</b>
+        <br />
+        <span className="text-xs text-dempet">Start uten varer, og registrer dine egne</span>
+      </span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B3362A" strokeWidth="2.2" aria-hidden="true"><path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M6 6l1 14h10l1-14" /></svg>
     </button>
   );
 }

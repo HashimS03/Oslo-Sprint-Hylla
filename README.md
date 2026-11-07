@@ -6,6 +6,11 @@ AI-lagerassistent for Oslo Sprint (Holio, utfordring #7 Varetelling og svinn).
 - **Spør Hylla:** spør med stemmen og få svar høyt på norsk, med et varekort på skjermen (ElevenLabs, eller nettleserens egen tale som reserve).
 - **Kameratelefon:** en telefon på stativ som følger med på en hylle og teller av seg selv når noen har vært der.
 
+Det finnes to klienter som bruker de samme API-ene i Next.js:
+
+- **Dashboardet i `src/app/`** er nettsiden for driftslederen: oversikt, varer og beholdning, lokasjoner, avvik, hendelseslogg og rapport med CSV-eksport. Det har ingen kamerafunksjoner og oppdaterer seg selv hvert 10. sekund.
+- **Mobilappen i `mobil/`** (Expo) er for skanneren på gulvet, se [mobil/README.md](mobil/README.md).
+
 ## Kom i gang
 
 ```bash
@@ -23,9 +28,12 @@ npm run dev
 | `ANTHROPIC_API_KEY` | Ekte telling av bilder og ekte svar i Spør Hylla (Claude Opus 5.5) |
 | `ELEVENLABS_API_KEY`, `ELEVENLABS_AGENT_ID` | Stemmesamtale. Oppsett i [docs/elevenlabs.md](docs/elevenlabs.md) |
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Lagring som overlever omstart. Kjør [supabase/schema.sql](supabase/schema.sql) først |
+| `SAM3_URL` | Telling med Metas SAM 3 i stedet for Claude, se [sam3/README.md](sam3/README.md) |
 | `YOLO_URL`, `HYLLA_TELLER=yolo` | Valgfri YOLO-teller, se [yolo/README.md](yolo/README.md) |
 
-Kamera på telefonen krever HTTPS. Lokalt kan dere bruke `npx next dev --experimental-https` eller deploye til Vercel.
+**Mobilappen:** start backenden med `npm run dev`, så `cd mobil && npm install && npx expo start` og skann QR-koden med Expo Go. Detaljer i [mobil/README.md](mobil/README.md).
+
+Kamera på telefonen i web-appen krever HTTPS. Lokalt kan dere bruke `npx next dev --experimental-https` eller deploye til Vercel.
 
 ## Hvordan det henger sammen
 
@@ -36,17 +44,23 @@ src/
     seed.ts       Testdata som passer med demomanuset
     store.ts      Lagring: minne, eller én JSON-rad i Supabase
     lager.ts      All lagerlogikk: beholdning, forslag etter telling, lagring, avvik
-    teller.ts     Tellere: Claude (bilde → antall), YOLO og demo
+    teller.ts     Tellere: SAM 3, Claude (bilde → antall), YOLO og demo
     verktoy.ts    Verktøyene Spør Hylla bruker (felles for Claude og ElevenLabs)
     spor.ts       Tekstversjonen av Spør Hylla (Claude med verktøy)
+    visning.ts    Ferdige visningsdata per skjerm (brukes av mobilappen)
+    rapport.ts    Tall til dashboardet og rapporten, og CSV
+    elevenlabs.ts Tale til tekst og tekst til tale for mobilappen
   app/
-    page.tsx              Hjem
-    tell/                 Velg hylle → kamera → analyse → resultat
-    spor/                 Spør Hylla (ElevenLabs eller nettleserens tale)
-    logg/, avvik/[id]/    Lagerlogg og avvik med før/etter-bilde
-    varer/                Katalog, vare og nytt produkt
-    innstillinger/, kameraer/, kamera/   Oppsett og kameratelefonen
-    api/                  Route handlers (tell, lagre, spor, stemme-token, verktøy for ElevenLabs …)
+    page.tsx              Oversikt (nøkkeltall, åpne avvik, lav beholdning, siste hendelser)
+    varer/                Varetabell, vare med historikk, og ny vare
+    lokasjoner/           Hver lokasjon med forventet og sist observert antall
+    avvik/, avvik/[id]/   Alle avvik, og avklaring (funnet, salg eller svinn)
+    logg/                 Hendelser med filter og CSV
+    rapport/              Mottatt, solgt, svinn og svinnrate per vare, lokasjon og dag
+    spor/, innstillinger/ Spør Hylla og oppsett
+    api/                  Route handlers (tell, lagre, spor, stemme, oversikt, hyller, logg, varer, rapport …)
+mobil/                    Expo-appen (hyllelapp-designet)
+sam3/                     SAM 3-telleren (Python, egen tjeneste)
 ```
 
 Viktige prinsipper:

@@ -23,7 +23,7 @@ export const fortegn = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(
 export const TYPE_NAVN: Record<string, string> = {
   start: "Start",
   mottak: "Mottak",
-  plukk: "Plukk",
+  plukk: "Salg",
   mulig_svinn: "Mulig svinn",
   svinn: "Svinn",
   funnet: "Funnet",

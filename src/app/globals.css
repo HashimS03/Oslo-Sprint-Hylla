@@ -23,7 +23,18 @@
 }
 
 html, body { background: var(--color-bg); color: var(--color-tekst); }
-body { font-family: var(--font-sans); -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+  padding-top: env(safe-area-inset-top);
+}
+/* Knapper og lenker skal føles som en app: ingen tekstmarkering, kort trykkrespons. */
+a, button { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+a:active, button:active { opacity: .75; transition: opacity 60ms; }
+main { animation: inn 180ms ease-out; }
+@keyframes inn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { main { animation: none; } }
 
 .display { font-family: var(--font-display); font-stretch: 80%; font-weight: 800; line-height: 1.05; }
 .etikett { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; color: var(--color-dempet); text-transform: uppercase; }
