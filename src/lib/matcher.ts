@@ -1,6 +1,6 @@
 import "server-only";
 import { endreState, hentState } from "./store";
-import { nyId, vare } from "./lager";
+import { beholdning, nyId, vare } from "./lager";
 import type { KameraHendelse, MatcherAvvik, MatcherAvvikType, Skann, State } from "./types";
 
 // Matcheren sammenligner det kameraet ser med det skanneren sier, i et tidsvindu på ±15 s.
@@ -149,8 +149,10 @@ export function registrerSkann(s: State, inn: { sku: string; antall?: number; ty
   const antall = Math.max(1, Math.round(inn.antall ?? 1));
   const skann: Skann = { id: nyId("s"), tid: new Date().toISOString(), sku: inn.sku, antall, type: inn.type };
   (s.skanninger ??= []).push(skann);
-  // Skanneren er den som oppdaterer lagerloggen. Varen bokføres på hylla den hører hjemme på.
-  const hylle = hjem(s, inn.sku)[0] ?? s.hyller.find((h) => h.innhold.some((p) => p.sku === inn.sku))?.id;
+  // Skanneren oppdaterer lagerloggen for hyller uten kamera. Varen bokføres på hylla den hører hjemme på.
+  // Hyller med kamerasone telles av kameraet, så der bekrefter skanningen bare (matcheren) og skriver ikke til loggen.
+  const kameraTeller = hjem(s, inn.sku).length > 0 || s.hyller.some((h) => h.sone && beholdning(s, inn.sku, h.id) > 0);
+  const hylle = kameraTeller ? undefined : s.hyller.find((h) => h.innhold.some((p) => p.sku === inn.sku))?.id;
   if (hylle) {
     s.hendelser.push({
       id: nyId("h"),
