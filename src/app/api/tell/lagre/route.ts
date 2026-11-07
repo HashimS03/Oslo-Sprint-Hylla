@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   };
   const res = await endreState((s) => {
     const lagret = lagreForslag(s, forslag, { kilde: kilde ?? "mobil", bilde, korrigert });
-    return { ...lagret, oppsummering: oppsummerTelling(s, forslag.hylle, lagret.hendelser) };
+    return { ...lagret, oppsummering: oppsummerTelling(s, forslag.hylle, lagret.hendelser, lagret.venter) };
   });
   let lyd: string | undefined;
   if (medLyd && harElevenLabs()) {

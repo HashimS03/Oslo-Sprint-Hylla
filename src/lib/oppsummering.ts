@@ -28,10 +28,16 @@ function setning(s: State, h: Hendelse): string {
   }
 }
 
-export function oppsummerTelling(s: State, hylleId: string, hendelser: Hendelse[]): string {
+export function oppsummerTelling(s: State, hylleId: string, hendelser: Hendelse[], venter: string[] = []): string {
   const hylle = s.hyller.find((h) => h.id === hylleId)?.navn ?? `Hylle ${hylleId}`;
-  if (hendelser.length === 0) return `${hylle} er talt, og alt stemmer med lagerloggen.`;
+  const omtelling = venter.length
+    ? `${venter.map((sku) => varenavn(s, sku)).join(" og ")} må telles på nytt før vi kaller det svinn.`
+    : "";
+  if (hendelser.length === 0)
+    return omtelling ? `${hylle} er talt. ${omtelling}` : `${hylle} er talt, og alt stemmer med lagerloggen.`;
   const deler = hendelser.map((h) => setning(s, h));
   const svinn = hendelser.some((h) => h.type === "mulig_svinn");
-  return [`${hylle} er talt.`, ...deler, svinn ? "Sjekk avviket i loggen." : "Det er lagt i loggen."].join(" ");
+  return [`${hylle} er talt.`, ...deler, omtelling, svinn ? "Sjekk avviket i loggen." : "Det er lagt i loggen."]
+    .filter(Boolean)
+    .join(" ");
 }

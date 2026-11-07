@@ -1,11 +1,9 @@
 import { useRef, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View, type ScrollViewInstance } from "react-native";
-import {
-  createAudioPlayer, requestRecordingPermissionsAsync, RecordingPresets, setAudioModeAsync, useAudioRecorder, type AudioPlayer,
-} from "expo-audio";
-import { File, Paths } from "expo-file-system";
-import * as Speech from "expo-speech";
+import { requestRecordingPermissionsAsync, RecordingPresets, setAudioModeAsync, useAudioRecorder } from "expo-audio";
+import { File } from "expo-file-system";
 import * as Haptics from "expo-haptics";
+import { lesHoyt, stoppOpplesning } from "@/lib/opplesning";
 import type { Kort, SporSvar } from "@/lib/typer";
 import { ApiFeil, send, sendSkjema } from "@/lib/api";
 import { F, S } from "@/lib/tema";
@@ -28,36 +26,9 @@ export default function SporHylla() {
   const rull = useRef<ScrollViewInstance>(null);
   const opptaker = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const startTid = useRef(0);
-  const spiller = useRef<AudioPlayer | null>(null);
 
   const historikk = () => meldinger.filter((m) => m.tekst).slice(-10).map((m) => ({ rolle: m.rolle, tekst: m.tekst }));
   const leggTil = (m: Omit<Melding, "id">) => setMeldinger((ms) => [...ms, { ...m, id: nesteId++ }]);
-
-  /** Spiller ElevenLabs-lyden hvis vi fikk den, ellers leser telefonen opp selv. */
-  const lesHoyt = (svar: string, lyd?: string) => {
-    Speech.stop();
-    spiller.current?.remove();
-    spiller.current = null;
-    if (lyd?.startsWith("data:") && Platform.OS === "web") {
-      const p = createAudioPlayer(lyd);
-      spiller.current = p;
-      p.play();
-      return;
-    }
-    if (lyd?.startsWith("data:")) {
-      try {
-        const fil = new File(Paths.cache, `hylla-${klokkeMs()}.mp3`);
-        fil.writeSync(lyd.slice(lyd.indexOf(",") + 1), { encoding: "base64" });
-        const p = createAudioPlayer(fil.uri);
-        spiller.current = p;
-        p.play();
-        return;
-      } catch {
-        /* faller tilbake til telefonens stemme */
-      }
-    }
-    Speech.speak(svar, { language: "nb-NO" });
-  };
 
   const sporTekst = async (sporsmal: string) => {
     if (!sporsmal.trim() || tenker) return;
@@ -81,8 +52,7 @@ export default function SporHylla() {
       leggTil({ rolle: "hylla", tekst: "Jeg trenger tilgang til mikrofonen for å høre deg. Du kan også skrive spørsmålet." });
       return;
     }
-    Speech.stop();
-    spiller.current?.pause();
+    stoppOpplesning();
     await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
     await opptaker.prepareToRecordAsync();
     opptaker.record();

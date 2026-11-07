@@ -18,7 +18,7 @@ npm run dev
 
 Åpne http://localhost:3000 (best i mobilvisning i DevTools, eller på telefonen).
 
-**Uten nøkler kjører alt i demomodus:** tellingen gir de faste tallene fra demomanuset (B3: 13 → 18 svarte, 16 → 14 hvite), Spør Hylla svarer med enkle regler, og data ligger i minnet. Demoen kan nullstilles under Innstillinger.
+**Uten nøkler kjører alt i demomodus:** trykk «Bruk demotelling», så spiller telleren av demomanuset på Bord 1 (T1): én brusboks plukket (ordre 20501), én penn borte (mulig svinn, telleren er usikker og spør deg), to kaffekopper kom (restlevering på PO-3001). Demotellingen regner ut fra loggen, så den virker også på andre hyller og ved flere gjennomkjøringer. Spør Hylla svarer med enkle regler, og data ligger i minnet. Demoen kan nullstilles under Innstillinger. Et ekte bilde uten noen teller satt opp gir en feilmelding i stedet for falske tall.
 
 | Variabel | Hva den slår på |
 |---|---|
@@ -33,7 +33,7 @@ npm run dev
 Appen har ingen brukere, så den er beskyttet med én felles PIN-kode:
 
 1. **Sett `HYLLA_PIN` i Vercel** (minst 6 tegn). Da må nettleseren taste koden én gang, og alle API-kall uten kode avvises. Uten `HYLLA_PIN` er appen åpen for alle, og «Nullstill demo» / «Tøm lageret» er skrudd av i produksjon.
-2. **Sett `HYLLA_WEBHOOK_SECRET`** hvis dere bruker ElevenLabs-agenten.
+2. **Sett `HYLLA_WEBHOOK_SECRET`** hvis dere bruker ElevenLabs-agenten, og samme verdi i headeren `x-hylla-secret` på verktøyene i ElevenLabs. Uten den krever verktøyene PIN-en i samme header. Bare når verken PIN eller hemmelighet er satt (lokalt), er verktøyene åpne.
 3. **Sett utgiftstak** hos Anthropic, ElevenLabs og Meta. Appen har en enkel grense på antall kall per minutt, men den gjelder per serverinstans.
 4. Andre nettsider får ikke kalle API-et. Trenger Expo i nettleser en egen adresse, legg den i `HYLLA_TILLATTE_ADRESSER`.
 
@@ -72,8 +72,10 @@ sam3/                     SAM 3-telleren (Python, egen tjeneste)
 Viktige prinsipper:
 
 - **Lagerloggen er sannheten.** Beholdningen er alltid summen av hendelsene for en vare.
-- **Claude teller bare.** Koden regner ut differansen og forklarer den: en økning dekkes av åpne innkjøp (restlevering), en nedgang av åpne plukkordrer, og resten blir mulig svinn.
-- **Ingenting lagres før brukeren trykker Lagre.** Er telleren usikker, spør appen brukeren om det rette tallet.
+- **Claude teller bare.** Claude får ikke vite hvor mange som skal stå på hylla, så tellingen ikke dras mot loggen. Koden regner ut differansen og forklarer den: en økning dekkes av åpne innkjøp til samme hylle (restlevering), en nedgang av åpne plukkordrer, og resten blir mulig svinn. En økning uten innkjøp kalles «ukjent mottak».
+- **Tell igjen før svinn.** Er telleren under 80 % sikker, eller bildet dårlig, blir en nedgang ikke kalt svinn. Appen ber om nytt bilde eller at brukeren bekrefter tallet. Usikre varer som ikke er bekreftet, lagres ikke.
+- **Ingenting lagres før brukeren trykker Lagre.** Er telleren usikker, spør appen brukeren om det rette tallet. (Unntak: kameratelefonen lagrer selv, men aldri usikkert svinn.)
+- **Telleren låser aldri skjermen.** Avbryt-knapp, tidsavbrudd, og Claude som reserve når SAM 3 eller YOLO er nede.
 
 ## Branches
 

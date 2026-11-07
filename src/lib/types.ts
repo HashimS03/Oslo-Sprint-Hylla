@@ -137,6 +137,11 @@ export type ForslagEndring = {
   na: number;
   sikkerhet: number;
   alternativ: number | null;
+  /**
+   * Satt når tellingen er for usikker til å kalle noe svinn. Teksten sier hvorfor.
+   * Varen lagres ikke før brukeren bekrefter tallet (korrigert) eller tar nytt bilde.
+   */
+  tellIgjen?: string;
   /** Hver endring er delt i deler som forklares hver for seg. */
   deler: {
     type: HendelseType;

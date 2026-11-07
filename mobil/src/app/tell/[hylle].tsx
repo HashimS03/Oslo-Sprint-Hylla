@@ -8,6 +8,7 @@ import type { Forslag, ForslagEndring, HylleDetalj } from "@/lib/typer";
 import { send } from "@/lib/api";
 import { useHent } from "@/lib/useHent";
 import { tilJpeg } from "@/lib/bilde";
+import { lesHoyt } from "@/lib/opplesning";
 import { F, S } from "@/lib/tema";
 import { fortegn, klokke, smaa } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
@@ -25,9 +26,13 @@ export default function TellHylle() {
   const [forslag, setForslag] = useState<Forslag | null>(null);
   const [fremdrift, setFremdrift] = useState(0);
   const [feil, setFeil] = useState("");
+  // Øker for hver telling og ved Avbryt. Svar fra en telling som er avbrutt, blir ignorert.
+  const forsok = useRef(0);
 
   const tell = useCallback(
     async (uri: string | null) => {
+      const mitt = ++forsok.current;
+      const aktiv = () => mitt === forsok.current;
       setBilde(uri ? { uri } : null);
       setSteg("analyserer");
       setFremdrift(0);
@@ -36,16 +41,20 @@ export default function TellHylle() {
         let liten: string | undefined;
         if (uri) {
           [stort, liten] = await Promise.all([tilJpeg(uri, 1600, 0.75), tilJpeg(uri, 640, 0.6)]);
+          if (!aktiv()) return;
           setBilde({ uri, liten });
         }
         setFremdrift(1);
         const { forslag } = await send<{ forslag: Forslag }>("/api/tell", { hylle: hylleId, bilde: stort, demo: !uri });
+        if (!aktiv()) return;
         setFremdrift(2);
         await new Promise((r) => setTimeout(r, 600));
+        if (!aktiv()) return;
         setForslag(forslag);
         setSteg("resultat");
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       } catch (e) {
+        if (!aktiv()) return;
         setFeil(e instanceof Error ? e.message : "Tellingen feilet");
         setSteg("feil");
       }
@@ -54,7 +63,19 @@ export default function TellHylle() {
   );
 
   if (steg === "kamera") return <Kamera hylle={hylleId} forrige={hylle?.forrige ?? null} onBilde={tell} />;
-  if (steg === "analyserer") return <Analyserer hylle={hylleId} bilde={bilde?.uri ?? null} forrige={hylle?.forrige?.tid ?? null} fremdrift={fremdrift} />;
+  if (steg === "analyserer")
+    return (
+      <Analyserer
+        hylle={hylleId}
+        bilde={bilde?.uri ?? null}
+        forrige={hylle?.forrige?.tid ?? null}
+        fremdrift={fremdrift}
+        onAvbryt={() => {
+          forsok.current++;
+          setSteg("kamera");
+        }}
+      />
+    );
   if (steg === "feil")
     return (
       <Skjerm tittel="Tellingen gikk ikke" fane="tell" bunn={<><Knapp tekst="Ta nytt bilde" ikon="kamera" onPress={() => setSteg("kamera")} /><Knapp variant="hvit" tekst="Bruk demotelling" onPress={() => tell(null)} /></>}>
@@ -62,7 +83,7 @@ export default function TellHylle() {
         <Feilboks melding={feil} />
       </Skjerm>
     );
-  return <Resultat hylle={hylleId} forslag={forslag!} liten={bilde?.liten} sporNaarUsikker={hylle?.sporNaarUsikker ?? true} onNyttBilde={() => setSteg("kamera")} />;
+  return <Resultat hylle={hylleId} forslag={forslag!} liten={bilde?.liten} sporNaarUsikker={hylle?.sporNaarUsikker ?? true} svarHoyt={hylle?.svarHoyt ?? true} onNyttBilde={() => setSteg("kamera")} />;
 }
 
 // ---------------- Kamera ----------------
@@ -152,7 +173,9 @@ function Kamera({ hylle, forrige, onBilde }: { hylle: string; forrige: HylleDeta
 
 // ---------------- Analyserer ----------------
 
-function Analyserer({ hylle, bilde, forrige, fremdrift }: { hylle: string; bilde: string | null; forrige: string | null; fremdrift: number }) {
+function Analyserer({ hylle, bilde, forrige, fremdrift, onAvbryt }: {
+  hylle: string; bilde: string | null; forrige: string | null; fremdrift: number; onAvbryt: () => void;
+}) {
   const [sek, setSek] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setSek((s) => s + 1), 1000);
@@ -189,6 +212,8 @@ function Analyserer({ hylle, bilde, forrige, fremdrift }: { hylle: string; bilde
         })}
       </View>
       <Txt style={{ textAlign: "center", color: F.dempet, fontSize: 13, marginTop: 12 }}>Tar vanligvis 3–8 sekunder · {sek} s</Txt>
+      {/* Stor knapp, så telleren aldri låser skjermen. Vises etter noen sekunder. */}
+      {sek >= 3 && <Knapp variant="hvit" tekst="Avbryt" onPress={onAvbryt} />}
     </Skjerm>
   );
 }
@@ -206,22 +231,30 @@ function justert(e: ForslagEndring, valgt: number | undefined): ForslagEndring {
   return { ...e, na: valgt, deler: deler.filter((d) => d.endring !== 0) };
 }
 
-function Resultat({ hylle, forslag, liten, sporNaarUsikker, onNyttBilde }: {
-  hylle: string; forslag: Forslag; liten?: string; sporNaarUsikker: boolean; onNyttBilde: () => void;
+function Resultat({ hylle, forslag, liten, sporNaarUsikker, svarHoyt, onNyttBilde }: {
+  hylle: string; forslag: Forslag; liten?: string; sporNaarUsikker: boolean; svarHoyt: boolean; onNyttBilde: () => void;
 }) {
   const [valg, setValg] = useState<Record<string, number>>({});
   const [lagrer, setLagrer] = useState(false);
   const [feil, setFeil] = useState<string | null>(null);
-  const usikre = sporNaarUsikker ? forslag.endringer.filter((e) => e.alternativ !== null && e.sikkerhet < 0.8) : [];
-  const endringer = forslag.endringer.map((e) => justert(e, valg[e.sku])).filter((e) => e.deler.length > 0);
+  // «Tell igjen» vises alltid. Vanlige usikre tall bare når «Spør når usikker» er på.
+  const usikre = forslag.endringer.filter((e) => e.tellIgjen || (sporNaarUsikker && e.alternativ !== null && e.sikkerhet < 0.8));
+  // Usikkert svinn som ikke er bekreftet, lagres ikke. Det vises bare i den gule boksen.
+  const venter = (e: ForslagEndring) => !!e.tellIgjen && valg[e.sku] === undefined;
+  const antallVenter = forslag.endringer.filter(venter).length;
+  const endringer = forslag.endringer.filter((e) => !venter(e)).map((e) => justert(e, valg[e.sku])).filter((e) => e.deler.length > 0);
   const snitt = forslag.endringer.length ? Math.round((forslag.endringer.reduce((s, e) => s + e.sikkerhet, 0) / forslag.endringer.length) * 100) : 100;
 
   const lagre = async () => {
     setLagrer(true);
     setFeil(null);
     try {
-      await send("/api/tell/lagre", { forslag, korrigert: valg, bilde: liten, kilde: "mobil" });
+      const svar = await send<{ oppsummering?: string; lyd?: string }>("/api/tell/lagre", {
+        forslag, korrigert: valg, bilde: liten, kilde: "mobil", medLyd: svarHoyt,
+      });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      // Hylla sier selv hva tellingen endret (og varsler om mulig svinn), som i webappen.
+      if (svarHoyt && svar.oppsummering) lesHoyt(svar.oppsummering, svar.lyd);
       if (router.canDismiss()) router.dismissAll();
       router.navigate({ pathname: "/logg", params: { lagret: hylle } });
     } catch (e) {
@@ -238,10 +271,12 @@ function Resultat({ hylle, forslag, liten, sporNaarUsikker, onNyttBilde }: {
     >
       <Etikett>{`Hylle ${hylle} · ${forslag.forrigeTid ? `sammenlignet med ${klokke(forslag.forrigeTid)}` : "første telling"}`}</Etikett>
       <Display style={{ fontSize: 26, marginTop: -4 }}>
-        {endringer.length === 0 ? "Ingen endringer" : `${endringer.length} ${endringer.length === 1 ? "endring" : "endringer"} funnet`}
+        {endringer.length === 0
+          ? antallVenter > 0 ? "Tell igjen" : "Ingen endringer"
+          : `${endringer.length} ${endringer.length === 1 ? "endring" : "endringer"} funnet`}
       </Display>
 
-      {endringer.length === 0 && <Kort><Txt>Hylla stemmer med lagerloggen. Lagre for å registrere at {hylle} er talt.</Txt></Kort>}
+      {endringer.length === 0 && antallVenter === 0 && <Kort><Txt>Hylla stemmer med lagerloggen. Lagre for å registrere at {hylle} er talt.</Txt></Kort>}
 
       {endringer.map((e) => {
         const sum = e.deler.reduce((s, d) => s + d.endring, 0);
@@ -275,14 +310,16 @@ function Resultat({ hylle, forslag, liten, sporNaarUsikker, onNyttBilde }: {
       })}
 
       {usikre.map((e) => {
-        const [a, b] = [Math.min(e.na, e.alternativ!), Math.max(e.na, e.alternativ!)];
+        const valgene = e.alternativ !== null ? [Math.min(e.na, e.alternativ), Math.max(e.na, e.alternativ)] : [e.na];
         return (
           <View key={`u-${e.sku}`} style={st.usikker}>
-            <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 14 }}>Usikker på {smaa(e.navn)}</Txt>
-            <Txt style={{ fontSize: 14 }}>Ser du {a} eller {b}?</Txt>
+            <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 14 }}>{e.tellIgjen ? `Tell igjen: ${smaa(e.navn)}` : `Usikker på ${smaa(e.navn)}`}</Txt>
+            {e.tellIgjen && <Txt style={{ fontSize: 14 }}>{e.tellIgjen}</Txt>}
+            <Txt style={{ fontSize: 14 }}>{valgene.length === 2 ? `Ser du ${valgene[0]} eller ${valgene[1]}?` : `Stemmer ${valgene[0]}?`}</Txt>
             <Rad>
-              {[a, b].map((n) => {
-                const aktiv = (valg[e.sku] ?? e.na) === n;
+              {valgene.map((n) => {
+                // Ved «tell igjen» er ingenting valgt før brukeren trykker.
+                const aktiv = (valg[e.sku] ?? (e.tellIgjen ? undefined : e.na)) === n;
                 return (
                   <Pressable key={n} onPress={() => setValg({ ...valg, [e.sku]: n })} style={[st.valg, aktiv && { backgroundColor: F.tekst }]}>
                     <Txt style={{ fontFamily: S.tekstHalvfet, color: aktiv ? F.hvit : F.tekst }}>{n}</Txt>

@@ -28,37 +28,55 @@ export function TellFlyt(p: Props) {
   const [fremdrift, setFremdrift] = useState(0);
   const [sekunder, setSekunder] = useState(0);
 
+  // Avbryter tellingen som pågår (Avbryt-knappen eller tidsavbrudd).
+  const avbryter = useRef<AbortController | null>(null);
+
   const tell = useCallback(
     async (dataUrl: string | null, demo = false) => {
+      avbryter.current?.abort();
+      const kontroll = new AbortController();
+      avbryter.current = kontroll;
       setBilde(dataUrl);
       setSteg("analyserer");
       setFremdrift(1);
+      setSekunder(0);
       const start = Date.now();
       const tikk = setInterval(() => setSekunder(Math.round((Date.now() - start) / 1000)), 500);
+      // Litt over serverens grense (60 s), så skjermen aldri henger.
+      const tidsur = setTimeout(() => kontroll.abort("tidsavbrudd"), 70_000);
       try {
         const res = await fetch("/api/tell", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ hylle: p.hylle.id, bilde: dataUrl ?? undefined, demo }),
+          signal: kontroll.signal,
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.feil ?? "Tellingen feilet");
         setFremdrift(2);
         await new Promise((r) => setTimeout(r, 700));
+        if (kontroll.signal.aborted) return;
         setForslag(data.forslag);
         setSteg("resultat");
       } catch (e) {
-        setFeil(e instanceof Error ? e.message : "Noe gikk galt");
+        if (kontroll.signal.aborted && kontroll.signal.reason !== "tidsavbrudd") return; // brukeren trykket Avbryt
+        setFeil(kontroll.signal.aborted ? "Serveren svarte ikke på 70 sekunder. Prøv igjen" : e instanceof Error ? e.message : "Noe gikk galt");
         setSteg("feil");
       } finally {
         clearInterval(tikk);
+        clearTimeout(tidsur);
       }
     },
     [p.hylle.id],
   );
 
+  const avbryt = () => {
+    avbryter.current?.abort("avbrutt");
+    setSteg("kamera");
+  };
+
   if (steg === "kamera") return <Kamera {...p} onBilde={(b) => tell(b)} onDemo={() => tell(null, true)} />;
-  if (steg === "analyserer") return <Analyserer {...p} bilde={bilde} fremdrift={fremdrift} sekunder={sekunder} />;
+  if (steg === "analyserer") return <Analyserer {...p} bilde={bilde} fremdrift={fremdrift} sekunder={sekunder} onAvbryt={avbryt} />;
   if (steg === "feil")
     return (
       <div className="flex min-h-dvh flex-col gap-4 px-5 pt-10">
@@ -187,7 +205,7 @@ function Kamera({ hylle, forrige, ekteTeller, onBilde, onDemo }: Props & { onBil
 
 // ---------------- Analyserer ----------------
 
-function Analyserer({ hylle, forrige, bilde, fremdrift, sekunder }: Props & { bilde: string | null; fremdrift: number; sekunder: number }) {
+function Analyserer({ hylle, forrige, bilde, fremdrift, sekunder, onAvbryt }: Props & { bilde: string | null; fremdrift: number; sekunder: number; onAvbryt: () => void }) {
   const tid = new Date().toLocaleTimeString("nb-NO", { timeZone: "Europe/Oslo", hour: "2-digit", minute: "2-digit" });
   const steg = [
     "Bildet er lastet opp",
@@ -229,6 +247,11 @@ function Analyserer({ hylle, forrige, bilde, fremdrift, sekunder }: Props & { bi
         })}
       </ol>
       <span className="mt-auto text-center text-xs text-dempet">Tar vanligvis 3–8 sekunder · {sekunder} s</span>
+      {sekunder >= 3 && (
+        <button onClick={onAvbryt} className="flex h-12 items-center justify-center rounded-xl border border-kant bg-white text-[15px] font-semibold">
+          Avbryt
+        </button>
+      )}
     </div>
   );
 }
@@ -257,8 +280,12 @@ function Resultat({ hylle, forslag, bilde, sporNaarUsikker, svarHoyt, onNyttBild
   const [valg, setValg] = useState<Record<string, number>>({});
   const [lagrer, setLagrer] = useState(false);
   const [lagreFeil, setLagreFeil] = useState("");
-  const usikre = sporNaarUsikker ? forslag.endringer.filter((e) => e.alternativ !== null && e.sikkerhet < 0.8) : [];
-  const endringer = forslag.endringer.map((e) => justert(e, valg[e.sku])).filter((e) => e.deler.length > 0);
+  // «Tell igjen» vises alltid. Vanlige usikre tall bare når «Spør når usikker» er på.
+  const usikre = forslag.endringer.filter((e) => e.tellIgjen || (sporNaarUsikker && e.alternativ !== null && e.sikkerhet < 0.8));
+  // Usikkert svinn som ikke er bekreftet, lagres ikke. Det vises bare i den gule boksen.
+  const venter = (e: ForslagEndring) => !!e.tellIgjen && valg[e.sku] === undefined;
+  const antallVenter = forslag.endringer.filter(venter).length;
+  const endringer = forslag.endringer.filter((e) => !venter(e)).map((e) => justert(e, valg[e.sku])).filter((e) => e.deler.length > 0);
   const tid = new Date(forslag.tid).toLocaleTimeString("nb-NO", { timeZone: "Europe/Oslo", hour: "2-digit", minute: "2-digit" });
   const snittSikkerhet = forslag.endringer.length ? Math.round((forslag.endringer.reduce((s, e) => s + e.sikkerhet, 0) / forslag.endringer.length) * 100) : 100;
 
@@ -295,13 +322,15 @@ function Resultat({ hylle, forslag, bilde, sporNaarUsikker, svarHoyt, onNyttBild
         <div className="flex flex-col">
           <span className="font-mono text-[11px] text-dempet">HYLLE {hylle.id} · {tid} · {forslag.sekunder.toLocaleString("nb-NO")} SEK</span>
           <h1 className="display text-[26px]">
-            {endringer.length === 0 ? "Ingen endringer" : `${endringer.length} ${endringer.length === 1 ? "endring" : "endringer"} funnet`}
+            {endringer.length === 0
+              ? antallVenter > 0 ? "Tell igjen" : "Ingen endringer"
+              : `${endringer.length} ${endringer.length === 1 ? "endring" : "endringer"} funnet`}
           </h1>
         </div>
       </header>
 
       <main className="flex flex-1 flex-col gap-2.5 px-5 pt-2 pb-3">
-        {endringer.length === 0 && (
+        {endringer.length === 0 && antallVenter === 0 && (
           <div className="kort p-4 text-[15px]">Hylla stemmer med lagerloggen. Lagre for å registrere at {hylle.id} er talt.</div>
         )}
         {endringer.map((e) => {
@@ -332,15 +361,20 @@ function Resultat({ hylle, forslag, bilde, sporNaarUsikker, svarHoyt, onNyttBild
           );
         })}
 
-        {usikre.map((e) => (
+        {usikre.map((e) => {
+          const valgene = e.alternativ !== null ? [Math.min(e.na, e.alternativ), Math.max(e.na, e.alternativ)] : [e.na];
+          const navn = e.navn.charAt(0).toLowerCase() + e.navn.slice(1);
+          return (
           <div key={`u-${e.sku}`} className="flex flex-col gap-2.5 rounded-[14px] bg-gullys p-3.5">
             <div className="text-sm">
-              <b className="font-semibold">Usikker på {e.navn.charAt(0).toLowerCase() + e.navn.slice(1)}.</b>{" "}
-              Ser du {Math.min(e.na, e.alternativ!)} eller {Math.max(e.na, e.alternativ!)}?
+              <b className="font-semibold">{e.tellIgjen ? `Tell igjen: ${navn}.` : `Usikker på ${navn}.`}</b>{" "}
+              {e.tellIgjen && <>{e.tellIgjen} </>}
+              {valgene.length === 2 ? `Ser du ${valgene[0]} eller ${valgene[1]}?` : `Stemmer ${valgene[0]}?`}
             </div>
             <div className="flex gap-2">
-              {[Math.min(e.na, e.alternativ!), Math.max(e.na, e.alternativ!)].map((n) => {
-                const aktiv = (valg[e.sku] ?? e.na) === n;
+              {valgene.map((n) => {
+                // Ved «tell igjen» er ingenting valgt før brukeren trykker.
+                const aktiv = (valg[e.sku] ?? (e.tellIgjen ? undefined : e.na)) === n;
                 return (
                   <button
                     key={n}
@@ -354,7 +388,8 @@ function Resultat({ hylle, forslag, bilde, sporNaarUsikker, svarHoyt, onNyttBild
               <button onClick={onNyttBilde} className="h-10 flex-[2] text-[13px] underline">Ta nytt bilde</button>
             </div>
           </div>
-        ))}
+          );
+        })}
 
         <div className="flex justify-between px-1 text-xs text-dempet">
           <span>Uendret: {forslag.uendret} {forslag.uendret === 1 ? "vare" : "varer"}</span>

@@ -24,8 +24,16 @@ export function velgTeller(tvingDemo = false): Teller {
   if (valgt === "claude") return claudeTeller;
   if (valgt === "yolo" || (!valgt && process.env.YOLO_URL && !process.env.ANTHROPIC_API_KEY)) return yoloTeller;
   if (process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN) return claudeTeller;
-  return demoTeller;
+  return ingenTeller;
 }
+
+/** Et ekte bilde uten noen teller satt opp: si fra i stedet for å vise demotall som om de var ekte. */
+const ingenTeller: Teller = {
+  navn: "ingen",
+  async tell() {
+    throw new Error("Ingen ekte teller er satt opp. Sett META_API_KEY, ANTHROPIC_API_KEY eller SAM3_URL i .env, eller bruk demotelling.");
+  },
+};
 
 // ---------------- Claude ----------------
 
@@ -261,36 +269,41 @@ export const sam31Teller: Teller = {
 };
 
 // ---------------- Demo ----------------
-// Faste tall fra demomanuset, så demoen alltid går selv uten nett eller API-nøkkel.
+// Spiller av demomanuset uten nett eller API-nøkkel. Tallene regnes ut fra loggen, så demoen
+// virker på alle hyller og også ved andre gjennomkjøring (uten nullstilling):
+// - vare med åpen plukkordre på hylla: én er plukket
+// - vare med åpent innkjøp til hylla: resten av leveransen har kommet
+// - én vare (pennen på Bord 1, ellers første vare med noe på hylla): én mangler, og telleren er usikker
+// På Bord 1 i seed gir dette: brus −1 (ordre 20501), penn −1 (mulig svinn), kaffekopp +2 (PO-3001).
 
-const DEMO: Record<string, Record<string, [number, number, number | null, string]>> = {
-  // Bord 1: en brusboks plukket (ordre 20501), en penn borte uten ordre (mulig svinn), to kaffekopper kom (PO-3001).
-  T1: {
-    "BRUS-RED": [3, 0.96, null, ""],
-    "PENN-SVART": [2, 0.74, 3, "Pennene ligger delvis oppå hverandre"],
-    "KAFFE-KOPP": [5, 0.95, null, ""],
-  },
-};
+const DEMO_SVINN = "PENN-SVART";
 
 export const demoTeller: Teller = {
   navn: "demo",
   async tell({ state, hylle }) {
     await new Promise((r) => setTimeout(r, 2500));
-    const tall = DEMO[hylle.id] ?? {};
-    if (!hylle.innhold.some((p) => tall[p.sku])) {
-      // Demoen har bare faste tall for demovarene. For egne varer ville den bare gjentatt forrige antall.
-      throw new Error("Ingen ekte teller er satt opp. Sett META_API_KEY, ANTHROPIC_API_KEY eller SAM3_URL i .env");
-    }
+    if (hylle.innhold.length === 0) throw new Error("Hylla har ingen varer å telle ennå. Legg til varer først.");
+
+    const base = (sku: string) => beholdning(state, sku, hylle.id);
+    const ordre = (sku: string) => state.ordrer.find((o) => o.sku === sku && o.hylle === hylle.id && o.status === "apen");
+    const po = (sku: string) => state.innkjop.find((i) => i.sku === sku && i.hylle === hylle.id && i.mottatt < i.bestilt);
+    const kandidater = hylle.innhold.map((p) => p.sku).filter((sku) => base(sku) > 0 && !ordre(sku) && !po(sku));
+    const svinnSku = kandidater.includes(DEMO_SVINN) ? DEMO_SVINN : kandidater[0];
+
     return {
-      varer: hylle.innhold.map((p) => {
-        const d = tall[p.sku];
-        return d
-          ? { sku: p.sku, antall: d[0], sikkerhet: d[1], alternativ: d[2], merknad: d[3] }
-          : { sku: p.sku, antall: beholdning(state, p.sku, hylle.id), sikkerhet: 0.95, alternativ: null, merknad: "" };
+      varer: hylle.innhold.map(({ sku }) => {
+        const b = base(sku);
+        const o = ordre(sku);
+        const p = po(sku);
+        if (o && b > 0) return { sku, antall: b - 1, sikkerhet: 0.96, alternativ: null, merknad: "" };
+        if (p) return { sku, antall: b + (p.bestilt - p.mottatt), sikkerhet: 0.95, alternativ: null, merknad: "" };
+        if (sku === svinnSku)
+          return { sku, antall: b - 1, sikkerhet: 0.74, alternativ: b, merknad: "Varene ligger delvis oppå hverandre" };
+        return { sku, antall: b, sikkerhet: 0.95, alternativ: null, merknad: "" };
       }),
       ukjente: [],
       bildekvalitet: "god",
-      kommentar: "Demotelling (fast resultat)",
+      kommentar: "Demotelling (spiller av demomanuset)",
     };
   },
 };

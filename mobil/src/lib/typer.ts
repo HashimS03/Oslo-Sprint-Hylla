@@ -19,7 +19,7 @@ export type HylleRad = {
   innhold: { sku: string; nivaa: string; navn: string; antall: number }[];
 };
 
-export type HylleDetalj = HylleRad & { forrige: { tid: string; bilde: string | null } | null; sporNaarUsikker: boolean };
+export type HylleDetalj = HylleRad & { forrige: { tid: string; bilde: string | null } | null; sporNaarUsikker: boolean; svarHoyt?: boolean };
 
 export type Avvik = LoggRad & {
   nivaa: string | null; status: string; lukketTid: string | null;
@@ -54,6 +54,8 @@ export type InnstillingerSvar = {
 export type ForslagEndring = {
   sku: string; navn: string; nivaa: string; swatch: string; forrige: number; na: number;
   sikkerhet: number; alternativ: number | null;
+  /** Tellingen er for usikker til å kalle noe svinn. Lagres ikke før brukeren bekrefter tallet. */
+  tellIgjen?: string;
   deler: { type: HendelseType; endring: number; aarsak: string; ref?: string }[];
 };
 

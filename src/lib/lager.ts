@@ -110,7 +110,8 @@ export function lagForslag(
       if (r.sikkerhet < 0.8 && r.alternativ !== null) endringer.push({ ...base, deler: [] });
       continue;
     }
-    endringer.push({ ...base, deler: forklar(s, hylle, plass.sku, diff) });
+    const deler = forklar(s, hylle, plass.sku, diff);
+    endringer.push({ ...base, deler, tellIgjen: tellIgjen(deler, r.sikkerhet, resultat.bildekvalitet) });
   }
 
   return {
@@ -127,6 +128,25 @@ export function lagForslag(
     kommentar: resultat.kommentar,
     sekunder,
   };
+}
+
+/** Grensen for når en telling er sikker nok til å kalle en nedgang mulig svinn. */
+export const SIKKER_NOK = 0.8;
+
+/**
+ * «Tell igjen» før «mulig svinn»: en usikker telling eller et dårlig bilde skal ikke gi et svinnvarsel.
+ * Gir en kort forklaring når varen må telles på nytt eller bekreftes, ellers undefined.
+ */
+export function tellIgjen(
+  deler: ForslagEndring["deler"],
+  sikkerhet: number,
+  bildekvalitet: TelleResultat["bildekvalitet"],
+): string | undefined {
+  if (!deler.some((d) => d.type === "mulig_svinn")) return undefined;
+  if (bildekvalitet === "darlig") return "Bildet er for dårlig til å kalle dette svinn. Ta nytt bilde, eller bekreft tallet.";
+  if (sikkerhet < SIKKER_NOK)
+    return `Telleren er bare ${Math.round(sikkerhet * 100)} % sikker. Tell igjen, eller bekreft tallet før det blir svinn.`;
+  return undefined;
 }
 
 export function forklar(s: State, hylle: string, sku: string, diff: number): ForslagEndring["deler"] {
@@ -169,9 +189,15 @@ export function lagreForslag(
   s: State,
   f: Forslag,
   opts: { kilde: Telling["kilde"]; bilde?: string; korrigert?: Record<string, number> },
-): { tellingId: string; hendelser: Hendelse[] } {
+): { tellingId: string; hendelser: Hendelse[]; venter: string[] } {
   // Brukeren kan ha rettet et usikkert tall; da regnes forklaringen ut på nytt.
   const antall = { ...f.antall, ...(opts.korrigert ?? {}) };
+  // «Tell igjen»: usikre varer som brukeren ikke har bekreftet, lagres ikke. Beholdningen står urørt
+  // til varen er talt på nytt, så ingen får et svinnvarsel på grunn av et dårlig bilde.
+  const venter = f.endringer
+    .filter((e) => e.tellIgjen && opts.korrigert?.[e.sku] === undefined)
+    .map((e) => e.sku);
+  for (const sku of venter) delete antall[sku];
   const telling: Telling = {
     id: nyId("t"),
     tid: new Date().toISOString(),
@@ -216,7 +242,7 @@ export function lagreForslag(
     }
   }
   ryddBilder(s, f.hylle);
-  return { tellingId: telling.id, hendelser: nye };
+  return { tellingId: telling.id, hendelser: nye, venter };
 }
 
 /** Avslutt et avvik: varen er funnet (setter tilbake antallet) eller registrert som svinn. */

@@ -36,7 +36,7 @@ export function hylleVisning(s: State, id: string) {
   const h = hyllerVisning(s).find((x) => x.id === id.toUpperCase());
   if (!h) return null;
   const t = sisteTelling(s, h.id);
-  return { ...h, forrige: t ? { tid: t.tid, bilde: t.bilde ?? null } : null, sporNaarUsikker: s.innstillinger.sporNaarUsikker };
+  return { ...h, forrige: t ? { tid: t.tid, bilde: t.bilde ?? null } : null, sporNaarUsikker: s.innstillinger.sporNaarUsikker, svarHoyt: s.innstillinger.svarHoyt };
 }
 
 export function avvikVisning(s: State, id: string) {
