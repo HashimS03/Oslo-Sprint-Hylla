@@ -37,7 +37,7 @@ export function VareSok({ varer, startStatus = "" }: { varer: V[]; startStatus?:
               key={f.id}
               onClick={() => setStatus(f.id)}
               aria-pressed={status === f.id}
-              className={`rounded-full px-3 py-1.5 text-[13px] ${status === f.id ? "bg-tekst font-semibold text-bg" : "border border-kant bg-white hover:border-tekst"}`}
+              className={`rounded-full px-3 py-1.5 text-[13px] ${status === f.id ? "bg-tekst font-semibold text-bg" : "border border-kant bg-kort hover:border-tekst"}`}
             >
               {f.navn}{merke[f.id] ? ` · ${merke[f.id]}` : ""}
             </button>
@@ -47,7 +47,7 @@ export function VareSok({ varer, startStatus = "" }: { varer: V[]; startStatus?:
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-[13.5px]">
           <thead>
-            <tr className="border-b border-kant bg-bg font-mono text-[10.5px] tracking-[.06em] text-dempet uppercase">
+            <tr className="border-b border-kant bg-thead font-mono text-[10.5px] tracking-[.06em] text-dempet uppercase">
               <th scope="col" className="px-4 py-2.5 text-left font-medium"><button onClick={() => setSortering("navn")} className={`uppercase ${sortering === "navn" ? "text-tekst" : ""}`}>Vare {sortering === "navn" ? "↓" : ""}</button></th>
               <th scope="col" className="px-4 py-2.5 text-left font-medium">SKU</th>
               <th scope="col" className="px-4 py-2.5 text-left font-medium">Variant</th>
@@ -60,7 +60,7 @@ export function VareSok({ varer, startStatus = "" }: { varer: V[]; startStatus?:
           </thead>
           <tbody>
             {liste.map((v) => (
-              <tr key={v.sku} className="border-b border-kant last:border-0 hover:bg-bg">
+              <tr key={v.sku} className="border-b border-linje last:border-0 hover:bg-graa">
                 <td className="px-4 py-2.5">
                   <Link href={`/varer/${encodeURIComponent(v.sku)}`} className="flex items-center gap-2.5 font-semibold hover:underline">
                     <span className="h-7 w-7 shrink-0 rounded-md border border-kant" style={{ background: v.swatch }} />

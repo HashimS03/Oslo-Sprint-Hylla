@@ -32,7 +32,7 @@ export default async function Lokasjoner() {
                       tittel={`${hy.id} · ${hy.navn}`}
                       handling={<StatusChip status={hylleStatus(s, hy.id)} />}
                     >
-                      <div className="flex flex-wrap gap-x-6 gap-y-1 border-b border-kant bg-bg px-4 py-2.5 text-[12.5px] text-dempet">
+                      <div className="flex flex-wrap gap-x-6 gap-y-1 border-b border-kant bg-thead px-4 py-2.5 text-[12.5px] text-dempet">
                         <span><b className="font-semibold text-tekst">{sum}</b> stk</span>
                         <span><b className="font-semibold text-tekst">{hy.innhold.length}</b> varetyper</span>
                         <span>Sist kontrollert {t ? `${kortDato(t.tid)} ${klokke(t.tid)}` : "aldri"}</span>

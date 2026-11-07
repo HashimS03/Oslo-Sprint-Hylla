@@ -46,7 +46,7 @@ export default async function Hendelser({ searchParams }: { searchParams: Promis
     <>
       <Topp tittel="Hendelser" under="Lagerloggen er sannheten: beholdningen er summen av alle hendelsene.">
         <PeriodeVelger valgt={dager} lag={(d) => lenke({ dager: String(d) })} />
-        <a href={`/api/rapport?format=csv&hva=hendelser&dager=${dager}`} className="rounded-lg border border-kant bg-white px-3.5 py-2 text-[13.5px] font-semibold hover:border-tekst">Last ned CSV</a>
+        <a href={`/api/rapport?format=csv&hva=hendelser&dager=${dager}`} className="rounded-lg border border-kant bg-kort px-3.5 py-2 text-[13.5px] font-semibold hover:border-tekst">Last ned CSV</a>
       </Topp>
       <Innhold>
         <div className="flex flex-wrap items-center gap-3">
@@ -54,11 +54,11 @@ export default async function Hendelser({ searchParams }: { searchParams: Promis
           <form action="/logg" className="ml-auto flex items-center gap-2">
             {type && <input type="hidden" name="type" value={type} />}
             {dager ? <input type="hidden" name="dager" value={dager} /> : null}
-            <label className="flex h-9 items-center gap-2 rounded-lg border border-kant bg-white px-2.5">
+            <label className="flex h-9 items-center gap-2 rounded-lg border border-kant bg-kort px-2.5">
               <Ikon navn="sok" size={15} className="text-dempet" />
               <input name="q" defaultValue={q} placeholder="Vare, SKU eller ref" aria-label="Søk i hendelser" className="w-44 bg-transparent text-[13.5px] outline-none" />
             </label>
-            <select name="hylle" defaultValue={hylle} aria-label="Lokasjon" className="h-9 rounded-lg border border-kant bg-white px-2 text-[13.5px]">
+            <select name="hylle" defaultValue={hylle} aria-label="Lokasjon" className="h-9 rounded-lg border border-kant bg-kort px-2 text-[13.5px]">
               <option value="">Alle lokasjoner</option>
               {s.hyller.map((h) => <option key={h.id} value={h.id}>{h.id}</option>)}
             </select>
@@ -71,7 +71,7 @@ export default async function Hendelser({ searchParams }: { searchParams: Promis
         >
           <Tabell hode={["Tid", "Type", "Lokasjon", "Vare", "Endring", "Årsak", "Ref", "Avvik"]} hoyre={[4]}>
             {rader.slice(0, MAKS).map((h) => (
-              <tr key={h.id} className={h.type === "mulig_svinn" && h.avvik?.status === "apen" ? "bg-rodlys/40" : ""}>
+              <tr key={h.id} className={h.type === "mulig_svinn" && h.avvik?.status === "apen" ? "bg-rodlys" : ""}>
                 <td className="font-mono text-[12px] whitespace-nowrap text-dempet">{kortDato(h.tid)} {klokke(h.tid)}</td>
                 <td><TypeChip type={h.type} /></td>
                 <td className="font-semibold">{h.hylle}</td>

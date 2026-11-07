@@ -73,7 +73,7 @@ export function Chat({ stemme }: { stemme: boolean }) {
                 className={
                   m.rolle === "bruker"
                     ? "max-w-[280px] self-end rounded-[16px_16px_4px_16px] bg-tekst px-3.5 py-2.5 text-sm leading-snug text-bg"
-                    : "max-w-[300px] self-start rounded-[16px_16px_16px_4px] border border-kant bg-white px-3.5 py-2.5 text-sm leading-snug"
+                    : "max-w-[300px] self-start rounded-[16px_16px_16px_4px] border border-kant bg-kort px-3.5 py-2.5 text-sm leading-snug"
                 }
               >
                 {m.tekst}
@@ -82,10 +82,10 @@ export function Chat({ stemme }: { stemme: boolean }) {
             {m.kort?.map((k, i) => <KortVisning key={i} kort={k} />)}
           </div>
         ))}
-        {tenker && <div className="self-start rounded-2xl border border-kant bg-white px-3.5 py-2.5 text-sm text-dempet">Slår opp …</div>}
+        {tenker && <div className="self-start rounded-2xl border border-kant bg-kort px-3.5 py-2.5 text-sm text-dempet">Slår opp …</div>}
         <div className="flex flex-wrap gap-1.5">
           {FORSLAG.map((f) => (
-            <button key={f} onClick={() => (sender ?? ((t: string) => sporTekst(t, false)))(f)} className="rounded-full border border-kant bg-white px-2.5 py-1.5 text-left text-xs">
+            <button key={f} onClick={() => (sender ?? ((t: string) => sporTekst(t, false)))(f)} className="rounded-full border border-kant bg-kort px-2.5 py-1.5 text-left text-xs">
               {f}
             </button>
           ))}
@@ -226,7 +226,7 @@ function TekstFelt({ onSend }: { onSend: (t: string) => void }) {
         setT("");
       }}
     >
-      <input value={t} onChange={(e) => setT(e.target.value)} placeholder="Eller skriv spørsmålet …" className="h-11 flex-1 rounded-xl border border-kant bg-white px-3 text-sm outline-none" />
+      <input value={t} onChange={(e) => setT(e.target.value)} placeholder="Eller skriv spørsmålet …" className="h-11 flex-1 rounded-xl border border-kant bg-kort px-3 text-sm outline-none" />
       <button type="submit" aria-label="Send" className="flex h-11 w-11 items-center justify-center rounded-xl bg-tekst text-bg">
         <Ikon navn="pil" size={18} />
       </button>

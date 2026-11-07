@@ -3,7 +3,7 @@ import { hentState } from "@/lib/store";
 import { apneAvvik, beholdning, hylleStatus, sisteTelling, totalBeholdning, vare } from "@/lib/lager";
 import { fortegn, hilsen, klokke, kortDato, dagTittel, typeFarge } from "@/lib/format";
 import { lavBeholdning, rapport } from "@/lib/rapport";
-import { AvvikChip, Innhold, Kpi, Panel, PanelLenke, Prikk, Tabell, TomRad, Topp, TypeChip } from "@/components/dash";
+import { Innhold, Kpi, Ruter, Panel, PanelLenke, Prikk, Tabell, TomRad, Topp, TypeChip } from "@/components/dash";
 import { StatusChip } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -25,42 +25,44 @@ export default async function Oversikt() {
         tittel={`${hilsen()} ${avvik.length ? `${avvik.length} ${avvik.length === 1 ? "avvik venter" : "avvik venter"}.` : "Ingen åpne avvik."}`}
         under={<span className="first-letter:uppercase">{dato} · {s.innstillinger.lager}</span>}
       >
-        <Link href="/rapport" className="rounded-lg border border-kant bg-white px-3.5 py-2 text-[13.5px] font-semibold hover:border-tekst">Se rapport</Link>
+        <Link href="/rapport" className="knapp-gul !h-11 !w-auto !rounded-[10px] !border-2 px-5 !text-[14px]">Se rapport</Link>
       </Topp>
       <Innhold>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
           <Kpi etikett="På lager" verdi={totalBeholdning(s)} under={`${s.varer.length} varetyper`} href="/varer" />
           <Kpi etikett="Åpne avvik" verdi={avvik.length} under={avvik.length ? `${avvik.reduce((n, a) => n - a.endring, 0)} stk uavklart` : "Alt er avklart"} tone={avvik.length ? "rod" : undefined} href="/avvik" />
           <Kpi etikett="Svinn, 7 dager" verdi={uke.totalt.svinn} under={uke.totalt.muligSvinn ? `+ ${uke.totalt.muligSvinn} stk uavklart` : "bekreftet etter kontroll"} href="/rapport?dager=7" />
-          <Kpi etikett="Bevegelser i dag" verdi={idag.antallHendelser} under={`+${idag.totalt.mottatt} inn · −${idag.totalt.solgt} solgt`} href="/logg?dager=1" />
+          <Kpi etikett="Bevegelser i dag" verdi={idag.antallHendelser} under={`+${idag.totalt.mottatt} inn · −${idag.totalt.solgt} solgt`} tone={idag.antallHendelser ? "gronn" : undefined} href="/logg?dager=1" />
           <Kpi etikett="Lav beholdning" verdi={lav.length} under="varer med 3 eller færre" tone={lav.length ? "gul" : undefined} href="/varer?status=lav" />
         </div>
 
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           <Panel tittel="Åpne avvik" handling={<PanelLenke href="/avvik">Alle avvik</PanelLenke>}>
-            <Tabell hode={["Oppdaget", "Lokasjon", "Vare", "Mangler", "Status", ""]} hoyre={[3]}>
-              {avvik.slice(0, 6).map((a) => (
-                <tr key={a.id} className="hover:bg-bg">
-                  <td className="font-mono text-[12px] whitespace-nowrap text-dempet">{tidTekst(a.tid)}</td>
-                  <td className="font-semibold">{a.hylle}</td>
-                  <td>{vare(s, a.sku)?.navn ?? a.sku}</td>
-                  <td className="text-right font-mono font-semibold text-rod">{Math.abs(a.endring)} stk</td>
-                  <td><AvvikChip status="apen" /></td>
-                  <td className="text-right"><Link href={`/avvik/${a.id}`} className="text-[13px] font-semibold underline underline-offset-2">Behandle</Link></td>
-                </tr>
+            <ul className="divide-y divide-linje">
+              {avvik.slice(0, 5).map((a) => (
+                <li key={a.id} className="flex flex-wrap items-center gap-4 bg-rodlys px-4 py-3.5">
+                  <span className="display w-12 text-[30px] text-rod" style={{ fontStretch: "100%" }}>−{Math.abs(a.endring)}</span>
+                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="text-[15px] font-semibold">{vare(s, a.sku)?.navn ?? a.sku} · {a.hylle}</span>
+                    <span className="text-[12.5px] text-dempet">{a.aarsak} · {tidTekst(a.tid)}</span>
+                  </span>
+                  <Link href={`/avvik/${a.id}`} className="flex h-10 items-center rounded-[9px] bg-rod px-4 text-[13px] font-bold text-bg hover:opacity-90">Behandle</Link>
+                </li>
               ))}
-              {avvik.length === 0 && <TomRad kolonner={6}>Ingen åpne avvik. Nye avvik dukker opp her så snart de oppdages.</TomRad>}
-            </Tabell>
+              {avvik.length === 0 && <li className="px-4 py-8 text-center text-[13.5px] text-dempet">Ingen åpne avvik. Nye avvik dukker opp her så snart de oppdages.</li>}
+              {avvik.length > 5 && <li className="px-4 py-3 text-[13px] text-dempet">{avvik.length - 5} til. <Link href="/avvik" className="underline underline-offset-2">Se alle</Link></li>}
+            </ul>
           </Panel>
 
           <Panel tittel="Lav beholdning" handling={<PanelLenke href="/varer?status=lav">Se varer</PanelLenke>}>
-            <ul className="divide-y divide-kant">
+            <ul className="divide-y divide-linje">
               {lav.slice(0, 6).map((v) => (
                 <li key={v.sku}>
-                  <Link href={`/varer/${encodeURIComponent(v.sku)}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-bg">
+                  <Link href={`/varer/${encodeURIComponent(v.sku)}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-graa">
                     <Prikk farge={v.swatch} />
                     <span className="flex-1 text-[13.5px]">{v.navn}<span className="ml-2 font-mono text-[11px] text-dempet">{v.sku}</span></span>
-                    <span className={`display text-[20px] ${v.antall <= 1 ? "text-rod" : ""}`} style={{ fontStretch: "100%" }}>{v.antall}</span>
+                    <Ruter antall={v.antall} />
+                    <span className={`display w-7 text-right text-[20px] ${v.antall <= 2 ? "text-rod" : "text-gultekst"}`} style={{ fontStretch: "100%" }}>{v.antall}</span>
                   </Link>
                 </li>
               ))}
@@ -87,14 +89,14 @@ export default async function Oversikt() {
           </Panel>
 
           <Panel tittel="Lokasjoner" handling={<PanelLenke href="/lokasjoner">Alle lokasjoner</PanelLenke>}>
-            <ul className="divide-y divide-kant">
+            <ul className="divide-y divide-linje">
               {s.hyller.map((hy) => {
                 const t = sisteTelling(s, hy.id);
                 const stk = hy.innhold.reduce((n, i) => n + beholdning(s, i.sku, hy.id), 0);
                 return (
                   <li key={hy.id}>
-                    <Link href={`/lokasjoner#${hy.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-bg">
-                      <span className="flex h-9 w-11 items-center justify-center rounded-md border border-[#EAD58A] bg-gullys font-display text-[15px] font-extrabold">{hy.id}</span>
+                    <Link href={`/lokasjoner#${hy.id}`} className="flex items-center gap-3 px-4 py-2.5 hover:bg-graa">
+                      <span className="flex h-9 w-11 items-center justify-center rounded-md border border-gulkant bg-gullys font-display text-[15px] font-extrabold">{hy.id}</span>
                       <span className="flex flex-1 flex-col text-[13.5px]">
                         <span className="font-semibold">{hy.navn}</span>
                         <span className="text-[12px] text-dempet">{hy.innhold.length} varetyper · {stk} stk{t ? ` · sist kontrollert ${tidTekst(t.tid)}` : ""}</span>

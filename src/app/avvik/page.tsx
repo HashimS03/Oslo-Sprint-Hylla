@@ -36,7 +36,7 @@ export default async function AvvikListe({ searchParams }: { searchParams: Promi
         <Panel tittel={VALG.find((v) => v.id === filter)!.navn + " avvik"}>
           <Tabell hode={["Oppdaget", "Lokasjon", "Vare", "Antall", "Status", "Lukket", ""]} hoyre={[3]}>
             {rader.map((a) => (
-              <tr key={a.id} className={a.status === "apen" ? "bg-rodlys/40" : ""}>
+              <tr key={a.id} className={a.status === "apen" ? "bg-rodlys" : ""}>
                 <td className="font-mono text-[12px] whitespace-nowrap text-dempet">{kortDato(a.tid)} {klokke(a.tid)}</td>
                 <td className="font-semibold">{a.hylle}</td>
                 <td><Link href={`/varer/${encodeURIComponent(a.sku)}`} className="hover:underline">{a.navn}</Link></td>

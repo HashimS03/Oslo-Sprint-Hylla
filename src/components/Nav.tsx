@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type IkonNavn = "oversikt" | "varer" | "lokasjoner" | "avvik" | "hendelser" | "rapport" | "spor" | "innstillinger";
 
@@ -32,25 +32,26 @@ function MenyIkon({ navn }: { navn: IkonNavn }) {
   }
 }
 
-function Lenke({ m, p }: { m: (typeof MENY)[number]; p: string }) {
+function Lenke({ m, p, merke }: { m: (typeof MENY)[number]; p: string; merke?: number }) {
   const a = m.aktiv(p);
   return (
     <Link
       href={m.href}
       aria-current={a ? "page" : undefined}
-      className={`flex h-10 shrink-0 items-center gap-2.5 rounded-lg px-3 text-[14px] ${a ? "bg-gullys font-semibold text-tekst shadow-[inset_3px_0_0_var(--color-gul)]" : "text-dempet hover:bg-graa hover:text-tekst"}`}
+      className={`flex h-10 shrink-0 items-center gap-2.5 rounded-lg px-3 text-[14px] ${a ? "bg-gullys font-semibold text-aktiv ring-1 ring-gulkant" : "text-dempet hover:bg-graa hover:text-tekst"}`}
     >
       <MenyIkon navn={m.ikon} />
-      {m.navn}
+      <span className="flex-1">{m.navn}</span>
+      {merke ? <span className="ml-1 rounded-full bg-rod px-2 py-px text-[11.5px] font-semibold text-bg" aria-label={`${merke} åpne`}>{merke}</span> : null}
     </Link>
   );
 }
 
 /** Sidemenyen. På smale skjermer blir den en rad øverst. */
-export function Sidemeny({ lager }: { lager: string }) {
+export function Sidemeny({ lager, avvik, tema }: { lager: string; avvik: number; tema: Tema }) {
   const p = usePathname();
   return (
-    <aside className="sticky top-0 z-20 flex shrink-0 flex-col gap-1 border-b border-kant bg-white px-3 py-3 lg:h-dvh lg:w-[232px] lg:border-r lg:border-b-0 lg:py-5">
+    <aside className="sticky top-0 z-20 flex shrink-0 flex-col gap-1 border-b border-kant bg-meny px-3 py-3 lg:h-dvh lg:w-[232px] lg:border-r lg:border-b-0 lg:py-5">
       <div className="flex items-center justify-between px-2 pb-2 lg:flex-col lg:items-start lg:gap-1 lg:pb-5">
         <Link href="/" className="display flex items-center gap-2 text-[24px]" style={{ fontStretch: "78%" }}>
           <span className="inline-block h-4 w-4 border-[2.5px] border-tekst bg-gul" />
@@ -59,12 +60,13 @@ export function Sidemeny({ lager }: { lager: string }) {
         <span className="etikett">{lager}</span>
       </div>
       <nav aria-label="Hovedmeny" className="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">
-        {MENY.map((m) => <Lenke key={m.href} m={m} p={p} />)}
+        {MENY.map((m) => <Lenke key={m.href} m={m} p={p} merke={m.href === "/avvik" ? avvik : undefined} />)}
         <span className="hidden lg:block lg:h-4" />
-        <div className="flex gap-1 lg:hidden">{BUNN.map((m) => <Lenke key={m.href} m={m} p={p} />)}</div>
+        <div className="flex gap-1 lg:hidden">{BUNN.map((m) => <Lenke key={m.href} m={m} p={p} />)}<TemaBryter start={tema} /></div>
       </nav>
       <div className="mt-auto hidden flex-col gap-1 lg:flex">
         {BUNN.map((m) => <Lenke key={m.href} m={m} p={p} />)}
+        <TemaBryter start={tema} />
         <span className="mt-3 px-3 text-[11px] text-dempet">Driftsleder · oppdateres automatisk</span>
       </div>
     </aside>
@@ -81,4 +83,32 @@ export function AutoOppdater({ sekunder = 10 }: { sekunder?: number }) {
     return () => clearInterval(t);
   }, [router, sekunder]);
   return null;
+}
+
+export type Tema = "lys" | "mork";
+
+/** Bytter mellom lys og mørk modus. Valget lagres i en informasjonskapsel, så serveren tegner riktig tema fra start. */
+export function TemaBryter({ start }: { start: Tema }) {
+  const [tema, setTema] = useState<Tema>(start);
+  const bytt = () => {
+    const neste: Tema = tema === "mork" ? "lys" : "mork";
+    setTema(neste);
+    document.documentElement.dataset.theme = neste === "mork" ? "dark" : "light";
+    document.cookie = `tema=${neste}; path=/; max-age=31536000; samesite=lax`;
+  };
+  const mork = tema === "mork";
+  return (
+    <button
+      type="button"
+      onClick={bytt}
+      role="switch"
+      aria-checked={mork}
+      className="flex h-10 shrink-0 items-center gap-2.5 rounded-lg px-3 text-[14px] text-dempet hover:bg-graa hover:text-tekst"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden="true">
+        {mork ? <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></> : <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" />}
+      </svg>
+      <span className="flex-1 text-left whitespace-nowrap">{mork ? "Lys modus" : "Mørk modus"}</span>
+    </button>
+  );
 }
