@@ -11,7 +11,7 @@ export default async function Innstillinger() {
   const i = s.innstillinger;
   const reoler = new Set(s.hyller.map((h) => h.reol)).size;
   const aktive = s.kameraer.filter((k) => Date.now() - new Date(k.sistSett).getTime() < 15 * 60e3).length;
-  const teller = process.env.HYLLA_TELLER ?? (process.env.ANTHROPIC_API_KEY ? "claude" : process.env.YOLO_URL ? "yolo" : "demo");
+  const teller = process.env.HYLLA_TELLER ?? (process.env.SAM3_URL ? "sam3" : process.env.ANTHROPIC_API_KEY ? "claude" : process.env.YOLO_URL ? "yolo" : "demo");
   const stemme = process.env.ELEVENLABS_AGENT_ID ? "ElevenLabs" : "nettleseren";
   const Rad = ({ v, h, forste, href }: { v: string; h: React.ReactNode; forste?: boolean; href?: string }) => {
     const innhold = <><span>{v}</span><span className="text-dempet">{h}</span></>;

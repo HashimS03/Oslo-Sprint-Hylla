@@ -4,10 +4,12 @@ import type { Hylle, State, TelleResultat } from "./types";
 import { beholdning, sisteTelling, vare } from "./lager";
 
 // En teller tar et hyllebilde og returnerer antall per vare.
-// Tre varianter, valgt med HYLLA_TELLER (claude | yolo | demo):
-// - claude: Claude ser på bildet og teller (standard når ANTHROPIC_API_KEY finnes)
+// Fire varianter, valgt med HYLLA_TELLER (sam3 | claude | yolo | demo):
+// - sam3:   Metas SAM 3 i en egen tjeneste (se sam3/), satt med SAM3_URL
+// - claude: Claude ser på bildet og teller (når ANTHROPIC_API_KEY finnes)
 // - yolo:   en egen YOLO-tjeneste (se yolo/), satt med YOLO_URL
 // - demo:   faste tall fra demomanuset, uten nettverk
+// Uten HYLLA_TELLER velges sam3 hvis SAM3_URL finnes, så claude, så yolo, ellers demo.
 
 export type TellerInput = { state: State; hylle: Hylle; bilde: string /* data-URL */ };
 export type Teller = { navn: string; tell: (i: TellerInput) => Promise<TelleResultat> };
@@ -16,6 +18,8 @@ export function velgTeller(tvingDemo = false): Teller {
   if (tvingDemo) return demoTeller;
   const valgt = process.env.HYLLA_TELLER;
   if (valgt === "demo") return demoTeller;
+  if (valgt === "sam3" || (!valgt && process.env.SAM3_URL)) return sam3Teller;
+  if (valgt === "claude") return claudeTeller;
   if (valgt === "yolo" || (!valgt && process.env.YOLO_URL && !process.env.ANTHROPIC_API_KEY)) return yoloTeller;
   if (process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN) return claudeTeller;
   return demoTeller;
@@ -126,20 +130,36 @@ export const claudeTeller: Teller = {
 // Forventer en tjeneste som tar { hylle, bilde, varer: [{sku, nivaa}] } og svarer med TelleResultat.
 // Se yolo/README.md for en enkel FastAPI-tjeneste med Ultralytics.
 
-export const yoloTeller: Teller = {
-  navn: "yolo",
-  async tell({ hylle, bilde }) {
-    const url = process.env.YOLO_URL;
-    if (!url) throw new Error("YOLO_URL er ikke satt");
-    const res = await fetch(`${url.replace(/\/$/, "")}/tell`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ hylle: hylle.id, bilde, varer: hylle.innhold }),
-    });
-    if (!res.ok) throw new Error(`YOLO-tjenesten svarte ${res.status}`);
-    return (await res.json()) as TelleResultat;
-  },
-};
+/** Kaller en egen telletjeneste (YOLO eller SAM 3) med samme format: POST /tell → TelleResultat. */
+function eksternTeller(navn: string, urlVar: string): Teller {
+  return {
+    navn,
+    async tell({ state, hylle, bilde }) {
+      const url = process.env[urlVar];
+      if (!url) throw new Error(`${urlVar} er ikke satt`);
+      const varer = hylle.innhold.map((i) => {
+        const v = vare(state, i.sku);
+        return { sku: i.sku, nivaa: i.nivaa, navn: v?.navn ?? i.sku, farge: v?.farge ?? "", beskrivelse: v?.beskrivelse ?? "" };
+      });
+      let res: Response;
+      try {
+        res = await fetch(`${url.replace(/\/$/, "")}/tell`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ hylle: hylle.id, bilde, varer }),
+          signal: AbortSignal.timeout(55_000),
+        });
+      } catch {
+        throw new Error(`Får ikke kontakt med ${navn}-tjenesten på ${url}`);
+      }
+      if (!res.ok) throw new Error(`${navn}-tjenesten svarte ${res.status}: ${(await res.text()).slice(0, 200)}`);
+      return (await res.json()) as TelleResultat;
+    },
+  };
+}
+
+export const yoloTeller = eksternTeller("yolo", "YOLO_URL");
+export const sam3Teller = eksternTeller("sam3", "SAM3_URL");
 
 // ---------------- Demo ----------------
 // Faste tall fra demomanuset, så demoen alltid går selv uten nett eller API-nøkkel.

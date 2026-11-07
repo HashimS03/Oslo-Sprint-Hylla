@@ -12,7 +12,7 @@ export default async function TellHylle({ params }: { params: Promise<{ hylle: s
   const hylle = s.hyller.find((h) => h.id === id.toUpperCase());
   if (!hylle) notFound();
   const forrige = sisteTelling(s, hylle.id);
-  const ekteTeller = !!(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN || process.env.YOLO_URL) && process.env.HYLLA_TELLER !== "demo";
+  const ekteTeller = !!(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN || process.env.YOLO_URL || process.env.SAM3_URL) && process.env.HYLLA_TELLER !== "demo";
   return (
     <TellFlyt
       hylle={{ id: hylle.id, navn: hylle.navn }}

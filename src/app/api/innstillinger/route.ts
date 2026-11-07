@@ -11,7 +11,7 @@ export async function GET() {
     innstillinger: s.innstillinger,
     reoler: new Set(s.hyller.map((h) => h.reol)).size,
     hyller: s.hyller.length,
-    teller: process.env.HYLLA_TELLER ?? (process.env.ANTHROPIC_API_KEY ? "claude" : process.env.YOLO_URL ? "yolo" : "demo"),
+    teller: process.env.HYLLA_TELLER ?? (process.env.SAM3_URL ? "sam3" : process.env.ANTHROPIC_API_KEY ? "claude" : process.env.YOLO_URL ? "yolo" : "demo"),
     stemme: process.env.ELEVENLABS_API_KEY ? "ElevenLabs" : "telefonen",
     lagring: lagringstype(),
   });
