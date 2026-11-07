@@ -4,7 +4,7 @@ import { sikreTakkamera } from "@/lib/kameraoppsett";
 
 export const runtime = "nodejs";
 
-// Setter opp takkameraet (T1 Red Bull, T2 Cola, gang) uten å slette noe. Trygt å kalle flere ganger.
+// Setter opp takkameraet (sone T1, T2 og gang) uten varer. Trygt å kalle flere ganger.
 export async function POST() {
   try {
     return NextResponse.json(await endreState((s) => sikreTakkamera(s)));

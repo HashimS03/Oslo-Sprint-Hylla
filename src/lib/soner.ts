@@ -58,9 +58,13 @@ export function sonerForKamera(s: State, kameraId: string): SoneHylle[] {
   return s.hyller.filter((h): h is SoneHylle => h.sone?.kamera === kameraId);
 }
 
-/** Alle varer som kan dukke opp i bildet: det som hører hjemme på en hylle med sone på dette kameraet. */
-function kandidater(soner: SoneHylle[]): string[] {
-  return [...new Set(soner.flatMap((h) => h.innhold.map((p) => p.sku)))];
+/**
+ * Alle varer som kan dukke opp i bildet: det som hører hjemme på en hylle med sone på dette kameraet.
+ * Har ingen sone fått varer ennå, ser kameraet etter alle varene på lageret.
+ */
+function kandidater(s: State, soner: SoneHylle[]): string[] {
+  const valgt = [...new Set(soner.flatMap((h) => h.innhold.map((p) => p.sku)))];
+  return valgt.length ? valgt : s.varer.map((v) => v.sku);
 }
 
 /** Hendelser fra kameraet, nyeste sist. `etter` er en ISO-tid, `sone` filtrerer på sone. */
@@ -84,7 +88,7 @@ export async function behandleTakbilde(opts: {
   if (opts.kunSone && soner.length === 0) throw new Error(`${opts.kunSone} er ikke en sone på kamera ${opts.kameraId}`);
   if (soner.length === 0) throw new Error(`Kamera ${opts.kameraId} har ingen soner`);
   const teller = velgTeller(!!opts.demo);
-  const alle = kandidater(alleSoner);
+  const alle = kandidater(state, alleSoner);
   const naa = Date.now();
 
   // Ny start: har kameraet ikke sett en sone på en stund (eller aldri), gjelder ikke det gamle utgangspunktet.
@@ -118,7 +122,8 @@ export async function behandleTakbilde(opts: {
 
       try {
         // Telleren får alle kjente varer som kandidater. Hjemmehørende varer er de som hører til denne hylla.
-        const egne = hylle.innhold.map((p) => p.sku);
+        // En sone uten valgte varer har ingen «feil» varer: alt den ser, regnes som hjemmehørende.
+        const egne = hylle.innhold.length ? hylle.innhold.map((p) => p.sku) : alle;
         const utvidet: Hylle = { ...hylle, innhold: alle.map((sku) => ({ sku, nivaa: egne.includes(sku) ? (hylle.innhold.find((p) => p.sku === sku)?.nivaa ?? "") : "annen sone" })) };
         // demoTall lar demoen og testene oppgi hva kameraet «ser» per sone, uten ekte bilde.
         const oppgitt = opts.demoTall?.[hylle.id];

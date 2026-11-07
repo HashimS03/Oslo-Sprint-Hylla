@@ -40,7 +40,7 @@ export default function Kameraer() {
       {hyller && !hyller.hyller.some((h) => h.sone) && (
         <Kort style={{ gap: 8 }}>
           <Txt>Takkameraet er ikke satt opp i denne databasen ennå.</Txt>
-          <Knapp tekst="Sett opp takkamera (T1 Red Bull, T2 Cola)" onPress={async () => { await send("/api/kamera/oppsett", {}).catch(() => undefined); oppdaterHyller(); }} />
+          <Knapp tekst="Sett opp takkamera (sone T1, T2 og gang)" onPress={async () => { await send("/api/kamera/oppsett", {}).catch(() => undefined); oppdaterHyller(); }} />
         </Kort>
       )}
       {(hyller?.hyller ?? []).some((h) => h.sone && h.sone.type !== "gang") && <Etikett style={{ marginTop: 10 }}>Kamera i taket</Etikett>}

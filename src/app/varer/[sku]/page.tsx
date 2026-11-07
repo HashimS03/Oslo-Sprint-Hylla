@@ -5,6 +5,7 @@ import { hentState } from "@/lib/store";
 import { apneAvvik, beholdning, beholdningPerHylle, innkjopForVare, plukketSiden, vare } from "@/lib/lager";
 import { fortegn, klokke, kortDato, typeFarge } from "@/lib/format";
 import { LAV_BEHOLDNING, rapport } from "@/lib/rapport";
+import { SlettVare } from "./SlettVare";
 import { Innhold, Kpi, Panel, Tabell, TomRad, Topp, TypeChip } from "@/components/dash";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +33,9 @@ export default async function VareSide({ params }: { params: Promise<{ sku: stri
 
   return (
     <>
-      <Topp tittel={v.navn} under={<span className="font-mono">{v.sku}</span>} tilbake={{ href: "/varer", navn: "Varer" }} />
+      <Topp tittel={v.navn} under={<span className="font-mono">{v.sku}</span>} tilbake={{ href: "/varer", navn: "Varer" }}>
+        <SlettVare sku={v.sku} navn={v.navn} />
+      </Topp>
       <Innhold>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           <Kpi etikett="På lager" verdi={totalt} under={totalt <= LAV_BEHOLDNING ? "Lav beholdning" : `fordelt på ${hyller.length} lokasjon${hyller.length === 1 ? "" : "er"}`} tone={totalt <= LAV_BEHOLDNING ? "rod" : undefined} />
