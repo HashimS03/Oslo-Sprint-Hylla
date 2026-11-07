@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useFocusEffect } from "expo-router";
-import { hent } from "./api";
+import { ApiFeil, hent } from "./api";
 
 /** Henter JSON fra backenden, og henter på nytt hver gang skjermen kommer i fokus. */
 export function useHent<T>(sti: string | null) {
@@ -19,7 +19,12 @@ export function useHent<T>(sti: string | null) {
         setFeil(null);
       }
     } catch (e) {
-      if (aktiv.current) setFeil(e instanceof Error ? e.message : "Noe gikk galt");
+      if (aktiv.current) {
+        setFeil(e instanceof Error ? e.message : "Noe gikk galt");
+        // Mangler vi tilgang (PIN fjernet eller feil), skal ingen gamle data bli stående på skjermen.
+        // Ved vanlige nettverksfeil beholder vi det vi hadde, så skjermen ikke blir tom i et dødt hjørne av lageret.
+        if (e instanceof ApiFeil && (e.status === 401 || e.status === 403)) setData(null);
+      }
     } finally {
       if (aktiv.current) setLaster(false);
     }

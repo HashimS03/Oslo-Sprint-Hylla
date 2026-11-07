@@ -41,7 +41,7 @@ export default function Hjem() {
         <Display style={st.heroTekst}>
           {hilsen()}
           {"\n"}
-          {!data ? "Henter lageret …" : kommIGang ? "La oss sette opp lageret." : ting === 0 ? "Alt ser bra ut i dag." : `${ting} ting trenger deg i dag.`}
+          {!data ? (feil ? "Fikk ikke hentet lageret." : "Henter lageret …") : kommIGang ? "La oss sette opp lageret." : ting === 0 ? "Alt ser bra ut i dag." : `${ting} ting trenger deg i dag.`}
         </Display>
         <View style={st.strekkode}>
           {Array.from({ length: 28 }).map((_, i) => <View key={i} style={{ width: i % 3 === 0 ? 3 : 1.5, height: 14, backgroundColor: F.tekst }} />)}
