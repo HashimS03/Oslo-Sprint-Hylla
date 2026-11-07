@@ -38,6 +38,12 @@ export default function SporHylla() {
     Speech.stop();
     spiller.current?.remove();
     spiller.current = null;
+    if (lyd?.startsWith("data:") && Platform.OS === "web") {
+      const p = createAudioPlayer(lyd);
+      spiller.current = p;
+      p.play();
+      return;
+    }
     if (lyd?.startsWith("data:")) {
       try {
         const fil = new File(Paths.cache, `hylla-${klokkeMs()}.mp3`);
@@ -95,8 +101,14 @@ export default function SporHylla() {
 
     setTenker(true);
     const skjema = new FormData();
-    // React Native laster opp filen fra uri-en.
-    skjema.append("lyd", { uri, name: "sporsmal.m4a", type: "audio/m4a" } as unknown as Blob);
+    if (Platform.OS === "web") {
+      // I nettleseren er opptaket en blob:-URL, så vi henter selve lyden og sender den.
+      const blob = await (await fetch(uri)).blob();
+      skjema.append("lyd", blob, blob.type.includes("mp4") ? "sporsmal.m4a" : "sporsmal.webm");
+    } else {
+      // På telefonen laster React Native opp filen fra uri-en.
+      skjema.append("lyd", { uri, name: "sporsmal.m4a", type: "audio/m4a" } as unknown as Blob);
+    }
     skjema.append("historikk", JSON.stringify(historikk()));
     try {
       const svar = await sendSkjema<SporSvar>("/api/stemme/sporsmal", skjema);
