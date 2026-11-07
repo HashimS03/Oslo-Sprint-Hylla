@@ -1,56 +1,59 @@
-# Welcome to your Expo app 👋
+# Hylla, mobilappen (Expo)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Appen dere demoer på telefonen. Den bruker Next.js-appen i rotmappa som backend, og ser ut som hyllelapp-skissene.
 
-## Get started
+## Kjør den
 
-1. Install dependencies
+1. Start backenden i rotmappa (en egen terminal):
 
    ```bash
    npm install
+   npm run dev          # http://localhost:3000
    ```
 
-2. Start the app
+2. Start appen:
 
    ```bash
+   cd mobil
+   npm install
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. Skann QR-koden med **Expo Go** (iPhone: kameraappen, Android: Expo Go-appen). Telefonen og maskinen må være på samme Wi-Fi.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Appen finner backenden selv: den bruker samme IP-adresse som Expo-serveren, port 3000.
+Er backenden et annet sted (f.eks. Vercel), lag `mobil/.env`:
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+EXPO_PUBLIC_API_URL=https://hylla-dere.vercel.app
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Uten nøkler i backenden kjører alt i demomodus. På tellingskjermen finnes også «Bruk demotelling» hvis dere ikke har en hylle foran dere.
 
-### Other setup steps
+## Skjermene
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+| Fil | Skjerm |
+|---|---|
+| `src/app/(faner)/index.tsx` | Hjem |
+| `src/app/(faner)/tell.tsx` | Velg hylle |
+| `src/app/tell/[hylle].tsx` | Kamera → Analyserer → Resultat → Lagre |
+| `src/app/(faner)/spor.tsx` | Spør Hylla (hold inne og snakk, eller skriv) |
+| `src/app/(faner)/logg.tsx` | Logg |
+| `src/app/(faner)/varer.tsx`, `vare/[sku].tsx`, `ny-vare.tsx` | Varer, vare og nytt produkt |
+| `src/app/avvik/[id].tsx` | Avvik med før/etter |
+| `src/app/innstillinger.tsx` | Innstillinger |
+| `src/app/kameraer.tsx`, `kamera/[hylle].tsx` | Kameratelefoner og kameramodus |
 
-## Learn more
+Felles: `src/components/ui.tsx` (knapper, kort, chips, skjermramme), `src/components/Faner.tsx` (fanelinja), `src/lib/tema.ts` (farger og skrift), `src/lib/api.ts` (kall til backenden).
 
-To learn more about developing your project with Expo, look at the following resources:
+## Stemme
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Når du holder inne mikrofonknappen tar appen opp lyd og sender den til `/api/stemme/sporsmal`. Serveren gjør tale til tekst og tekst til tale med ElevenLabs, og Claude svarer. Svaret spilles av på telefonen.
+Uten `ELEVENLABS_API_KEY` på serveren kan dere skrive spørsmålet i stedet, og telefonen leser svaret høyt med sin egen stemme.
 
-## Join the community
+## Før dere committer
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npx tsc --noEmit
+npx expo lint
+```

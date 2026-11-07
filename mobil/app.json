@@ -1,38 +1,59 @@
 {
   "expo": {
-    "name": "mobil",
-    "slug": "mobil",
+    "name": "Hylla",
+    "slug": "hylla",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "mobil",
-    "userInterfaceStyle": "automatic",
+    "icon": "./assets/images/hylla-ikon.png",
+    "scheme": "hylla",
+    "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "supportsTablet": false,
+      "bundleIdentifier": "no.oslosprint.hylla"
     },
     "android": {
+      "package": "no.oslosprint.hylla",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#F4C430",
+        "foregroundImage": "./assets/images/hylla-ikon.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "output": "server",
-      "favicon": "./assets/images/favicon.png"
+      "output": "single",
+      "favicon": "./assets/images/hylla-ikon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#F4C430",
+          "image": "./assets/images/hylla-ikon.png",
+          "imageWidth": 96
         }
-      ]
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Hylla bruker kameraet til å telle varene på hylla.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Hylla bruker mikrofonen når du holder inne og spør."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Hylla tar bilder av nye varer så den kjenner dem igjen."
+        }
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,
