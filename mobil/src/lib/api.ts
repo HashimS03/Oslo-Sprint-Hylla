@@ -1,5 +1,6 @@
 import Constants from "expo-constants";
 import { lesPin } from "./pin";
+import { settTilgang } from "./tilgangStatus";
 
 // Adressen til Next.js-backenden.
 // 1. EXPO_PUBLIC_API_URL hvis den er satt (f.eks. https://hylla.vercel.app)
@@ -39,7 +40,10 @@ export class ApiFeil extends Error {
 
 async function svar<T>(res: Response): Promise<T> {
   const data = await res.json().catch(() => ({}));
-  if (res.status === 401 && (data as { trengerPin?: boolean }).trengerPin) throw new ApiFeil(PIN_MELDING, 401, data);
+  if (res.status === 401 && (data as { trengerPin?: boolean }).trengerPin) {
+    settTilgang("laast"); // viser PIN-skjermen (se app/_layout.tsx)
+    throw new ApiFeil(PIN_MELDING, 401, data);
+  }
   if (!res.ok) throw new ApiFeil((data as { feil?: string }).feil ?? `Feil fra serveren (${res.status})`, res.status, data);
   return data as T;
 }

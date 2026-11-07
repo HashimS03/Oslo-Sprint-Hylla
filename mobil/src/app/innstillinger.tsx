@@ -5,6 +5,7 @@ import * as Speech from "expo-speech";
 import type { Innstillinger as Inn, InnstillingerSvar } from "@/lib/typer";
 import { apiUrl, send, usikkerAdresse } from "@/lib/api";
 import { lagrePin, lesPin, slettPin } from "@/lib/pin";
+import { sjekkTilgang } from "@/lib/tilgang";
 import { useHent } from "@/lib/useHent";
 import { F, S } from "@/lib/tema";
 import { Ikon } from "@/components/Ikon";
@@ -38,6 +39,8 @@ export default function Innstillinger() {
     await slettPin().catch(() => {});
     setHarPin(false);
     setPinLagret(false);
+    // Krever serveren kode, låses appen med en gang og PIN-skjermen vises.
+    await sjekkTilgang();
   };
 
   const endre = async (e: Partial<Inn>) => {
