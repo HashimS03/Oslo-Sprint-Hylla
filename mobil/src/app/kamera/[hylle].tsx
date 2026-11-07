@@ -84,7 +84,7 @@ export default function KameraStasjon() {
       leggTilLogg({
         tid: new Date().toISOString(),
         tekst: endringer.length === 0
-          ? `Talt med ${res.forslag.teller}: ${Object.values(res.forslag.antall).reduce((a, b) => a + b, 0)} stk, ingen endring`
+          ? `Ingen endring · ${res.forslag.kommentar || `${Object.values(res.forslag.antall).reduce((a, b) => a + b, 0)} stk`}`
           : `${endringer.map((e) => `${e.navn} ${fortegn(e.na - e.forrige)}`).join(", ")}${svinn ? " · mulig svinn" : ""}`,
         endring: endringer.reduce((sum, e) => sum + e.na - e.forrige, 0),
       });
