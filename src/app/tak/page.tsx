@@ -1,5 +1,6 @@
 import { hentState } from "@/lib/store";
 import { TakTest } from "./TakTest";
+import { Innhold, Topp } from "@/components/dash";
 
 export const dynamic = "force-dynamic";
 
@@ -11,5 +12,12 @@ export default async function Tak({ searchParams }: { searchParams: Promise<{ ka
     .filter((h) => h.sone?.kamera === kamera)
     .map((h) => ({ id: h.id, navn: h.navn, sone: h.sone!, skuer: h.innhold.map((p) => p.sku), varer: h.innhold.map((p) => s.varer.find((v) => v.sku === p.sku)?.navn ?? p.sku) }));
   const katalog = s.varer.map((v) => ({ sku: v.sku, navn: v.navn }));
-  return <TakTest kameraId={kamera} soner={soner} katalog={katalog} />;
+  return (
+    <>
+      <Topp tittel="Takkamera" under="Kameraet ser hyllene ovenfra. Hver sone telles for seg, og endringer dukker opp i dashboardet." tilbake={{ href: "/innstillinger", navn: "Innstillinger" }} />
+      <Innhold>
+        <TakTest kameraId={kamera} soner={soner} katalog={katalog} />
+      </Innhold>
+    </>
+  );
 }

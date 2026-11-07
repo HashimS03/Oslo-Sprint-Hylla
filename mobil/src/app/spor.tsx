@@ -106,7 +106,7 @@ export default function SporHylla() {
           {meldinger.map((m) =>
             m.rolle === "bruker" ? (
               <View key={m.id} style={st.bruker}>
-                <Txt style={{ color: F.hvit, fontSize: 15, lineHeight: 21 }}>{m.tekst}</Txt>
+                <Txt style={{ color: F.tekst, fontSize: 15, lineHeight: 21 }}>{m.tekst}</Txt>
               </View>
             ) : (
               <View key={m.id} style={{ gap: 10 }}>
@@ -152,7 +152,7 @@ export default function SporHylla() {
             onPressOut={stoppOpptak}
             style={[st.mik, lytter && { transform: [{ scale: 1.1 }] }]}
           >
-            <Ikon navn="mikrofon" size={30} />
+            <Ikon navn="mikrofon" size={30} farge={F.blekk} />
           </Pressable>
           <Txt style={{ color: F.dempet, fontSize: 15 }}>{lytter ? "Lytter … slipp når du er ferdig" : tenker ? "Slår opp …" : "Hold inne og snakk"}</Txt>
           <Rad style={st.felt}>
@@ -176,7 +176,7 @@ export default function SporHylla() {
               }}
               style={st.send}
             >
-              <Ikon navn="pil" size={18} farge={F.hvit} />
+              <Ikon navn="pil" size={18} farge={F.bg} />
             </Pressable>
           </Rad>
         </View>
@@ -187,13 +187,13 @@ export default function SporHylla() {
 
 const st = StyleSheet.create({
   liste: { padding: 16, gap: 14 },
-  bruker: { alignSelf: "flex-end", maxWidth: "88%", backgroundColor: F.tekst, borderRadius: 10, paddingHorizontal: 16, paddingVertical: 12 },
-  svar: { backgroundColor: F.hvit, borderWidth: 1.5, borderColor: F.tekst, borderRadius: 10, padding: 16, gap: 10 },
+  bruker: { alignSelf: "flex-end", maxWidth: "88%", backgroundColor: F.gullys, borderWidth: 1, borderColor: F.gulkant, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 12 },
+  svar: { backgroundColor: F.kort, borderWidth: 1, borderColor: F.kant, borderRadius: 10, padding: 16, gap: 10 },
   forslag: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  forslagKnapp: { borderWidth: 1, borderColor: F.kant, backgroundColor: F.hvit, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, maxWidth: "100%" },
+  forslagKnapp: { borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, maxWidth: "100%" },
   mikDel: { alignItems: "center", gap: 10, paddingTop: 6, paddingBottom: 10, paddingHorizontal: 16 },
-  mik: { width: 72, height: 72, borderRadius: 36, backgroundColor: F.gul, borderWidth: 2, borderColor: F.tekst, alignItems: "center", justifyContent: "center" },
+  mik: { width: 72, height: 72, borderRadius: 36, backgroundColor: F.gul, borderWidth: 2.5, borderColor: F.blekk, alignItems: "center", justifyContent: "center" },
   felt: { alignSelf: "stretch", gap: 8 },
-  input: { flex: 1, height: 44, borderWidth: 1, borderColor: F.kant, borderRadius: 10, backgroundColor: F.hvit, paddingHorizontal: 12, fontFamily: S.tekst, fontSize: 15, color: F.tekst },
+  input: { flex: 1, height: 44, borderWidth: 1, borderColor: F.kant, borderRadius: 10, backgroundColor: F.kort, paddingHorizontal: 12, fontFamily: S.tekst, fontSize: 15, color: F.tekst },
   send: { width: 44, height: 44, borderRadius: 10, backgroundColor: F.tekst, alignItems: "center", justifyContent: "center" },
 });

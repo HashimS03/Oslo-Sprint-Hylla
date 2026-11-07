@@ -85,7 +85,7 @@ function OppgaveKort({ o }: { o: Oppgave }) {
 const st = StyleSheet.create({
   tom: { alignItems: "center", gap: 10, paddingVertical: 40 },
   kort: {
-    flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: F.hvit, borderWidth: 1.5, borderColor: F.tekst,
+    flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: F.kort, borderWidth: 1, borderColor: F.kant,
     borderRadius: 14, padding: 14, minHeight: 76,
   },
   hoy: { borderColor: F.rod, borderWidth: 2.5 },

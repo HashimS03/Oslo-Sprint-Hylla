@@ -9,6 +9,7 @@ import { useOppdater } from "@/lib/useOppdater";
 import { F, S } from "@/lib/tema";
 import { Ikon } from "@/components/Ikon";
 import { StorKnapp } from "@/components/StorKnapp";
+import { Logo } from "@/components/Logo";
 import { Display, Knapp, Txt } from "@/components/ui";
 
 /** Startsiden: fire store knapper. Første gang spør den om navnet til den ansatte. */
@@ -26,6 +27,11 @@ function Knapper({ navn }: { navn: string }) {
   return (
     <View style={[st.skjerm, { paddingTop: inn.top }]}>
       <ScrollView contentContainerStyle={[st.innhold, { paddingBottom: Math.max(inn.bottom, 20) }]}>
+        <View style={st.merke}>
+          <Logo size={28} />
+          <Display style={{ fontSize: 22 }}>Hylla</Display>
+          <Txt style={st.merkeEtikett}>SKANNER</Txt>
+        </View>
         <View style={st.topp}>
           <View style={{ flex: 1 }}>
             <Txt style={{ color: F.dempet, fontSize: 16 }}>Hei,</Txt>
@@ -37,12 +43,11 @@ function Knapper({ navn }: { navn: string }) {
         </View>
 
         <View style={st.rutenett}>
-          {/* Legg til nye knapper her (for eksempel Takkamera) med én linje til. */}
+          {/* Legg til nye knapper her med én linje til. Takkamera ligger under Innstillinger. */}
           <StorKnapp bred tekst="Scann" undertekst="Pek kameraet på koden" ikon="skann" farge={F.gul} onPress={() => router.push("/scann")} />
           <StorKnapp tekst="Oppgaver" ikon="hake" farge={F.gronnlys} merke={data?.nye} onPress={() => router.push("/oppgaver")} />
           <StorKnapp tekst="Varer" ikon="varer" farge={F.blalys} onPress={() => router.push("/varer")} />
-          <StorKnapp tekst="Spør Hylla" ikon="mikrofon" farge={F.lillalys} onPress={() => router.push("/spor")} />
-          <StorKnapp tekst="Takkamera" ikon="kamera" farge={F.gullys} onPress={() => router.push("/takkamera")} />
+          <StorKnapp bred tekst="Spør Hylla" undertekst="Spør om en vare med stemmen" ikon="mikrofon" farge={F.lillalys} onPress={() => router.push("/spor")} />
         </View>
       </ScrollView>
     </View>
@@ -56,9 +61,7 @@ function HvemErDu() {
   return (
     <KeyboardAvoidingView style={[st.skjerm, { paddingTop: inn.top + 40 }]} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <View style={[st.innhold, { gap: 18 }]}>
-        <View style={st.logo}>
-          <Ikon navn="skann" size={40} />
-        </View>
+        <Logo size={72} />
         <Display style={{ fontSize: 34 }}>Hei! Hva heter du?</Display>
         <Txt style={{ color: F.dempet, fontSize: 16, lineHeight: 22 }}>
           Navnet vises for driftsleder når du tar en oppgave eller melder fra om noe. Du kan endre det senere.
@@ -83,12 +86,13 @@ function HvemErDu() {
 const st = StyleSheet.create({
   skjerm: { flex: 1, backgroundColor: F.bg },
   innhold: { padding: 20 },
-  topp: { flexDirection: "row", alignItems: "center", marginBottom: 22, marginTop: 8 },
-  tannhjul: { width: 48, height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: F.tekst, backgroundColor: F.hvit, alignItems: "center", justifyContent: "center" },
+  merke: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 8 },
+  merkeEtikett: { fontFamily: S.mono, fontSize: 11, letterSpacing: 0.7, color: F.dempet, marginLeft: 4 },
+  topp: { flexDirection: "row", alignItems: "center", marginBottom: 22, marginTop: 20 },
+  tannhjul: { width: 48, height: 48, borderRadius: 24, borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort, alignItems: "center", justifyContent: "center" },
   rutenett: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" },
-  logo: { width: 72, height: 72, borderRadius: 18, backgroundColor: F.gul, borderWidth: 2, borderColor: F.tekst, alignItems: "center", justifyContent: "center" },
   felt: {
-    height: 60, borderWidth: 2, borderColor: F.tekst, borderRadius: 12, backgroundColor: F.hvit, paddingHorizontal: 16,
+    height: 60, borderWidth: 1, borderColor: F.kant, borderRadius: 12, backgroundColor: F.kort, paddingHorizontal: 16,
     fontFamily: S.tekstMedium, fontSize: 20, color: F.tekst,
   },
 });

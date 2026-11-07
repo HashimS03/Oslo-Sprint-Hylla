@@ -171,8 +171,8 @@ export default function KameraStasjon() {
             <Display style={{ color: F.hvit, fontSize: 30 }}>{STATUS_TEKST[status]}</Display>
           </View>
           <Pressable onPress={() => { tving.current = true; }} disabled={!klar || status === "teller"} style={({ pressed }) => [st.tellNa, pressed && { opacity: 0.7 }, (!klar || status === "teller") && { opacity: 0.5 }]}>
-            <Ikon navn="kamera" size={20} />
-            <Txt style={{ fontFamily: S.tekstHalvfet }}>Tell nå</Txt>
+            <Ikon navn="kamera" size={20} farge={F.blekk} />
+            <Txt style={{ fontFamily: S.tekstHalvfet, color: F.blekk }}>Tell nå</Txt>
           </Pressable>
         </Rad>
         <Mono style={{ color: "#9AA3A6" }}>
@@ -199,5 +199,5 @@ const st = StyleSheet.create({
   topp: { position: "absolute", top: 0, left: 0, right: 0, paddingHorizontal: 20, paddingBottom: 12, backgroundColor: "rgba(17,21,23,0.55)" },
   prikk: { width: 10, height: 10, borderRadius: 5 },
   panel: { position: "absolute", left: 0, right: 0, bottom: 0, backgroundColor: "rgba(17,21,23,0.82)", padding: 20, gap: 10 },
-  tellNa: { flexDirection: "row", gap: 8, alignItems: "center", backgroundColor: F.gul, borderRadius: 10, borderWidth: 2, borderColor: F.tekst, paddingHorizontal: 16, height: 48 },
+  tellNa: { flexDirection: "row", gap: 8, alignItems: "center", backgroundColor: F.gul, borderRadius: 12, borderWidth: 2.5, borderColor: F.blekk, paddingHorizontal: 16, height: 48 },
 });

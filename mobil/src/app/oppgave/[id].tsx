@@ -131,5 +131,5 @@ function Status({ o }: { o: Oppgave }) {
 
 const st = StyleSheet.create({
   merke: { backgroundColor: F.rod, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
-  status: { borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, borderWidth: 1.5, borderColor: F.tekst, alignSelf: "flex-start" },
+  status: { borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, borderWidth: 1, borderColor: F.kant, alignSelf: "flex-start" },
 });

@@ -74,14 +74,15 @@ export function Knapp({
   tekst: string; undertekst?: string; onPress?: () => void; variant?: "gul" | "mork" | "hvit"; ikon?: IkonNavn; pil?: boolean;
   laster?: boolean; deaktivert?: boolean; style?: StyleProp<ViewStyle>;
 }) {
-  const farge = variant === "mork" ? F.hvit : F.tekst;
-  const bg = variant === "gul" ? F.gul : variant === "mork" ? F.tekst : F.hvit;
+  // Samme knapper som i dashboardet: gul med mørk kant (.knapp-gul), lys (som «Filtrer») og kort-farget.
+  const farge = variant === "gul" ? F.blekk : variant === "mork" ? F.bg : F.tekst;
+  const bg = variant === "gul" ? F.gul : variant === "mork" ? F.tekst : F.kort;
+  const kant = variant === "gul" ? F.blekk : variant === "mork" ? F.tekst : F.kant;
   return (
     <Pressable onPress={onPress} disabled={deaktivert || laster} style={[{ opacity: deaktivert ? 0.5 : 1 }, style]}>
       {({ pressed }) => (
-        <View style={{ paddingBottom: variant === "gul" ? 4 : 0, paddingRight: variant === "gul" ? 4 : 0 }}>
-          {variant === "gul" && <View style={st.skygge} />}
-          <View style={[st.knapp, { backgroundColor: bg }, pressed && { transform: [{ translateX: 2 }, { translateY: 2 }] }, undertekst && { height: 64 }]}>
+        <View>
+          <View style={[st.knapp, { backgroundColor: bg, borderColor: kant, borderWidth: variant === "gul" ? 2.5 : 1 }, pressed && { opacity: 0.75 }, undertekst && { height: 64 }]}>
             {laster ? <ActivityIndicator color={farge} /> : ikon && <Ikon navn={ikon} size={22} farge={farge} />}
             <View style={{ flex: 1, alignItems: ikon || pil ? "flex-start" : "center" }}>
               <Txt style={[st.knappTekst, { color: farge }]}>{tekst}</Txt>
@@ -109,7 +110,7 @@ const CHIP: Record<string, { bg: string; farge: string; tekst?: string }> = {
   ikke_talt: { bg: F.graa, farge: F.dempet, tekst: "ikke talt" },
   mottak: { bg: F.gronnlys, farge: F.gronn, tekst: "MOTTAK" },
   mottatt: { bg: F.gronnlys, farge: F.gronn, tekst: "MOTTATT" },
-  restordre: { bg: F.gullys, farge: F.tekst, tekst: "RESTORDRE" },
+  restordre: { bg: F.gullys, farge: F.gul, tekst: "RESTORDRE" },
   plukk: { bg: F.graa, farge: F.dempet, tekst: "PLUKK" },
   mulig_svinn: { bg: F.rodlys, farge: F.rod, tekst: "MULIG SVINN" },
   svinn: { bg: F.rodlys, farge: F.rod, tekst: "SVINN" },
@@ -160,7 +161,7 @@ export function Seksjon({ tittel, hoyre, children }: { tittel: string; hoyre?: R
 
 export function Feilboks({ melding, igjen }: { melding: string; igjen?: () => void }) {
   return (
-    <Kort farge={F.rodlys} style={{ borderColor: F.rod, gap: 8 }}>
+    <Kort farge={F.rodlys} style={{ borderColor: F.rodkant, gap: 8 }}>
       <Txt style={{ fontFamily: S.tekstHalvfet, color: F.rod }}>Noe gikk galt</Txt>
       <Txt style={{ color: F.tekst }}>{melding}</Txt>
       {igjen && <LenkeKnapp tekst="Prøv igjen" onPress={igjen} />}
@@ -180,22 +181,21 @@ export const st = StyleSheet.create({
   tekst: { fontFamily: S.tekst, fontSize: 15, color: F.tekst },
   display: { fontFamily: S.display, color: F.tekst, letterSpacing: -0.8 },
   mono: { fontFamily: S.mono, color: F.tekst, fontSize: 12 },
-  etikett: { fontFamily: S.monoMedium, fontSize: 11, letterSpacing: 1.2, color: F.dempet },
+  etikett: { fontFamily: S.mono, fontSize: 11, letterSpacing: 0.7, color: F.dempet },
   skjerm: { flex: 1, backgroundColor: F.bg },
-  topp: { paddingHorizontal: 16, paddingTop: 10 },
+  topp: { paddingHorizontal: 16, paddingTop: 10, backgroundColor: F.bg },
   toppRad: { flexDirection: "row", alignItems: "center", gap: 14, minHeight: 44 },
   tilbake: { width: 32, height: 32, justifyContent: "center" },
   tittel: { fontSize: 26 },
-  strek: { height: 2, backgroundColor: F.tekst, marginTop: 10 },
+  strek: { height: 1, backgroundColor: F.kant, marginTop: 10, marginHorizontal: -16 },
   innhold: { padding: 16, gap: 12, paddingBottom: 32 },
   bunn: { paddingHorizontal: 16, paddingTop: 10, backgroundColor: F.bg, gap: 8 },
-  kort: { backgroundColor: F.hvit, borderWidth: 1.5, borderColor: F.tekst, borderRadius: 12, padding: 16 },
-  skygge: { position: "absolute", left: 4, top: 4, right: 0, bottom: 0, backgroundColor: F.tekst, borderRadius: 10 },
+  kort: { backgroundColor: F.kort, borderWidth: 1, borderColor: F.kant, borderRadius: 14, padding: 16 },
   knapp: {
-    height: 56, borderRadius: 10, borderWidth: 2, borderColor: F.tekst, flexDirection: "row", alignItems: "center",
+    height: 56, borderRadius: 14, borderWidth: 1, borderColor: F.kant, flexDirection: "row", alignItems: "center",
     paddingHorizontal: 16, gap: 12,
   },
   knappTekst: { fontFamily: S.tekstHalvfet, fontSize: 16 },
-  chip: { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 4 },
-  flis: { backgroundColor: F.gullys, borderWidth: 2, borderColor: F.tekst, borderRadius: 6, alignItems: "center", justifyContent: "center" },
+  chip: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
+  flis: { backgroundColor: F.gullys, borderWidth: 1, borderColor: F.gulkant, borderRadius: 6, alignItems: "center", justifyContent: "center" },
 });

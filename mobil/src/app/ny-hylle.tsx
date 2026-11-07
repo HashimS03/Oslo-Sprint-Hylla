@@ -46,5 +46,5 @@ export default function NyHylle() {
 
 const st = StyleSheet.create({
   etikett: { fontFamily: S.tekstHalvfet, fontSize: 14 },
-  input: { height: 48, borderWidth: 1, borderColor: F.kant, borderRadius: 10, backgroundColor: F.hvit, paddingHorizontal: 14, fontFamily: S.tekst, fontSize: 16, color: F.tekst },
+  input: { height: 48, borderWidth: 1, borderColor: F.kant, borderRadius: 10, backgroundColor: F.kort, paddingHorizontal: 14, fontFamily: S.tekst, fontSize: 16, color: F.tekst },
 });

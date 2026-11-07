@@ -44,7 +44,7 @@ export default function SoneInnstillinger() {
       {(varer?.varer ?? []).map((v) => {
         const er = v.sku === valgt;
         return (
-          <Pressable key={v.sku} onPress={() => setValgt(v.sku)} style={[st.rad, er && { backgroundColor: F.gul }]}>
+          <Pressable key={v.sku} onPress={() => setValgt(v.sku)} style={[st.rad, er && { backgroundColor: F.gullys, borderColor: F.gul }]}>
             <View style={[st.ring, er && { backgroundColor: F.tekst }]} />
             <Txt style={{ fontFamily: S.tekstHalvfet }}>{v.navn}</Txt>
           </Pressable>
@@ -56,6 +56,6 @@ export default function SoneInnstillinger() {
 }
 
 const st = StyleSheet.create({
-  rad: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1.5, borderColor: F.tekst, backgroundColor: F.hvit, borderRadius: 10, paddingHorizontal: 14, height: 52 },
+  rad: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort, borderRadius: 10, paddingHorizontal: 14, height: 52 },
   ring: { width: 18, height: 18, borderRadius: 9, borderWidth: 2, borderColor: F.tekst },
 });

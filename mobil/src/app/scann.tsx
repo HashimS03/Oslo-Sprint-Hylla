@@ -183,5 +183,5 @@ const st = StyleSheet.create({
     flex: 1, height: 56, borderRadius: 14, borderWidth: 1.5, borderColor: "rgba(255,255,255,0.6)",
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
   },
-  felt: { height: 56, borderRadius: 12, backgroundColor: F.hvit, paddingHorizontal: 14, fontFamily: S.monoMedium, fontSize: 17, color: F.tekst },
+  felt: { height: 56, borderRadius: 12, backgroundColor: F.kort, paddingHorizontal: 14, fontFamily: S.monoMedium, fontSize: 17, color: F.tekst },
 });

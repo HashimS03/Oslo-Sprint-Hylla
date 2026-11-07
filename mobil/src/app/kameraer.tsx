@@ -74,5 +74,5 @@ export default function Kameraer() {
 
 const st = StyleSheet.create({
   miniatyr: { width: 56, height: 56, borderRadius: 8, backgroundColor: F.skifer, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  innstilling: { width: 44, height: 44, borderRadius: 8, borderWidth: 1.5, borderColor: F.tekst, backgroundColor: F.hvit, alignItems: "center", justifyContent: "center" },
+  innstilling: { width: 44, height: 44, borderRadius: 8, borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort, alignItems: "center", justifyContent: "center" },
 });

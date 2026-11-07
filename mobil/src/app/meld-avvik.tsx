@@ -111,7 +111,7 @@ export default function MeldAvvik() {
                   accessibilityRole="radio"
                   accessibilityState={{ selected: valgt }}
                   onPress={() => velgGrunn(g.id)}
-                  style={[st.grunn, valgt && { backgroundColor: F.gul, borderWidth: 3 }]}
+                  style={[st.grunn, valgt && { backgroundColor: F.gullys, borderColor: F.gul }]}
                 >
                   <Ikon navn={g.ikon} size={30} />
                   <Txt style={{ fontFamily: S.tekstFet, fontSize: 17 }}>{g.tekst}</Txt>
@@ -161,15 +161,15 @@ export default function MeldAvvik() {
 const st = StyleSheet.create({
   grunner: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 12 },
   grunn: {
-    width: "48%", height: 100, borderRadius: 14, borderWidth: 2, borderColor: F.tekst, backgroundColor: F.hvit,
+    width: "48%", height: 100, borderRadius: 14, borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort,
     alignItems: "center", justifyContent: "center", gap: 8,
   },
-  pluss: { width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: F.tekst, backgroundColor: F.hvit, alignItems: "center", justifyContent: "center" },
+  pluss: { width: 64, height: 64, borderRadius: 32, borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort, alignItems: "center", justifyContent: "center" },
   plussTekst: { fontFamily: S.tekstFet, fontSize: 30, lineHeight: 34 },
   notat: {
-    minHeight: 80, borderWidth: 1.5, borderColor: F.kant, borderRadius: 12, backgroundColor: F.hvit, padding: 12,
+    minHeight: 80, borderWidth: 1, borderColor: F.kant, borderRadius: 12, backgroundColor: F.kort, padding: 12,
     fontFamily: S.tekst, fontSize: 16, color: F.tekst, textAlignVertical: "top",
   },
   ferdig: { alignItems: "center", gap: 16, paddingTop: 48 },
-  hake: { width: 110, height: 110, borderRadius: 55, backgroundColor: F.gronnlys, borderWidth: 2, borderColor: F.tekst, alignItems: "center", justifyContent: "center" },
+  hake: { width: 110, height: 110, borderRadius: 55, backgroundColor: F.gronnlys, borderWidth: 1, borderColor: F.kant, alignItems: "center", justifyContent: "center" },
 });
