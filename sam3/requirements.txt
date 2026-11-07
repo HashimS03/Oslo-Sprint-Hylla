@@ -1,5 +1,8 @@
-fastapi
-uvicorn
-pillow
-torch
-transformers>=5.0
+# Faste versjoner, så en ny (eller kapret) utgave på PyPI ikke blir installert av seg selv.
+# Lag en låst fil med hasher: se «Avhengigheter» i README.md.
+fastapi==0.115.12
+pydantic==2.11.4
+uvicorn==0.34.2
+pillow==11.2.1
+torch==2.7.0
+transformers==5.0.0

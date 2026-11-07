@@ -1,4 +1,7 @@
 """Kjør: python -m pytest test_telling.py   (eller bare: python test_telling.py)"""
+import base64
+
+from sikkerhet import MAKS_BASE64, UgyldigBilde, les_data_url, token_ok
 from telling import Funn, i_omraade, lag_resultat, prompt_for
 
 B3 = [
@@ -33,6 +36,38 @@ def test_resultat():
     assert hvit["antall"] == 14 and hvit["alternativ"] == 15 and hvit["sikkerhet"] < 0.8
 
 
+def test_token():
+    assert token_ok(None, None) and token_ok("noe", "")  # uten token: åpent (lokal utvikling)
+    assert token_ok("Bearer hemmelig", "hemmelig")
+    assert not token_ok(None, "hemmelig")
+    assert not token_ok("Bearer feil", "hemmelig")
+    assert not token_ok("hemmelig", "hemmelig")  # mangler «Bearer »
+    assert not token_ok("Basic hemmelig", "hemmelig")
+
+
+def avvist(bilde: str) -> bool:
+    try:
+        les_data_url(bilde)
+    except UgyldigBilde:
+        return True
+    return False
+
+
+def test_data_url():
+    png = b"\x89PNG\r\n\x1a\nnoe"
+    b64 = base64.b64encode(png).decode()
+    assert les_data_url("data:image/png;base64," + b64) == png
+    assert les_data_url("data:image/jpeg;base64," + b64) == png
+    assert les_data_url("data:image/webp;base64," + b64) == png
+    assert avvist(b64)  # uten prefiks (krasjet før med IndexError)
+    assert avvist("data:image/png;base64")  # uten komma
+    assert avvist("data:image/gif;base64," + b64)
+    assert avvist("data:image/svg+xml;base64," + b64)
+    assert avvist("data:image/png;base64,ikke base64!!")
+    assert avvist("data:image/png;base64,")
+    assert avvist("data:image/png;base64," + "A" * MAKS_BASE64)  # for stort
+
+
 if __name__ == "__main__":
-    test_prompter(); test_omraade(); test_resultat()
+    test_prompter(); test_omraade(); test_resultat(); test_token(); test_data_url()
     print("Alle tester ok")
