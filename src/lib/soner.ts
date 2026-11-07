@@ -17,6 +17,8 @@ import type { Bokse, Hylle, KameraHendelse, Sone, State } from "./types";
 
 const GJENGLEMT_MS = Number(process.env.GJENGLEMT_MS ?? 10 * 60 * 1000);
 const LAV_SIKKERHET = 0.6;
+/** Har kameraet ikke sett sonen på så lenge, regnes neste bilde som en ny start: det setter bare utgangspunktet. */
+const NY_START_MS = Number(process.env.KAMERA_NY_START_S ?? 60) * 1000;
 
 type SoneHylle = Hylle & { sone: Sone };
 
@@ -84,6 +86,20 @@ export async function behandleTakbilde(opts: {
   const teller = velgTeller(!!opts.demo);
   const alle = kandidater(alleSoner);
   const naa = Date.now();
+
+  // Ny start: har kameraet ikke sett en sone på en stund (eller aldri), gjelder ikke det gamle utgangspunktet.
+  // Vi nullstiller det, så første bilde som telles bare setter utgangspunktet. Ellers ville forskjellen mot
+  // forrige økt eller demodataene blitt meldt som uttak og plassering (for eksempel Red Bull og Cola).
+  const nyStart = soner.filter((z) => {
+    const sett = state.soneSett?.[z.id];
+    return !sett || naa - Date.parse(sett) > NY_START_MS;
+  });
+  if (nyStart.length) {
+    await endreState((s) => {
+      s.soneStand ??= {};
+      for (const z of nyStart) s.soneStand[z.id] = {};
+    });
+  }
 
   const resultater = await Promise.all(
     soner.map(async (hylle): Promise<SoneResultat> => {
