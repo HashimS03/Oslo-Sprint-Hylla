@@ -5,7 +5,6 @@ import { avvikListe } from "@/lib/rapport";
 import { oppdragFor } from "@/lib/oppdrag";
 import { apneKameraAvvik } from "@/lib/lager";
 import { KameraAvvikRad } from "../kamera/KameraAvvikRad";
-import { PanelLenke } from "@/components/dash";
 import { AvvikChip, Filter, Innhold, Kpi, Panel, Tabell, TomRad, Topp } from "@/components/dash";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +40,7 @@ export default async function AvvikListe({ searchParams }: { searchParams: Promi
           <Kpi etikett="Var salg" verdi={tell("lukket")} under="stk ført som salg" />
         </div>
         {kamera.length > 0 && filter !== "lukket" && (
-          <Panel tittel="Fra kameraet" handling={<PanelLenke href="/kamera">Kamera</PanelLenke>}>
+          <Panel tittel="Fra kameraet">
             <ul className="divide-y divide-linje">{kamera.map((a) => <KameraAvvikRad key={a.id} a={a} />)}</ul>
           </Panel>
         )}

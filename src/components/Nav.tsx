@@ -8,9 +8,8 @@ type IkonNavn = "oversikt" | "varer" | "lokasjoner" | "avvik" | "hendelser" | "r
 const MENY: { href: string; navn: string; ikon: IkonNavn; aktiv: (p: string) => boolean }[] = [
   { href: "/", navn: "Oversikt", ikon: "oversikt", aktiv: (p) => p === "/" },
   { href: "/varer", navn: "Varer", ikon: "varer", aktiv: (p) => p.startsWith("/varer") },
-  { href: "/lokasjoner", navn: "Lokasjoner", ikon: "lokasjoner", aktiv: (p) => p.startsWith("/lokasjoner") },
+  { href: "/lokasjoner", navn: "Lokasjoner", ikon: "lokasjoner", aktiv: (p) => p.startsWith("/lokasjoner") || p.startsWith("/tak") },
   { href: "/avvik", navn: "Avvik", ikon: "avvik", aktiv: (p) => p.startsWith("/avvik") },
-  { href: "/kamera", navn: "Kamera", ikon: "kamera", aktiv: (p) => p.startsWith("/kamera") || p.startsWith("/tak") },
   { href: "/logg", navn: "Hendelser", ikon: "hendelser", aktiv: (p) => p.startsWith("/logg") },
   { href: "/rapport", navn: "Rapport", ikon: "rapport", aktiv: (p) => p.startsWith("/rapport") },
 ];

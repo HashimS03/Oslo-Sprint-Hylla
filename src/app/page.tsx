@@ -7,6 +7,7 @@ import { erAktiv, oppdragFor } from "@/lib/oppdrag";
 import { Innhold, Kpi, Ruter, Panel, PanelLenke, Prikk, Tabell, TomRad, Topp, TypeChip } from "@/components/dash";
 import { StatusChip } from "@/components/ui";
 import { KameraAvvikRad } from "./kamera/KameraAvvikRad";
+import { alleRader } from "@/lib/kamerafeed";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export default async function Oversikt() {
   const lav = lavBeholdning(s);
   const uke = rapport(s, 7);
   const idag = rapport(s, 1);
-  const siste = [...s.hendelser].sort((a, b) => b.tid.localeCompare(a.tid)).slice(0, 8);
+  const siste = alleRader(s).slice(0, 8);
   const dato = new Date().toLocaleDateString("nb-NO", { timeZone: "Europe/Oslo", weekday: "long", day: "numeric", month: "long" });
 
   return (
@@ -78,15 +79,15 @@ export default async function Oversikt() {
         </div>
 
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-          <Panel tittel="Siste hendelser" handling={<PanelLenke href="/logg">Hele loggen</PanelLenke>}>
+          <Panel tittel="Siste hendelser og kamera" handling={<PanelLenke href="/logg">Hele loggen</PanelLenke>}>
             <Tabell hode={["Tid", "Type", "Lokasjon", "Vare", "Endring", "Årsak"]} hoyre={[4]}>
               {siste.map((h) => (
                 <tr key={h.id}>
                   <td className="font-mono text-[12px] whitespace-nowrap text-dempet">{tidTekst(h.tid)}</td>
                   <td><TypeChip type={h.type} /></td>
                   <td className="font-semibold">{h.hylle}</td>
-                  <td><Link href={`/varer/${encodeURIComponent(h.sku)}`} className="hover:underline">{vare(s, h.sku)?.navn ?? h.sku}</Link></td>
-                  <td className={`text-right font-mono font-medium ${typeFarge(h.type, h.endring)}`}>{fortegn(h.endring)}</td>
+                  <td>{h.sku ? <Link href={`/varer/${encodeURIComponent(h.sku)}`} className="hover:underline">{h.navn}</Link> : h.navn}</td>
+                  <td className={`text-right font-mono font-medium ${h.kamera ? "text-dempet" : typeFarge(h.type, h.endring)}`}>{h.endring ? fortegn(h.endring) : "–"}</td>
                   <td className="max-w-[240px] truncate text-[12.5px] whitespace-nowrap text-dempet" title={h.aarsak}>{h.aarsak}</td>
                 </tr>
               ))}
