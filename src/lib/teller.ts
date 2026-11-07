@@ -147,7 +147,11 @@ function eksternTeller(navn: string, urlVar: string): Teller {
       try {
         res = await fetch(`${url.replace(/\/$/, "")}/tell`, {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: {
+            "content-type": "application/json",
+            // SAM3_TOKEN / YOLO_TOKEN: samme verdi som tjenesten er startet med (se sam3/ og yolo/ README).
+            ...(process.env[urlVar.replace(/_URL$/, "_TOKEN")] ? { authorization: `Bearer ${process.env[urlVar.replace(/_URL$/, "_TOKEN")]}` } : {}),
+          },
           body: JSON.stringify({ hylle: hylle.id, bilde, varer }),
           signal: AbortSignal.timeout(55_000),
         });
