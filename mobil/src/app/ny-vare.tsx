@@ -13,6 +13,7 @@ import { Feilboks, Knapp, Mono, Rad, Skjerm, Txt } from "@/components/ui";
 const FARGER = [
   { navn: "svart", hex: "#1E1E20" }, { navn: "hvit", hex: "#E8E6E1" }, { navn: "grå", hex: "#9AA3A6" },
   { navn: "rød", hex: "#B3362A" }, { navn: "blå", hex: "#2F5D8A" }, { navn: "grønn", hex: "#2F7D55" },
+  { navn: "gul", hex: "#F4C430" }, { navn: "oransje", hex: "#E07B2A" }, { navn: "brun", hex: "#8A5A3B" },
 ];
 const STORRELSER = ["XS", "S", "M", "L", "XL", "One size"];
 const BILDE_HINT = ["Brettet", "Stablet", "Merkelapp"];
@@ -23,6 +24,8 @@ export default function NyVare() {
   const [navn, setNavn] = useState("");
   const [sku, setSku] = useState("");
   const [hylle, setHylle] = useState("");
+  const [antall, setAntall] = useState("");
+  const [prompt, setPrompt] = useState("");
   const [storrelse, setStorrelse] = useState("M");
   const [farge, setFarge] = useState(FARGER[2]);
   const [lagrer, setLagrer] = useState(false);
@@ -39,10 +42,13 @@ export default function NyVare() {
 
   const lagre = async () => {
     setFeil(null);
-    if (!navn.trim() || !sku.trim() || !hylle) return setFeil("Fyll inn navn, SKU og hylle.");
+    if (!navn.trim() || !sku.trim() || !hylle.trim()) return setFeil("Fyll inn navn, SKU og hylle.");
     setLagrer(true);
     try {
-      const res = await send<{ sku: string }>("/api/varer", { sku, navn, farge: farge.navn, storrelse, swatch: farge.hex, hylle, bilder });
+      const res = await send<{ sku: string }>("/api/varer", {
+        sku, navn, farge: farge.navn, storrelse, swatch: farge.hex, hylle: hylle.trim(), bilder,
+        antall: Number(antall) || 0, prompt, beskrivelse: `${navn}, ${farge.navn}, størrelse ${storrelse}`,
+      });
       router.replace({ pathname: "/vare/[sku]", params: { sku: res.sku } });
     } catch (e) {
       setFeil(e instanceof Error ? e.message : "Kunne ikke lagre");
@@ -80,6 +86,16 @@ export default function NyVare() {
       <Rad gap={8} style={{ flexWrap: "wrap" }}>
         {(data?.hyller ?? []).map((h) => <Valg key={h.id} tekst={h.id} aktiv={hylle === h.id} onPress={() => setHylle(h.id)} />)}
       </Rad>
+      <TextInput value={hylle} onChangeText={(t) => setHylle(t.toUpperCase())} placeholder={data?.hyller.length ? "Eller skriv en ny, f.eks. T1" : "Skriv hylla, f.eks. T1"} placeholderTextColor={F.dempet} autoCapitalize="characters" style={st.input} />
+
+      <Rad gap={10}>
+        <View style={{ flex: 1 }}>
+          <Felt etikett="Antall på hylla nå" verdi={antall} endre={(t) => setAntall(t.replace(/\D/g, ""))} plassholder="0" tall />
+        </View>
+        <View style={{ flex: 1.4 }}>
+          <Felt etikett="På engelsk (kamera)" verdi={prompt} endre={setPrompt} plassholder="red soda can" liten />
+        </View>
+      </Rad>
 
       <Txt style={st.etikett}>Størrelse</Txt>
       <Rad gap={8} style={{ flexWrap: "wrap" }}>
@@ -87,7 +103,7 @@ export default function NyVare() {
       </Rad>
 
       <Txt style={st.etikett}>Farge</Txt>
-      <Rad gap={12}>
+      <Rad gap={12} style={{ flexWrap: "wrap" }}>
         {FARGER.map((f) => (
           <Pressable key={f.navn} accessibilityLabel={f.navn} onPress={() => setFarge(f)} style={[st.fargeRing, farge === f && { borderColor: F.tekst }]}>
             <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: f.hex, borderWidth: 1, borderColor: "#BDBAB4" }} />
@@ -100,11 +116,11 @@ export default function NyVare() {
   );
 }
 
-function Felt({ etikett, verdi, endre, plassholder, store }: { etikett: string; verdi: string; endre: (t: string) => void; plassholder: string; store?: boolean }) {
+function Felt({ etikett, verdi, endre, plassholder, store, tall, liten }: { etikett: string; verdi: string; endre: (t: string) => void; plassholder: string; store?: boolean; tall?: boolean; liten?: boolean }) {
   return (
     <View style={{ gap: 6 }}>
       <Txt style={st.etikett}>{etikett}</Txt>
-      <TextInput value={verdi} onChangeText={endre} placeholder={plassholder} placeholderTextColor={F.dempet} autoCapitalize={store ? "characters" : "sentences"} style={st.input} />
+      <TextInput value={verdi} onChangeText={endre} placeholder={plassholder} placeholderTextColor={F.dempet} autoCapitalize={store ? "characters" : liten ? "none" : "sentences"} keyboardType={tall ? "number-pad" : "default"} style={st.input} />
     </View>
   );
 }

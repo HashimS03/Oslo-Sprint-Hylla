@@ -2,7 +2,7 @@ import Link from "next/link";
 import { hentState, lagringstype } from "@/lib/store";
 import { Side } from "@/components/Nav";
 import { Tilbake } from "@/components/ui";
-import { Bryter, NullstillDemo, TerskelVelger } from "./Kontroller";
+import { Bryter, NullstillDemo, TerskelVelger, TomLager } from "./Kontroller";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +46,7 @@ export default async function Innstillinger() {
 
         <span className="etikett mt-1">Demo</span>
         <NullstillDemo />
+        <TomLager />
       </main>
     </Side>
   );
