@@ -144,14 +144,14 @@ export function forklar(s: State, hylle: string, sku: string, diff: number): For
     for (const o of s.ordrer.filter((x) => x.sku === sku && x.hylle === hylle && x.status === "apen")) {
       if (rest >= 0) break;
       const n = Math.min(-rest, o.antall);
-      deler.push({ type: "plukk", endring: -n, aarsak: `Plukk, ordre ${o.id}`, ref: o.id });
+      deler.push({ type: "plukk", endring: -n, aarsak: `Salg, ordre ${o.id}`, ref: o.id });
       rest += n;
     }
     if (rest < 0) {
       const terskel = s.innstillinger.svinnTerskel;
       deler.push(
         -rest >= terskel
-          ? { type: "mulig_svinn", endring: rest, aarsak: "Ingen plukkordre forklarer dette" }
+          ? { type: "mulig_svinn", endring: rest, aarsak: "Ingen registrert salg forklarer dette" }
           : { type: "korrigering", endring: rest, aarsak: "Liten nedgang under varslingsgrensen" },
       );
     }
@@ -200,7 +200,11 @@ export function lagreForslag(
       }
       if (d.type === "plukk" && d.ref) {
         const o = s.ordrer.find((x) => x.id === d.ref);
-        if (o) o.status = "plukket";
+        // Bare det som faktisk ble tatt trekkes fra; resten av ordren venter på neste telling.
+        if (o) {
+          o.antall += d.endring;
+          if (o.antall <= 0) o.status = "plukket";
+        }
       }
       s.hendelser.push(hend);
       nye.push(hend);
@@ -211,11 +215,15 @@ export function lagreForslag(
 }
 
 /** Avslutt et avvik: varen er funnet (setter tilbake antallet) eller registrert som svinn. */
-export function lukkAvvik(s: State, id: string, handling: "funnet" | "svinn"): Hendelse {
+export function lukkAvvik(s: State, id: string, handling: "funnet" | "svinn" | "salg"): Hendelse {
   const h = s.hendelser.find((x) => x.id === id);
   if (!h || h.type !== "mulig_svinn") throw new Error("Fant ikke avviket");
-  h.avvik = { ...(h.avvik ?? { status: "apen" }), status: handling, lukketTid: new Date().toISOString() };
-  if (handling === "funnet") {
+  h.avvik = { ...(h.avvik ?? { status: "apen" }), status: handling === "salg" ? "lukket" : handling, lukketTid: new Date().toISOString() };
+  if (handling === "salg") {
+    // Det var et salg likevel: samme nedgang, men ført som salg i stedet for svinn.
+    h.type = "plukk";
+    h.aarsak = "Salg, registrert fra avvik";
+  } else if (handling === "funnet") {
     const motpost: Hendelse = {
       id: nyId("h"),
       tid: new Date().toISOString(),

@@ -13,7 +13,8 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { handling } = (await req.json()) as { handling: "funnet" | "svinn" };
+  const { handling } = (await req.json()) as { handling: "funnet" | "svinn" | "salg" };
+  if (!["funnet", "svinn", "salg"].includes(handling)) return NextResponse.json({ feil: "Ukjent handling" }, { status: 400 });
   try {
     const h = await endreState((s) => lukkAvvik(s, id, handling));
     return NextResponse.json({ hendelse: h });

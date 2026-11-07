@@ -14,7 +14,7 @@ export default function Avvik() {
   const { data: a, feil, last } = useHent<AvvikData>(`/api/avvik/${id}`);
   const [jobber, setJobber] = useState<string | null>(null);
 
-  const lukk = async (handling: "funnet" | "svinn") => {
+  const lukk = async (handling: "funnet" | "svinn" | "salg") => {
     setJobber(handling);
     try {
       await send(`/api/avvik/${id}`, { handling });
@@ -37,7 +37,8 @@ export default function Avvik() {
         a && apen ? (
           <>
             <Knapp tekst="Tell på nytt" ikon="kamera" onPress={() => router.push({ pathname: "/tell/[hylle]", params: { hylle: a.hylle } })} />
-            <Knapp tekst="Marker funnet" variant="mork" laster={jobber === "funnet"} onPress={() => lukk("funnet")} />
+            <Knapp tekst="Det var et salg" variant="mork" laster={jobber === "salg"} onPress={() => lukk("salg")} />
+            <Knapp tekst="Marker funnet" variant="hvit" laster={jobber === "funnet"} onPress={() => lukk("funnet")} />
             <View style={{ alignItems: "center", paddingVertical: 4 }}>
               <LenkeKnapp
                 tekst={jobber === "svinn" ? "Registrerer …" : "Registrer som svinn"}
@@ -54,10 +55,10 @@ export default function Avvik() {
       {a && (
         <>
           <Rad>
-            <Chip status={apen ? "mulig_svinn" : a.status === "funnet" ? "funnet" : "svinn"} />
+            <Chip status={apen ? "mulig_svinn" : a.status === "funnet" ? "funnet" : a.status === "lukket" ? "ok" : "svinn"} tekst={a.status === "lukket" ? "SALG" : undefined} />
             {!apen && a.lukketTid && <Mono style={{ color: F.dempet }}>lukket {klokke(a.lukketTid)}</Mono>}
           </Rad>
-          <Display style={{ fontSize: 28, lineHeight: 31 }}>{n} × {smaa(a.navn)} {apen ? "mangler" : a.status === "funnet" ? "ble funnet" : "er registrert som svinn"}</Display>
+          <Display style={{ fontSize: 28, lineHeight: 31 }}>{n} × {smaa(a.navn)} {apen ? "mangler" : a.status === "funnet" ? "ble funnet" : a.status === "lukket" ? "ble solgt" : "er registrert som svinn"}</Display>
           <View>
             <Txt style={{ color: F.dempet }}>Hylle {a.hylle}{a.nivaa ? ` · ${a.nivaa}` : ""}</Txt>
             {a.for && a.etter && <Txt style={{ color: F.dempet }}>Mellom {klokke(a.for.tid)} og {klokke(a.etter.tid)}</Txt>}
@@ -81,7 +82,7 @@ export default function Avvik() {
             <Txt style={{ fontFamily: S.tekstHalvfet }}>Hvorfor Hylla flagget dette</Txt>
             <Txt style={{ color: F.dempet, fontSize: 14 }}>{stor(a.aarsak || "Ingen plukkordre eller retur i tidsrommet.")}</Txt>
             <Txt style={{ color: F.dempet, fontSize: 14 }}>
-              {a.apneOrdrer > 0 ? `${a.apneOrdrer} åpne plukkordrer for varen, men ingen som dekker nedgangen.` : "Ingen åpne plukkordrer for varen."}
+              {a.apneOrdrer > 0 ? `${a.apneOrdrer} registrerte salg for varen, men ingen som dekker nedgangen.` : "Ingen registrerte salg for varen. Registrer salg på varesiden før varene tas, så skiller Hylla salg fra svinn."}
             </Txt>
             {a.etter && <Mono style={{ color: F.dempet, marginTop: 4 }}>talt av {a.etter.teller} · {a.etter.kilde}</Mono>}
           </Kort>
