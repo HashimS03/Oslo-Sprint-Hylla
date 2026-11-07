@@ -171,12 +171,12 @@ export function TakTest({ kameraId, soner, katalog }: { kameraId: string; soner:
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <Panel tittel="Varer per sone">
           <div className="flex flex-col gap-3 p-4">
-            <p className="text-[13px] text-dempet">Velg hvilke varer hver sone skal kjenne igjen. Endringen nullstiller utgangspunktet for sonen.</p>
+            <p className="text-[13px] text-dempet">Velg hvilke varer hver sone skal kjenne igjen. Uten valgte varer ser kameraet etter alle varene på lageret. Endringen nullstiller utgangspunktet for sonen.</p>
             {soner.filter((z) => z.sone.type !== "gang").map((z) => (
               <fieldset key={z.id} disabled={lagrer} className="flex flex-col gap-2 disabled:opacity-60">
                 <legend className="etikett mb-1.5">{z.navn}</legend>
                 <div className="flex flex-wrap gap-1.5">
-                  {katalog.filter((v) => ["REDBULL", "COLA-BOKS", "BRUS-RED", "VANN-KLAR"].includes(v.sku) || z.skuer.includes(v.sku)).map((v) => {
+                  {katalog.map((v) => {
                     const pa = z.skuer.includes(v.sku);
                     return (
                       <label key={v.sku} className={`flex h-9 cursor-pointer items-center gap-2 rounded-lg border px-3 text-[13px] ${pa ? "border-2 border-tekst bg-gullys font-semibold" : "border-kant bg-kort hover:border-tekst"}`}>
