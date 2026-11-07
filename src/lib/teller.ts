@@ -272,7 +272,7 @@ export const sam31Teller: Teller = {
 
 const DEMO: Record<string, Record<string, [number, number, number | null, string]>> = {
   // Bord 1: en brusboks plukket (ordre 20501), en penn borte uten ordre (mulig svinn), to kaffekopper kom (PO-3001).
-  T1: {
+  BORD: {
     "BRUS-RED": [3, 0.96, null, ""],
     "PENN-SVART": [2, 0.74, 3, "Pennene ligger delvis oppå hverandre"],
     "KAFFE-KOPP": [5, 0.95, null, ""],
