@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Image, Pressable, StyleSheet, TextInput, View } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import type { HylleRad } from "@/lib/typer";
 import { send } from "@/lib/api";
@@ -20,10 +20,11 @@ const BILDE_HINT = ["Brettet", "Stablet", "Merkelapp"];
 
 export default function NyVare() {
   const { data } = useHent<{ hyller: HylleRad[] }>("/api/hyller");
+  const param = useLocalSearchParams<{ hylle?: string }>();
   const [bilder, setBilder] = useState<string[]>([]);
   const [navn, setNavn] = useState("");
   const [sku, setSku] = useState("");
-  const [hylle, setHylle] = useState("");
+  const [hylle, setHylle] = useState(param.hylle ?? "");
   const [antall, setAntall] = useState("");
   const [prompt, setPrompt] = useState("");
   const [storrelse, setStorrelse] = useState("M");

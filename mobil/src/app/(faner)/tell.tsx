@@ -6,7 +6,7 @@ import { useHent } from "@/lib/useHent";
 import { F, S } from "@/lib/tema";
 import { sistTalt } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
-import { Chip, Etikett, Feilboks, HylleFlis, Laster, Rad, Skjerm, Txt } from "@/components/ui";
+import { Chip, Etikett, Feilboks, HylleFlis, Knapp, Kort, Laster, Rad, Skjerm, Txt } from "@/components/ui";
 
 export default function VelgHylle() {
   const { data, feil, last } = useHent<{ hyller: HylleRad[] }>("/api/hyller");
@@ -21,10 +21,27 @@ export default function VelgHylle() {
 
   const reoler = [...new Set(hyller.map((h) => h.reol))].sort();
   const avvik = (data?.hyller ?? []).filter((h) => h.status === "avvik");
-  const velg = (id: string) => router.push({ pathname: "/tell/[hylle]", params: { hylle: id } });
+  const tomme = new Set((data?.hyller ?? []).filter((h) => h.innhold.length === 0).map((h) => h.id));
+  // En hylle uten varer kan ikke telles ennå, så den åpner «legg til vare» i stedet.
+  const velg = (id: string) =>
+    tomme.has(id)
+      ? router.push({ pathname: "/ny-vare", params: { hylle: id } })
+      : router.push({ pathname: "/tell/[hylle]", params: { hylle: id } });
+  const ingenHyller = !!data && data.hyller.length === 0;
 
   return (
-    <Skjerm tittel="Velg hylle">
+    <Skjerm
+      tittel="Velg hylle"
+      bunn={ingenHyller ? undefined : <Knapp tekst="Ny hylle" ikon="pluss" variant="hvit" onPress={() => router.push("/ny-hylle")} />}
+    >
+      {ingenHyller && (
+        <Kort style={{ gap: 12 }}>
+          <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 17 }}>Ingen hyller ennå</Txt>
+          <Txt style={{ color: F.dempet }}>Lag den første hylla, og legg inn varene som ligger på den. Så kan du telle den med kameraet.</Txt>
+          <Knapp tekst="Lag første hylle" ikon="pluss" onPress={() => router.push("/ny-hylle")} />
+        </Kort>
+      )}
+      {!ingenHyller && (
       <Rad style={st.sok}>
         <Ikon navn="sok" size={20} farge={F.dempet} />
         <TextInput
@@ -38,6 +55,7 @@ export default function VelgHylle() {
           onSubmitEditing={() => hyller.length === 1 && velg(hyller[0].id)}
         />
       </Rad>
+      )}
 
       {avvik.length > 0 && (
         <Pressable onPress={() => velg(avvik[0].id)} style={st.varsel}>
@@ -63,14 +81,16 @@ export default function VelgHylle() {
                 <HylleFlis id={h.id} />
                 <View style={{ flex: 1, gap: 2 }}>
                   <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 17 }} numberOfLines={1}>{kortNavn(h)}</Txt>
-                  <Txt style={{ fontSize: 14, color: F.dempet }}>Sist talt: {h.sistTalt ? sistTalt(h.sistTalt) : "Ikke talt i dag"}</Txt>
+                  <Txt style={{ fontSize: 14, color: F.dempet }}>
+                    {tomme.has(h.id) ? "Ingen varer ennå. Trykk for å legge til." : `Sist talt: ${h.sistTalt ? sistTalt(h.sistTalt) : "Ikke talt i dag"}`}
+                  </Txt>
                 </View>
-                <Chip status={h.status} />
+                {tomme.has(h.id) ? <Ikon navn="pluss" size={22} /> : <Chip status={h.status} />}
               </Pressable>
             ))}
         </View>
       ))}
-      {data && hyller.length === 0 && <Txt style={{ color: F.dempet }}>Ingen hyller passer søket.</Txt>}
+      {data && !ingenHyller && hyller.length === 0 && <Txt style={{ color: F.dempet }}>Ingen hyller passer søket.</Txt>}
     </Skjerm>
   );
 }

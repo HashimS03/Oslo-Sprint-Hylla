@@ -6,7 +6,7 @@ import { useHent } from "@/lib/useHent";
 import { F, S } from "@/lib/tema";
 import { klokke, sistTalt } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
-import { Chip, Etikett, Feilboks, Kort, Knapp, Laster, Mono, Rad, Skjerm, Txt } from "@/components/ui";
+import { Chip, Etikett, Feilboks, Kort, Knapp, LenkeKnapp, Laster, Mono, Rad, Skjerm, Txt } from "@/components/ui";
 
 export default function Kameraer() {
   const { data, feil, last } = useHent<{ kameraer: Kamera[] }>("/api/kameraer");
@@ -50,6 +50,12 @@ export default function Kameraer() {
           </Pressable>
         ))}
       </Rad>
+      {hyller && hyller.hyller.length === 0 && (
+        <Kort style={{ gap: 8 }}>
+          <Txt>Du har ingen hyller ennå. Lag en hylle og legg inn varene, så kan telefonen følge med på den.</Txt>
+          <LenkeKnapp tekst="Lag en hylle" onPress={() => router.push("/ny-hylle")} />
+        </Kort>
+      )}
     </Skjerm>
   );
 }
