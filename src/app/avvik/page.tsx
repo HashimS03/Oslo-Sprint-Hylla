@@ -3,6 +3,9 @@ import { hentState } from "@/lib/store";
 import { klokke, kortDato } from "@/lib/format";
 import { avvikListe } from "@/lib/rapport";
 import { oppdragFor } from "@/lib/oppdrag";
+import { apneKameraAvvik } from "@/lib/lager";
+import { KameraAvvikRad } from "../kamera/KameraAvvikRad";
+import { PanelLenke } from "@/components/dash";
 import { AvvikChip, Filter, Innhold, Kpi, Panel, Tabell, TomRad, Topp } from "@/components/dash";
 
 export const dynamic = "force-dynamic";
@@ -22,12 +25,13 @@ export default async function AvvikListe({ searchParams }: { searchParams: Promi
   const rader = avvikListe(s, filter);
   const alle = avvikListe(s, "alle");
   const apne = alle.filter((a) => a.status === "apen");
+  const kamera = apneKameraAvvik(s);
   const tell = (st: string) => alle.filter((a) => a.status === st).reduce((n, a) => n + a.antall, 0);
 
   return (
     <>
       <Topp tittel="Avvik" under="Når det som er observert ikke stemmer med det lagerloggen forventer. Et avvik blir først svinn når noen har kontrollert det.">
-        <Filter valg={VALG} valgt={filter} lag={(id) => `/avvik?vis=${id}`} merke={{ apne: apne.length }} />
+        <Filter valg={VALG} valgt={filter} lag={(id) => `/avvik?vis=${id}`} merke={{ apne: apne.length + kamera.length }} />
       </Topp>
       <Innhold>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -36,6 +40,11 @@ export default async function AvvikListe({ searchParams }: { searchParams: Promi
           <Kpi etikett="Bekreftet svinn" verdi={tell("svinn")} under="stk trukket fra" />
           <Kpi etikett="Var salg" verdi={tell("lukket")} under="stk ført som salg" />
         </div>
+        {kamera.length > 0 && filter !== "lukket" && (
+          <Panel tittel="Fra kameraet" handling={<PanelLenke href="/kamera">Kamera</PanelLenke>}>
+            <ul className="divide-y divide-linje">{kamera.map((a) => <KameraAvvikRad key={a.id} a={a} />)}</ul>
+          </Panel>
+        )}
         <Panel tittel={VALG.find((v) => v.id === filter)!.navn + " avvik"}>
           <Tabell hode={["Oppdaget", "Lokasjon", "Vare", "Antall", "Status", "Skanner", "Lukket", ""]} hoyre={[3]}>
             {rader.map((a) => (

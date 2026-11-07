@@ -166,6 +166,14 @@ export function registrerSkann(s: State, inn: { sku: string; antall?: number; ty
   return { skann, varsler: nye.filter((a) => a.varsel) };
 }
 
+/** Kjør matcheren bare hvis noe venter på å bli avstemt (så sidevisninger ikke skriver til lagringen hver gang). */
+export async function kjorMatcherVedBehov() {
+  const s = await hentState();
+  const m = s.matchet ?? {};
+  const venter = (s.kameraHendelser ?? []).some((k) => !m[k.id]) || (s.skanninger ?? []).some((x) => x.type === "plukk" && !m[x.id]);
+  if (venter) await kjorMatcher();
+}
+
 /** Kjør matcheren mot lagret state (brukes når kameraet har sendt nye hendelser). */
 export function kjorMatcher() {
   return endreState((s) => avstem(s));

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { hentState } from "@/lib/store";
-import { apneAvvik, beholdning, hylleStatus, sisteTelling, totalBeholdning, vare } from "@/lib/lager";
+import { apneAvvik, apneKameraAvvik, beholdning, hylleStatus, sisteTelling, totalBeholdning, vare } from "@/lib/lager";
 import { fortegn, hilsen, klokke, kortDato, dagTittel, typeFarge } from "@/lib/format";
 import { lavBeholdning, rapport } from "@/lib/rapport";
 import { erAktiv, oppdragFor } from "@/lib/oppdrag";
 import { Innhold, Kpi, Ruter, Panel, PanelLenke, Prikk, Tabell, TomRad, Topp, TypeChip } from "@/components/dash";
 import { StatusChip } from "@/components/ui";
+import { KameraAvvikRad } from "./kamera/KameraAvvikRad";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,8 @@ const tidTekst = (iso: string) => (dagTittel(iso) === "I dag" ? klokke(iso) : `$
 export default async function Oversikt() {
   const s = await hentState();
   const avvik = apneAvvik(s);
+  const kamera = apneKameraAvvik(s);
+  const totalt = avvik.length + kamera.length;
   const lav = lavBeholdning(s);
   const uke = rapport(s, 7);
   const idag = rapport(s, 1);
@@ -23,7 +26,7 @@ export default async function Oversikt() {
   return (
     <>
       <Topp
-        tittel={`${hilsen()} ${avvik.length ? `${avvik.length} ${avvik.length === 1 ? "avvik venter" : "avvik venter"}.` : "Ingen åpne avvik."}`}
+        tittel={`${hilsen()} ${totalt ? `${totalt} avvik venter.` : "Ingen åpne avvik."}`}
         under={<span className="first-letter:uppercase">{dato} · {s.innstillinger.lager}</span>}
       >
         <Link href="/rapport" className="knapp-gul !h-11 !w-auto !rounded-[10px] !border-2 px-5 !text-[14px]">Se rapport</Link>
@@ -31,7 +34,7 @@ export default async function Oversikt() {
       <Innhold>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
           <Kpi etikett="På lager" verdi={totalBeholdning(s)} under={`${s.varer.length} varetyper`} href="/varer" />
-          <Kpi etikett="Åpne avvik" verdi={avvik.length} under={avvik.length ? `${avvik.reduce((n, a) => n - a.endring, 0)} stk uavklart` : "Alt er avklart"} tone={avvik.length ? "rod" : undefined} href="/avvik" />
+          <Kpi etikett="Åpne avvik" verdi={totalt} under={totalt ? `${avvik.length} fra telling · ${kamera.length} fra kamera` : "Alt er avklart"} tone={totalt ? "rod" : undefined} href="/avvik" />
           <Kpi etikett="Svinn, 7 dager" verdi={uke.totalt.svinn} under={uke.totalt.muligSvinn ? `+ ${uke.totalt.muligSvinn} stk uavklart` : "bekreftet etter kontroll"} href="/rapport?dager=7" />
           <Kpi etikett="Bevegelser i dag" verdi={idag.antallHendelser} under={`+${idag.totalt.mottatt} inn · −${idag.totalt.solgt} solgt`} tone={idag.antallHendelser ? "gronn" : undefined} href="/logg?dager=1" />
           <Kpi etikett="Lav beholdning" verdi={lav.length} under="varer med 3 eller færre" tone={lav.length ? "gul" : undefined} href="/varer?status=lav" />
@@ -50,7 +53,9 @@ export default async function Oversikt() {
                   <Link href={`/avvik/${a.id}`} className="flex h-10 items-center rounded-[9px] bg-rod px-4 text-[13px] font-bold text-bg hover:opacity-90">Behandle</Link>
                 </li>
               ))}
-              {avvik.length === 0 && <li className="px-4 py-8 text-center text-[13.5px] text-dempet">Ingen åpne avvik. Nye avvik dukker opp her så snart de oppdages.</li>}
+              {kamera.slice(0, 5).map((a) => <KameraAvvikRad key={a.id} a={a} />)}
+              {kamera.length > 5 && <li className="px-4 py-3 text-[13px] text-dempet">{kamera.length - 5} til fra kameraet. <Link href="/kamera" className="underline underline-offset-2">Se alle</Link></li>}
+              {totalt === 0 && <li className="px-4 py-8 text-center text-[13.5px] text-dempet">Ingen åpne avvik. Nye avvik dukker opp her så snart de oppdages.</li>}
               {avvik.length > 5 && <li className="px-4 py-3 text-[13px] text-dempet">{avvik.length - 5} til. <Link href="/avvik" className="underline underline-offset-2">Se alle</Link></li>}
             </ul>
           </Panel>

@@ -51,8 +51,14 @@ export function erIdag(iso: string): boolean {
   return f(new Date(iso)) === f(new Date());
 }
 
+/** Åpne avvik fra matcheren (takkamera mot skanner). */
+export function apneKameraAvvik(s: State) {
+  return (s.matcherAvvik ?? []).filter((a) => a.status === "apen").sort((a, b) => b.tid.localeCompare(a.tid));
+}
+
 export function hylleStatus(s: State, hylle: string): "avvik" | "ok" | "ikke_talt" {
   if (apneAvvik(s).some((a) => a.hylle === hylle)) return "avvik";
+  if (apneKameraAvvik(s).some((a) => a.sone === hylle || a.sone2 === hylle)) return "avvik";
   const t = sisteTelling(s, hylle);
   return t && erIdag(t.tid) ? "ok" : "ikke_talt";
 }

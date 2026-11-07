@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Archivo, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { cookies } from "next/headers";
 import { hentState } from "@/lib/store";
-import { apneAvvik } from "@/lib/lager";
+import { apneAvvik, apneKameraAvvik } from "@/lib/lager";
+import { kjorMatcherVedBehov } from "@/lib/matcher";
 import { AutoOppdater, Sidemeny, type Tema } from "@/components/Nav";
 import "./globals.css";
 
@@ -29,6 +30,8 @@ export const viewport: Viewport = {
 export const dynamic = "force-dynamic";
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  // Avvik som venter på at tidsvinduet går ut, dukker opp uten at kameraet må sende noe nytt.
+  await kjorMatcherVedBehov().catch(() => undefined);
   const s = await hentState();
   // Mørk modus er standard. Valget fra bryteren i menyen ligger i informasjonskapselen «tema».
   const tema: Tema = (await cookies()).get("tema")?.value === "lys" ? "lys" : "mork";
@@ -36,10 +39,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang="nb" data-theme={tema === "mork" ? "dark" : "light"} className={`${archivo.variable} ${plex.variable} ${plexMono.variable}`}>
       <body className="antialiased">
         <div className="flex min-h-dvh flex-col bg-bg lg:flex-row">
-          <Sidemeny lager={s.innstillinger.lager} avvik={apneAvvik(s).length} tema={tema} />
+          <Sidemeny lager={s.innstillinger.lager} avvik={apneAvvik(s).length + apneKameraAvvik(s).length} tema={tema} />
           <div className="flex min-w-0 flex-1 flex-col">{children}</div>
         </div>
-        <AutoOppdater />
+        <AutoOppdater sekunder={5} />
       </body>
     </html>
   );
