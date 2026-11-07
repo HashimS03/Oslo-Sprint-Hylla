@@ -96,6 +96,10 @@ const TYPE_STIL: Record<string, string> = {
   funnet: "bg-gronnlys text-gronn",
   korrigering: "bg-graa text-dempet",
   start: "bg-graa text-dempet",
+  kamera_uttak: "text-blaa ring-1 ring-inset ring-blaa",
+  kamera_plassering: "text-gronn ring-1 ring-inset ring-gronn",
+  kamera_feil_vare: "bg-rod text-bg",
+  kamera_gjenglemt: "bg-gul text-[#1B2226]",
 };
 
 export function TypeChip({ type }: { type: string }) {

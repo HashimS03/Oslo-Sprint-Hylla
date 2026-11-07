@@ -5,6 +5,7 @@ import { fortegn, klokke, kortDato, typeFarge } from "@/lib/format";
 import { iPerioden, lesPeriode } from "@/lib/rapport";
 import { AvvikChip, Filter, Innhold, Panel, PeriodeVelger, Tabell, TomRad, Topp, TypeChip } from "@/components/dash";
 import { Ikon } from "@/components/ui";
+import { alleRader } from "@/lib/kamerafeed";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,7 @@ const TYPER = [
   { id: "svinn", navn: "Svinn og avvik" },
   { id: "funnet", navn: "Funnet" },
   { id: "korrigering", navn: "Korrigering" },
+  { id: "kamera", navn: "Fra kamera" },
 ];
 const MAKS = 300;
 
@@ -34,17 +36,17 @@ export default async function Hendelser({ searchParams }: { searchParams: Promis
     const t = p.toString();
     return t ? `/logg?${t}` : "/logg";
   };
-  const rader = [...s.hendelser]
+  const rader = alleRader(s)
     .filter((h) => iPerioden(h, dager))
-    .filter((h) => !type || h.type === type || (type === "svinn" && h.type === "mulig_svinn"))
+    .filter((h) => !type || h.type === type || (type === "svinn" && h.type === "mulig_svinn") || (type === "kamera" && h.kamera))
     .filter((h) => !hylle || h.hylle === hylle)
-    .filter((h) => !q || `${h.sku} ${vare(s, h.sku)?.navn ?? ""} ${h.ref ?? ""} ${h.aarsak}`.toLowerCase().includes(q.toLowerCase()))
-    .sort((a, b) => b.tid.localeCompare(a.tid));
-  const sum = rader.reduce((n, h) => n + h.endring, 0);
+    .filter((h) => !q || `${h.sku} ${h.navn} ${h.aarsak}`.toLowerCase().includes(q.toLowerCase()));
+  const refOg = new Map(s.hendelser.map((h) => [h.id, h]));
+  const sum = rader.filter((h) => !h.kamera).reduce((n, h) => n + h.endring, 0);
 
   return (
     <>
-      <Topp tittel="Hendelser" under="Lagerloggen er sannheten: beholdningen er summen av alle hendelsene.">
+      <Topp tittel="Hendelser" under="Lagerloggen og det kameraet ser. Beholdningen er summen av lagerloggen, kameraet sjekker at den stemmer.">
         <PeriodeVelger valgt={dager} lag={(d) => lenke({ dager: String(d) })} />
         <a href={`/api/rapport?format=csv&hva=hendelser&dager=${dager}`} className="rounded-lg border border-kant bg-kort px-3.5 py-2 text-[13.5px] font-semibold hover:border-tekst">Last ned CSV</a>
       </Topp>
@@ -67,21 +69,27 @@ export default async function Hendelser({ searchParams }: { searchParams: Promis
         </div>
         <Panel
           tittel={`${rader.length} hendelse${rader.length === 1 ? "" : "r"}`}
-          handling={<span className="font-mono text-[12px] text-dempet">Netto {fortegn(sum)} stk</span>}
+          handling={<span className="font-mono text-[12px] text-dempet">Netto i loggen {fortegn(sum)} stk</span>}
         >
           <Tabell hode={["Tid", "Type", "Lokasjon", "Vare", "Endring", "Årsak", "Ref", "Avvik"]} hoyre={[4]}>
-            {rader.slice(0, MAKS).map((h) => (
-              <tr key={h.id} className={h.type === "mulig_svinn" && h.avvik?.status === "apen" ? "bg-rodlys" : ""}>
-                <td className="font-mono text-[12px] whitespace-nowrap text-dempet">{kortDato(h.tid)} {klokke(h.tid)}</td>
-                <td><TypeChip type={h.type} /></td>
-                <td className="font-semibold">{h.hylle}</td>
-                <td><Link href={`/varer/${encodeURIComponent(h.sku)}`} className="hover:underline">{vare(s, h.sku)?.navn ?? h.sku}</Link></td>
-                <td className={`text-right font-mono font-medium ${typeFarge(h.type, h.endring)}`}>{fortegn(h.endring)}</td>
-                <td className="text-[12.5px]">{h.aarsak}</td>
-                <td className="font-mono text-[12px] text-dempet">{h.ref ?? ""}</td>
-                <td>{h.avvik ? <Link href={`/avvik/${h.id}`}><AvvikChip status={h.avvik.status} /></Link> : null}</td>
-              </tr>
-            ))}
+            {rader.slice(0, MAKS).map((h) => {
+              const lh = refOg.get(h.id);
+              return (
+                <tr key={h.id} className={lh?.type === "mulig_svinn" && lh.avvik?.status === "apen" ? "bg-rodlys" : ""}>
+                  <td className="font-mono text-[12px] whitespace-nowrap text-dempet">{kortDato(h.tid)} {klokke(h.tid)}</td>
+                  <td><TypeChip type={h.type} /></td>
+                  <td className="font-semibold">{h.hylle}</td>
+                  <td>{h.sku ? <Link href={`/varer/${encodeURIComponent(h.sku)}`} className="hover:underline">{h.navn}</Link> : h.navn}</td>
+                  <td className={`text-right font-mono font-medium ${h.kamera ? "text-dempet" : typeFarge(h.type, h.endring)}`}>{h.endring ? fortegn(h.endring) : "–"}</td>
+                  <td className="text-[12.5px]">{h.aarsak}</td>
+                  <td className="font-mono text-[12px] text-dempet">{lh?.ref ?? ""}</td>
+                  <td>
+                    {lh?.avvik ? <Link href={`/avvik/${lh.id}`}><AvvikChip status={lh.avvik.status} /></Link> : null}
+                    {h.kamera && h.avvik ? <Link href={`/avvik#${h.avvik}`} className="text-[12.5px] font-semibold text-rod underline underline-offset-2">Avvik</Link> : null}
+                  </td>
+                </tr>
+              );
+            })}
             {rader.length === 0 && <TomRad kolonner={8}>Ingen hendelser passer filteret.</TomRad>}
           </Tabell>
           {rader.length > MAKS && <p className="border-t border-kant px-4 py-2.5 text-[12.5px] text-dempet">Viser de {MAKS} nyeste. Last ned CSV for alle.</p>}

@@ -28,6 +28,10 @@ export const TYPE_NAVN: Record<string, string> = {
   svinn: "Svinn",
   funnet: "Funnet",
   korrigering: "Korrigering",
+  kamera_uttak: "Kamera: tatt",
+  kamera_plassering: "Kamera: lagt til",
+  kamera_feil_vare: "Kamera: feil plass",
+  kamera_gjenglemt: "Kamera: gjenglemt",
 };
 
 export function typeFarge(type: string, endring: number) {

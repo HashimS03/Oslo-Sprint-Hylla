@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { alleRader } from "@/lib/kamerafeed";
 import { notFound } from "next/navigation";
 import { hentState } from "@/lib/store";
 import { apneAvvik, beholdning, beholdningPerHylle, innkjopForVare, plukketSiden, vare } from "@/lib/lager";
@@ -16,7 +17,8 @@ export default async function VareSide({ params }: { params: Promise<{ sku: stri
   const totalt = beholdning(s, v.sku);
   const hyller = beholdningPerHylle(s, v.sku);
   const innkjop = innkjopForVare(s, v.sku);
-  const historikk = s.hendelser.filter((h) => h.sku === v.sku).sort((a, b) => b.tid.localeCompare(a.tid)).slice(0, 25);
+  const historikk = alleRader(s).filter((h) => h.sku === v.sku).slice(0, 25);
+  const refOg = new Map(s.hendelser.map((h) => [h.id, h]));
   const plass = (id: string) => s.hyller.find((h) => h.id === id)?.innhold.find((i) => i.sku === v.sku)?.nivaa;
   const avvik = apneAvvik(s).filter((a) => a.sku === v.sku);
   const apneSalg = s.ordrer.filter((o) => o.sku === v.sku && o.status === "apen");
@@ -91,9 +93,9 @@ export default async function VareSide({ params }: { params: Promise<{ sku: stri
                   <td className="font-mono text-[12px] whitespace-nowrap text-dempet">{kortDato(h.tid)} {klokke(h.tid)}</td>
                   <td><TypeChip type={h.type} /></td>
                   <td className="font-semibold">{h.hylle}</td>
-                  <td className={`text-right font-mono font-medium ${typeFarge(h.type, h.endring)}`}>{fortegn(h.endring)}</td>
-                  <td className="text-[12.5px]">{h.type === "mulig_svinn" || h.type === "svinn" ? <Link href={`/avvik/${h.id}`} className="underline underline-offset-2">{h.aarsak}</Link> : h.aarsak}</td>
-                  <td className="font-mono text-[12px] text-dempet">{h.ref ?? ""}</td>
+                  <td className={`text-right font-mono font-medium ${h.kamera ? "text-dempet" : typeFarge(h.type, h.endring)}`}>{h.endring ? fortegn(h.endring) : "–"}</td>
+                  <td className="text-[12.5px]">{h.type === "mulig_svinn" || h.type === "svinn" ? <Link href={`/avvik/${h.id}`} className="underline underline-offset-2">{h.aarsak}</Link> : h.kamera && h.avvik ? <Link href={`/avvik#${h.avvik}`} className="underline underline-offset-2">{h.aarsak}</Link> : h.aarsak}</td>
+                  <td className="font-mono text-[12px] text-dempet">{refOg.get(h.id)?.ref ?? ""}</td>
                 </tr>
               ))}
               {historikk.length === 0 && <TomRad kolonner={6}>Ingen hendelser for denne varen.</TomRad>}
