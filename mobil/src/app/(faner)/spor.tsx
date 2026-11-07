@@ -13,12 +13,13 @@ import { Ikon } from "@/components/Ikon";
 import { KortVisning } from "@/components/KortVisning";
 import { Etikett, Rad, Skjerm, Txt } from "@/components/ui";
 
-type Melding = { id: number; rolle: "bruker" | "hylla"; tekst: string; kort?: Kort[]; lyd?: string };
+type Melding = { id: string; rolle: "bruker" | "hylla"; tekst: string; kort?: Kort[]; lyd?: string };
 
 const FORSLAG = ["Hvor mange kaffekopper har vi igjen?", "Hva er mulig svinn i dag?", "Når kom PO-3001?"];
 
-let nesteId = 1;
 const klokkeMs = () => Date.now();
+// Unik nøkkel også etter hot reload (en modul-teller starter på nytt, men meldingene blir liggende).
+const nyId = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 export default function SporHylla() {
   const [meldinger, setMeldinger] = useState<Melding[]>([]);
@@ -31,7 +32,10 @@ export default function SporHylla() {
   const spiller = useRef<AudioPlayer | null>(null);
 
   const historikk = () => meldinger.filter((m) => m.tekst).slice(-10).map((m) => ({ rolle: m.rolle, tekst: m.tekst }));
-  const leggTil = (m: Omit<Melding, "id">) => setMeldinger((ms) => [...ms, { ...m, id: nesteId++ }]);
+  const leggTil = (m: Omit<Melding, "id">) => {
+    const id = nyId();
+    setMeldinger((ms) => [...ms, { ...m, id }]);
+  };
 
   /** Spiller ElevenLabs-lyden hvis vi fikk den, ellers leser telefonen opp selv. */
   const lesHoyt = (svar: string, lyd?: string) => {
