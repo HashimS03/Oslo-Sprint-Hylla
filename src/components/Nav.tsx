@@ -18,6 +18,17 @@ const BUNN: typeof MENY = [
   { href: "/innstillinger", navn: "Innstillinger", ikon: "innstillinger", aktiv: (p) => p.startsWith("/innstillinger") },
 ];
 
+/** Hylla-logoen: gul flis med en mørk ramme og tre hyllestreker, som app-ikonet. */
+export function Logo({ size = 30 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 512 512" role="img" aria-label="Hylla">
+      <rect width="512" height="512" rx="96" fill="#F4C430" />
+      <rect x="158" y="158" width="196" height="196" fill="none" stroke="#1B2226" strokeWidth="30" />
+      <path d="M203 199h106M203 256h106M203 312h106" stroke="#1B2226" strokeWidth="16" />
+    </svg>
+  );
+}
+
 function MenyIkon({ navn }: { navn: IkonNavn }) {
   const p = { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const, "aria-hidden": true };
   switch (navn) {
@@ -54,7 +65,7 @@ export function Sidemeny({ lager, avvik, tema }: { lager: string; avvik: number;
     <aside className="sticky top-0 z-20 flex shrink-0 flex-col gap-1 border-b border-kant bg-meny px-3 py-3 lg:h-dvh lg:w-[232px] lg:border-r lg:border-b-0 lg:py-5">
       <div className="flex items-center justify-between px-2 pb-2 lg:flex-col lg:items-start lg:gap-1 lg:pb-5">
         <Link href="/" className="display flex items-center gap-2 text-[24px]" style={{ fontStretch: "78%" }}>
-          <span className="inline-block h-4 w-4 border-[2.5px] border-tekst bg-gul" />
+          <Logo />
           Hylla
         </Link>
         <span className="etikett">{lager}</span>
