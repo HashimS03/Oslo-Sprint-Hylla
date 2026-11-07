@@ -2,7 +2,7 @@ import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import type { Hylle, State, TelleResultat } from "./types";
 import { beholdning, sisteTelling, vare } from "./lager";
-import { samPrompt } from "./prompt";
+import { samPrompter } from "./prompt";
 
 // En teller tar et hyllebilde og returnerer antall per vare.
 // Fem varianter, valgt med HYLLA_TELLER (sam31 | sam3 | claude | yolo | demo):
@@ -228,8 +228,18 @@ export const sam31Teller: Teller = {
       const varer = await Promise.all(
         hylle.innhold.map(async (p) => {
           const v = vare(state, p.sku);
-          const prompt = samPrompt(v);
-          const c = await sam31Antall(bilde, prompt);
+          // Prøv søketekstene etter tur til en av dem finner noe sikkert. Den beste vinner.
+          let prompt = "";
+          let c: number[] = [];
+          for (const p of samPrompter(v)) {
+            const funn = await sam31Antall(bilde, p);
+            const sikreHer = funn.filter((x) => x >= SAM_TERSKEL).length;
+            if (!prompt || sikreHer > c.filter((x) => x >= SAM_TERSKEL).length) {
+              prompt = p;
+              c = funn;
+            }
+            if (sikreHer > 0) break;
+          }
           const sikre = c.filter((x) => x >= SAM_TERSKEL).length;
           const med = c.filter((x) => x >= SAM_LAV_TERSKEL).length;
           const snitt = c.length ? c.reduce((a, b) => a + b, 0) / c.length : 0.9;

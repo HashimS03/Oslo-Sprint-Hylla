@@ -24,6 +24,16 @@ const TING: [string, string][] = [
 export function samPrompt(v: Pick<Vare, "navn" | "farge" | "prompt"> | undefined): string {
   if (!v) return "object";
   if (v.prompt?.trim()) return v.prompt.trim();
+  return autoPrompt(v);
+}
+
+/** Søketekster å prøve i rekkefølge: egen beskrivelse først, så den automatiske engelske. */
+export function samPrompter(v: Pick<Vare, "navn" | "farge" | "prompt"> | undefined): string[] {
+  if (!v) return ["object"];
+  return [...new Set([samPrompt(v), autoPrompt(v), autoPrompt({ ...v, farge: "" })].filter(Boolean))];
+}
+
+function autoPrompt(v: Pick<Vare, "navn" | "farge">): string {
   const navn = v.navn.toLowerCase();
   const farge = FARGER[(v.farge ?? "").toLowerCase().trim()] ?? Object.entries(FARGER).find(([no]) => navn.split(/[\s,]+/).includes(no))?.[1] ?? "";
   const ting = TING.find(([no]) => navn.includes(no))?.[1];
