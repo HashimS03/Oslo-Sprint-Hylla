@@ -6,6 +6,8 @@ AI-lagerassistent for Oslo Sprint (Holio, utfordring #7 Varetelling og svinn).
 - **Spør Hylla:** spør med stemmen og få svar høyt på norsk, med et varekort på skjermen (ElevenLabs, eller nettleserens egen tale som reserve).
 - **Kameratelefon:** en telefon på stativ som følger med på en hylle og teller av seg selv når noen har vært der.
 
+Det finnes to klienter: **mobilappen i `mobil/`** (Expo, den vi demoer, se [mobil/README.md](mobil/README.md)) og web-appen i `src/app/`. Begge bruker de samme API-ene i Next.js.
+
 ## Kom i gang
 
 ```bash
@@ -25,7 +27,9 @@ npm run dev
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Lagring som overlever omstart. Kjør [supabase/schema.sql](supabase/schema.sql) først |
 | `YOLO_URL`, `HYLLA_TELLER=yolo` | Valgfri YOLO-teller, se [yolo/README.md](yolo/README.md) |
 
-Kamera på telefonen krever HTTPS. Lokalt kan dere bruke `npx next dev --experimental-https` eller deploye til Vercel.
+**Mobilappen:** start backenden med `npm run dev`, så `cd mobil && npm install && npx expo start` og skann QR-koden med Expo Go. Detaljer i [mobil/README.md](mobil/README.md).
+
+Kamera på telefonen i web-appen krever HTTPS. Lokalt kan dere bruke `npx next dev --experimental-https` eller deploye til Vercel.
 
 ## Hvordan det henger sammen
 
@@ -39,6 +43,8 @@ src/
     teller.ts     Tellere: Claude (bilde → antall), YOLO og demo
     verktoy.ts    Verktøyene Spør Hylla bruker (felles for Claude og ElevenLabs)
     spor.ts       Tekstversjonen av Spør Hylla (Claude med verktøy)
+    visning.ts    Ferdige visningsdata per skjerm (brukes av mobilappen)
+    elevenlabs.ts Tale til tekst og tekst til tale for mobilappen
   app/
     page.tsx              Hjem
     tell/                 Velg hylle → kamera → analyse → resultat
@@ -46,7 +52,8 @@ src/
     logg/, avvik/[id]/    Lagerlogg og avvik med før/etter-bilde
     varer/                Katalog, vare og nytt produkt
     innstillinger/, kameraer/, kamera/   Oppsett og kameratelefonen
-    api/                  Route handlers (tell, lagre, spor, stemme-token, verktøy for ElevenLabs …)
+    api/                  Route handlers (tell, lagre, spor, stemme, oversikt, hyller, logg, varer …)
+mobil/                    Expo-appen (hyllelapp-designet)
 ```
 
 Viktige prinsipper:

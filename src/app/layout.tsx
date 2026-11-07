@@ -10,11 +10,17 @@ export const metadata: Metadata = {
   title: "Hylla",
   description: "Lagerassistent som teller hylla fra ett bilde",
   manifest: "/manifest.webmanifest",
+  // Lagt til på hjemskjermen åpnes Hylla i fullskjerm, som en vanlig app.
+  appleWebApp: { capable: true, title: "Hylla", statusBarStyle: "default" },
+  icons: { icon: "/ikon-192.png", apple: "/apple-touch-icon.png" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
   themeColor: "#F7F8F7",
 };
 

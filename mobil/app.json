@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "Hylla",
+    "slug": "hylla",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/hylla-ikon.png",
+    "scheme": "hylla",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "no.oslosprint.hylla"
+    },
+    "android": {
+      "package": "no.oslosprint.hylla",
+      "adaptiveIcon": {
+        "backgroundColor": "#F4C430",
+        "foregroundImage": "./assets/images/hylla-ikon.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/hylla-ikon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F4C430",
+          "image": "./assets/images/hylla-ikon.png",
+          "imageWidth": 96
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Hylla bruker kameraet til å telle varene på hylla.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Hylla bruker mikrofonen når du holder inne og spør."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Hylla tar bilder av nye varer så den kjenner dem igjen."
+        }
+      ],
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
