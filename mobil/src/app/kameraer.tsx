@@ -5,11 +5,12 @@ import { useHent } from "@/lib/useHent";
 import { F, S } from "@/lib/tema";
 import { klokke, sistTalt } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
-import { Chip, Etikett, Feilboks, Kort, LenkeKnapp, Laster, Mono, Skjerm, Txt } from "@/components/ui";
+import { send } from "@/lib/api";
+import { Chip, Etikett, Feilboks, Kort, Knapp, LenkeKnapp, Laster, Mono, Skjerm, Txt } from "@/components/ui";
 
 export default function Kameraer() {
   const { data, feil, last } = useHent<{ kameraer: Kamera[] }>("/api/kameraer");
-  const { data: hyller } = useHent<{ hyller: HylleRad[] }>("/api/hyller");
+  const { data: hyller, last: oppdaterHyller } = useHent<{ hyller: HylleRad[] }>("/api/hyller");
 
   return (
     <Skjerm tittel="Kameraer" fane="index">
@@ -36,6 +37,12 @@ export default function Kameraer() {
         </Kort>
       ))}
 
+      {hyller && !hyller.hyller.some((h) => h.sone) && (
+        <Kort style={{ gap: 8 }}>
+          <Txt>Takkameraet er ikke satt opp i denne databasen ennå.</Txt>
+          <Knapp tekst="Sett opp takkamera (T1 Red Bull, T2 Cola)" onPress={async () => { await send("/api/kamera/oppsett", {}).catch(() => undefined); oppdaterHyller(); }} />
+        </Kort>
+      )}
       {(hyller?.hyller ?? []).some((h) => h.sone && h.sone.type !== "gang") && <Etikett style={{ marginTop: 10 }}>Kamera i taket</Etikett>}
       {(hyller?.hyller ?? []).filter((h) => h.sone && h.sone.type !== "gang").map((h) => (
         <Kort key={h.id} style={{ flexDirection: "row", gap: 8, alignItems: "center", padding: 12 }}>
