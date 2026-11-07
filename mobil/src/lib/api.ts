@@ -48,3 +48,12 @@ export async function sendSkjema<T>(sti: string, skjema: FormData): Promise<T> {
     throw new ApiFeil(`Kunne ikke sende opptaket til ${apiUrl()} (${e instanceof Error ? e.message : String(e)})`, 0);
   }
 }
+
+export async function patch<T>(sti: string, body: unknown): Promise<T> {
+  try {
+    return await svar<T>(await fetch(apiUrl() + sti, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }));
+  } catch (e) {
+    if (e instanceof ApiFeil) throw e;
+    throw new ApiFeil(`Får ikke kontakt med Hylla-serveren på ${apiUrl()} (${e instanceof Error ? e.message : String(e)})`, 0);
+  }
+}

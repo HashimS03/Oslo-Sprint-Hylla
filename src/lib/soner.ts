@@ -5,7 +5,7 @@ import { nyId, vare } from "./lager";
 import { ferdigTelt, vurder, type RammeStatus } from "./ramme";
 import { velgTeller } from "./teller";
 import { kjorMatcher } from "./matcher";
-import type { Hylle, KameraHendelse, Sone, State } from "./types";
+import type { Bokse, Hylle, KameraHendelse, Sone, State } from "./types";
 
 // Takkamera: ett bilde ser flere soner (hyller og gang). Kameraet gjør én ting: det sier fra om hva som skjer i hver sone.
 //   uttak      færre varer i sonen enn sist
@@ -27,7 +27,7 @@ export type SoneResultat = {
   bevegelse: number;
   endring: number;
   /** Antall funnet per vare i sonen, også varer som ikke hører hjemme her. */
-  funnet?: { sku: string; navn: string; antall: number; hjemmehorende: boolean }[];
+  funnet?: { sku: string; navn: string; antall: number; hjemmehorende: boolean; bokser: Bokse[] }[];
   hendelser?: KameraHendelse[];
   feil?: string;
 };
@@ -71,12 +71,18 @@ export async function hentKameraHendelser(opts: { etter?: string; sone?: string 
  * Behandler ett bilde fra et takkamera. Hver sone vurderes for seg, så en hånd i hylle 1 stopper
  * ikke tellingen av hylle 2. Vi klassifiserer bare når bildet i sonen har roet seg og er endret.
  */
-export async function behandleTakbilde(opts: { kameraId: string; bilde: string; liten?: string; demo?: boolean; tving?: boolean; demoTall?: Record<string, Record<string, number>> }) {
+export async function behandleTakbilde(opts: {
+  kameraId: string; bilde: string; liten?: string; demo?: boolean; tving?: boolean; demoTall?: Record<string, Record<string, number>>;
+  /** En telefon som følger med på bare én sone: hele bildet er da sonen, og vi klipper ikke. */
+  kunSone?: string;
+}) {
   const state = await hentState();
-  const soner = sonerForKamera(state, opts.kameraId);
+  const alleSoner = sonerForKamera(state, opts.kameraId);
+  const soner = opts.kunSone ? alleSoner.filter((z) => z.id === opts.kunSone) : alleSoner;
+  if (opts.kunSone && soner.length === 0) throw new Error(`${opts.kunSone} er ikke en sone på kamera ${opts.kameraId}`);
   if (soner.length === 0) throw new Error(`Kamera ${opts.kameraId} har ingen soner`);
   const teller = velgTeller(!!opts.demo);
-  const alle = kandidater(soner);
+  const alle = kandidater(alleSoner);
   const naa = Date.now();
 
   const resultater = await Promise.all(
@@ -86,7 +92,7 @@ export async function behandleTakbilde(opts: { kameraId: string; bilde: string; 
       const erGang = hylle.sone.type === "gang";
       let klipp: string;
       try {
-        klipp = await klippSone(opts.bilde, hylle.sone);
+        klipp = opts.kunSone ? opts.bilde : await klippSone(opts.bilde, hylle.sone);
       } catch (e) {
         return { ...grunn, status: "feil", bevegelse: 0, endring: 0, feil: e instanceof Error ? e.message : "Klipping feilet" };
       }
@@ -101,10 +107,13 @@ export async function behandleTakbilde(opts: { kameraId: string; bilde: string; 
         // demoTall lar demoen og testene oppgi hva kameraet «ser» per sone, uten ekte bilde.
         const oppgitt = opts.demoTall?.[hylle.id];
         const tall = oppgitt
-          ? { varer: alle.map((sku) => ({ sku, antall: oppgitt[sku] ?? 0, sikkerhet: 0.95, alternativ: null, merknad: "" })), ukjente: [], bildekvalitet: "god" as const, kommentar: "Oppgitt i demo" }
+          ? { varer: alle.map((sku) => ({ sku, antall: oppgitt[sku] ?? 0, bokser: demoBokser(oppgitt[sku] ?? 0), sikkerhet: 0.95, alternativ: null, merknad: "" })), ukjente: [], bildekvalitet: "god" as const, kommentar: "Oppgitt i demo" }
           : await teller.tell({ state, hylle: utvidet, bilde: klipp });
 
+        // Boksene gjelder utklippet. Vi regner dem om til hele bildet, så de kan tegnes over kamerabildet.
+        const iBildet = (b: Bokse): Bokse => opts.kunSone ? b : ({ x: hylle.sone.x + b.x * hylle.sone.b, y: hylle.sone.y + b.y * hylle.sone.h, b: b.b * hylle.sone.b, h: b.h * hylle.sone.h, c: b.c });
         const funnet = tall.varer.map((r) => ({
+          bokser: (r.bokser ?? []).map(iBildet),
           sku: r.sku,
           navn: vare(state, r.sku)?.navn ?? r.sku,
           antall: Math.max(0, Math.round(r.antall)),
@@ -194,4 +203,10 @@ export async function behandleTakbilde(opts: { kameraId: string; bilde: string; 
 
   const lavSikkerhet = resultater.flatMap((r) => r.hendelser ?? []).some((h) => h.sikkerhet < LAV_SIKKERHET);
   return { kameraId: opts.kameraId, teller: teller.navn, soner: resultater, lavSikkerhet };
+}
+
+/** Falske bokser til demoen: n bokser på en rad i utklippet, så oppsettet kan vises uten ekte bilder. */
+function demoBokser(n: number): Bokse[] {
+  const b = Math.min(0.2, 0.9 / Math.max(n, 1));
+  return Array.from({ length: n }, (_, i) => ({ x: 0.05 + i * (b + 0.02), y: 0.35, b, h: 0.3, c: 0.9 }));
 }

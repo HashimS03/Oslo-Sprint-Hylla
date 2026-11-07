@@ -17,8 +17,8 @@ export default function NyHylle() {
     setLagrer(true);
     try {
       const res = await send<{ id: string }>("/api/hyller", { id, navn });
-      // Rett videre til å legge varer på den nye hylla.
-      router.replace({ pathname: "/ny-vare", params: { hylle: res.id } });
+      // Produktet velges per kamerasone på Kameraer-skjermen.
+      router.replace("/kameraer");
     } catch (e) {
       setFeil(e instanceof Error ? e.message : "Kunne ikke lagre");
       setLagrer(false);
@@ -26,9 +26,9 @@ export default function NyHylle() {
   };
 
   return (
-    <Skjerm tittel="Ny hylle" bunn={<Knapp tekst={lagrer ? "Lagrer …" : "Lagre og legg til varer"} laster={lagrer} onPress={lagre} />}>
+    <Skjerm tittel="Ny hylle" bunn={<Knapp tekst={lagrer ? "Lagrer …" : "Lagre"} laster={lagrer} onPress={lagre} />}>
       <Txt style={{ color: F.dempet }}>
-        En hylle er stedet kameraet ser på, f.eks. en hylle i en reol eller et bord. Etterpå legger du varene som ligger der.
+        En hylle er stedet kameraet ser på, f.eks. en hylle i en reol eller et bord. Etterpå velger du hvilket produkt kameraet skal se etter der.
       </Txt>
       <View style={{ gap: 6 }}>
         <Txt style={st.etikett}>ID</Txt>

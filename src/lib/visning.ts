@@ -28,7 +28,7 @@ export function oversiktVisning(s: State) {
 
 export function hyllerVisning(s: State) {
   return s.hyller.map((h) => ({
-    id: h.id, reol: h.reol, navn: h.navn, status: hylleStatus(s, h.id), sistTalt: sisteTelling(s, h.id)?.tid ?? null,
+    id: h.id, reol: h.reol, navn: h.navn, sone: h.sone ? { kamera: h.sone.kamera, type: h.sone.type ?? "hylle" } : null, status: hylleStatus(s, h.id), sistTalt: sisteTelling(s, h.id)?.tid ?? null,
     innhold: h.innhold.map((i) => ({ sku: i.sku, nivaa: i.nivaa, navn: vare(s, i.sku)?.navn ?? i.sku, antall: beholdning(s, i.sku, h.id) })),
   }));
 }

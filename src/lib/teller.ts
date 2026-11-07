@@ -1,6 +1,6 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
-import type { Hylle, State, TelleResultat } from "./types";
+import type { Bokse, Hylle, State, TelleResultat } from "./types";
 import { beholdning, sisteTelling, vare } from "./lager";
 import { samPrompter } from "./prompt";
 
@@ -198,13 +198,27 @@ function samleTekst(raa: string): string {
 
 /** Gir sikkerheten til hver boks i et SAM 3.1-svar. */
 export function parseBokser(raa: string): number[] {
+  return parseBoksDetaljer(raa).map((b) => b.c);
+}
+
+/** Gir hver boks i et SAM 3.1-svar, med koordinater som andel av bildet (0 til 1). Boksene kommer i piksler med w og h. */
+export function parseBoksDetaljer(raa: string): Bokse[] {
+  const tall = (felt: string, navn: string) => {
+    const m = new RegExp(`(?:^|;)${navn}=(-?[0-9.]+)`).exec(felt);
+    return m ? Number(m[1]) : NaN;
+  };
   return [...samleTekst(raa).matchAll(/<\|box;([^|]*)\|>/g)].map((m) => {
-    const c = /(?:^|;)c=([0-9.]+)/.exec(m[1]);
-    return c ? Number(c[1]) : 1;
+    const c = tall(m[1], "c");
+    const [x1, y1, x2, y2, w, h] = ["x1", "y1", "x2", "y2", "w", "h"].map((n) => tall(m[1], n));
+    const ok = [x1, y1, x2, y2, w, h].every((v) => Number.isFinite(v)) && w > 0 && h > 0;
+    return {
+      x: ok ? x1 / w : 0, y: ok ? y1 / h : 0, b: ok ? (x2 - x1 + 1) / w : 0, h: ok ? (y2 - y1 + 1) / h : 0,
+      c: Number.isFinite(c) ? c : 1,
+    };
   });
 }
 
-async function sam31Antall(bilde: string, prompt: string): Promise<number[]> {
+async function sam31Antall(bilde: string, prompt: string): Promise<Bokse[]> {
   const res = await fetch(META_URL, {
     method: "POST",
     headers: { authorization: `Bearer ${metaNokkel()}`, "content-type": "application/json" },
@@ -217,7 +231,7 @@ async function sam31Antall(bilde: string, prompt: string): Promise<number[]> {
     signal: AbortSignal.timeout(40_000),
   });
   if (!res.ok) throw new Error(`Meta API svarte ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  return parseBokser(await res.text());
+  return parseBoksDetaljer(await res.text());
 }
 
 export const sam31Teller: Teller = {
@@ -230,21 +244,22 @@ export const sam31Teller: Teller = {
           const v = vare(state, p.sku);
           // Prøv søketekstene etter tur til en av dem finner noe sikkert. Den beste vinner.
           let prompt = "";
-          let c: number[] = [];
+          let c: Bokse[] = [];
           for (const p of samPrompter(v)) {
             const funn = await sam31Antall(bilde, p);
-            const sikreHer = funn.filter((x) => x >= SAM_TERSKEL).length;
-            if (!prompt || sikreHer > c.filter((x) => x >= SAM_TERSKEL).length) {
+            const sikreHer = funn.filter((x) => x.c >= SAM_TERSKEL).length;
+            if (!prompt || sikreHer > c.filter((x) => x.c >= SAM_TERSKEL).length) {
               prompt = p;
               c = funn;
             }
             if (sikreHer > 0) break;
           }
-          const sikre = c.filter((x) => x >= SAM_TERSKEL).length;
-          const med = c.filter((x) => x >= SAM_LAV_TERSKEL).length;
-          const snitt = c.length ? c.reduce((a, b) => a + b, 0) / c.length : 0.9;
+          const sikre = c.filter((x) => x.c >= SAM_TERSKEL).length;
+          const med = c.filter((x) => x.c >= SAM_LAV_TERSKEL).length;
+          const snitt = c.length ? c.reduce((a, b) => a + b.c, 0) / c.length : 0.9;
           return {
             prompt,
+            bokser: c.filter((x) => x.c >= SAM_LAV_TERSKEL),
             sku: p.sku,
             antall: sikre,
             sikkerhet: med > sikre ? Math.min(0.75, snitt) : snitt,
@@ -255,7 +270,7 @@ export const sam31Teller: Teller = {
       );
       // Viser hva vi lette etter, så det er lett å se om søketeksten bør endres.
       const kommentar = varer.map((x) => `«${x.prompt}» ${x.antall}${x.alternativ !== null ? ` (kanskje ${x.alternativ})` : ""}`).join(", ");
-      return { varer: varer.map((x) => ({ sku: x.sku, antall: x.antall, sikkerhet: x.sikkerhet, alternativ: x.alternativ, merknad: x.merknad })), ukjente: [], bildekvalitet: "god", kommentar };
+      return { varer: varer.map((x) => ({ sku: x.sku, bokser: x.bokser, antall: x.antall, sikkerhet: x.sikkerhet, alternativ: x.alternativ, merknad: x.merknad })), ukjente: [], bildekvalitet: "god", kommentar };
     } catch (e) {
       // Reserve: Claude, hvis nøkkel finnes. Ellers kaster vi feilen videre.
       if (process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN) {

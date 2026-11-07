@@ -186,9 +186,14 @@ export type MatcherAvvik = {
 
 // ---------- Telling ----------
 
+/** En deteksjon, som en YOLO-boks: plassering i bildet (0 til 1, fra øvre venstre hjørne) og sikkerhet. */
+export type Bokse = { x: number; y: number; b: number; h: number; c: number };
+
 export type TelleResultatVare = {
   sku: string;
   antall: number;
+  /** Boksene som ble funnet, hvis telleren kan gi dem (SAM 3.1). Koordinatene gjelder bildet telleren fikk. */
+  bokser?: Bokse[];
   sikkerhet: number; // 0..1
   alternativ: number | null;
   merknad: string;

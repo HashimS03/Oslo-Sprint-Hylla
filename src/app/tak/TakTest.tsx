@@ -2,13 +2,13 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { filTilBilde, tilJpeg } from "@/lib/bilde";
-import type { KameraHendelse, Sone } from "@/lib/types";
+import type { Bokse, KameraHendelse, Sone } from "@/lib/types";
 
 type SoneInfo = { id: string; navn: string; sone: Sone; skuer: string[]; varer: string[] };
 type Katalog = { sku: string; navn: string }[];
 type SoneSvar = {
   sone: string; navn: string; status: string; bevegelse: number; endring: number;
-  funnet?: { sku: string; navn: string; antall: number; hjemmehorende: boolean }[];
+  funnet?: { sku: string; navn: string; antall: number; hjemmehorende: boolean; bokser: Bokse[] }[];
   hendelser?: KameraHendelse[]; feil?: string;
 };
 
@@ -124,6 +124,17 @@ export function TakTest({ kameraId, soner, katalog }: { kameraId: string; soner:
         {kilde === "kamera" && <video ref={video} playsInline muted style={{ width: "100%", height: "100%", objectFit: "fill" }} />}
         {kilde === "bilde" && <img src={forhandsvisning} alt="" style={{ width: "100%", height: "100%", objectFit: "fill" }} />}
         {kilde === "ingen" && <div style={{ color: "#aaa", padding: 24 }}>Start kameraet eller last opp et bilde.</div>}
+        {/* Deteksjoner, som i YOLO: en boks per funn med navn og sikkerhet. Rødt = vare som ikke hører hjemme i sonen. */}
+        {svar.flatMap((s) => (s.funnet ?? []).flatMap((f) => f.bokser.map((b, i) => (
+          <div key={`${s.sone}-${f.sku}-${i}`} style={{
+            position: "absolute", left: `${b.x * 100}%`, top: `${b.y * 100}%`, width: `${b.b * 100}%`, height: `${b.h * 100}%`,
+            border: `2px solid ${f.hjemmehorende ? "#3DDC84" : "#FF5A4F"}`, boxSizing: "border-box", pointerEvents: "none",
+          }}>
+            <span style={{ position: "absolute", top: -18, left: -2, background: f.hjemmehorende ? "#3DDC84" : "#FF5A4F", color: "#000", fontSize: 11, padding: "0 4px", whiteSpace: "nowrap" }}>
+              {f.navn} {Math.round(b.c * 100)} %
+            </span>
+          </div>
+        ))))}
         {soner.map((z) => {
           const s = svar.find((x) => x.sone === z.id);
           const gang = z.sone.type === "gang";
