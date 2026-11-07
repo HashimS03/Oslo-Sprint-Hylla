@@ -15,7 +15,7 @@ export default function Hjem() {
   const avvik = data?.apneAvvik.length ?? 0;
   const ikkeTalt = data ? data.antallHyller - data.taltIdag : 0;
   const ting = avvik + (ikkeTalt > 0 ? 1 : 0);
-  const kommIGang = !!data && (data.antallHyller === 0 || data.varerPaaLager === 0);
+  const kommIGang = !!data && data.antallHyller === 0;
 
   return (
     <ScrollView
@@ -53,8 +53,8 @@ export default function Hjem() {
       {data && kommIGang && (
         <Seksjon tittel="Kom i gang">
           <Steg nr={1} tekst="Lag en hylle" ferdig={data.antallHyller > 0} onPress={() => router.push("/ny-hylle")} />
-          <Steg nr={2} tekst="Legg inn varene på hylla" ferdig={data.varerPaaLager > 0} aktiv={data.antallHyller > 0} onPress={() => router.push("/ny-vare")} />
-          <Steg nr={3} tekst="Skann varene" ferdig={false} aktiv={data.varerPaaLager > 0} onPress={() => router.navigate("/skann")} />
+          <Steg nr={2} tekst="Velg produkt for kamerasonen" ferdig={false} aktiv={data.antallHyller > 0} onPress={() => router.push("/kameraer")} />
+          <Steg nr={3} tekst="Skann varene" ferdig={false} aktiv={data.antallHyller > 0} onPress={() => router.navigate("/skann")} />
         </Seksjon>
       )}
 

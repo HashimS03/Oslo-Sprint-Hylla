@@ -36,7 +36,8 @@ const STATUS_TEKST: Record<Status, string> = {
 export default function KameraStasjon() {
   useKeepAwake();
   const inn = useSafeAreaInsets();
-  const { hylle } = useLocalSearchParams<{ hylle: string }>();
+  // tak=1: telefonen følger med på én kamerasone (T1) og sender hendelser. Ellers er det den gamle telle-flyten.
+  const { hylle, tak } = useLocalSearchParams<{ hylle: string; tak?: string }>();
   const [tillatelse, spor] = useCameraPermissions();
   const kamera = useRef<CameraView>(null);
   const [klar, setKlar] = useState(false);
@@ -61,10 +62,11 @@ export default function KameraStasjon() {
 
   // Meld fra at kameraet lever.
   useEffect(() => {
+    if (tak) return; // takkameraet melder seg selv når bilder kommer inn
     pling();
     const t = setInterval(pling, 60_000);
     return () => clearInterval(t);
-  }, [pling]);
+  }, [pling, tak]);
 
   const leggTilLogg = useCallback((h: Hendelse) => setLogg((l) => [h, ...l].slice(0, 6)), []);
 
@@ -75,6 +77,21 @@ export default function KameraStasjon() {
     const [bilde, liten] = await Promise.all([tilJpeg(b.uri, 1024, 0.65), tilJpeg(b.uri, 320, 0.5)]);
     const tvang = tving.current;
     tving.current = false;
+    if (tak) {
+      type SoneSvar = { status: Status | "talt"; bevegelse: number; endring: number; feil?: string; funnet?: { navn: string; antall: number }[]; hendelser?: { type: string; antall: number; sku?: string }[] };
+      const r = (await send<{ soner: SoneSvar[] }>("/api/kamera/tak", { kameraId: "kam_tak", sone: hylle, bilde, liten, tving: tvang })).soner[0];
+      setStatus(r.status === "talt" ? "uendret" : r.status);
+      setMal({ bevegelse: r.bevegelse, endring: r.endring });
+      if (r.status === "talt") {
+        const tittel: Record<string, string> = { uttak: "Uttak", plassering: "Plassering", feil_vare: "Feil produkt", gjenglemt: "Gjenglemt" };
+        const funnet = (r.funnet ?? []).filter((f) => f.antall > 0).map((f) => `${f.antall} × ${f.navn}`).join(", ") || "ingenting";
+        if (!r.hendelser?.length) leggTilLogg({ tid: new Date().toISOString(), tekst: `Ingen endring · ser ${funnet}` });
+        for (const h of r.hendelser ?? []) leggTilLogg({ tid: new Date().toISOString(), tekst: `${tittel[h.type] ?? h.type} · ${h.antall} × ${h.sku ?? "ukjent"}` });
+      } else if (r.status === "feil") {
+        leggTilLogg({ tid: new Date().toISOString(), tekst: r.feil ?? "Tellingen feilet" });
+      }
+      return;
+    }
     const res = await send<RammeSvar>("/api/kamera/ramme", { kameraId, hylle, bilde, liten, tving: tvang });
     setStatus(res.status === "talt" ? "uendret" : res.status);
     setMal({ bevegelse: res.bevegelse, endring: res.endring });
@@ -94,7 +111,7 @@ export default function KameraStasjon() {
     } else if (res.status === "feil") {
       leggTilLogg({ tid: new Date().toISOString(), tekst: res.feil ?? "Tellingen feilet" });
     }
-  }, [kameraId, hylle, leggTilLogg]);
+  }, [kameraId, hylle, tak, leggTilLogg]);
 
   // Kjører rundene etter hverandre så lenge skjermen er åpen.
   useEffect(() => {

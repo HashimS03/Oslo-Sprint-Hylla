@@ -15,7 +15,7 @@ export type Oversikt = {
 export type HylleStatus = "avvik" | "ok" | "ikke_talt";
 
 export type HylleRad = {
-  id: string; reol: string; navn: string; status: HylleStatus; sistTalt: string | null;
+  id: string; reol: string; navn: string; sone: { kamera: string; type: string } | null; status: HylleStatus; sistTalt: string | null;
   innhold: { sku: string; nivaa: string; navn: string; antall: number }[];
 };
 

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Image, Pressable, StyleSheet, View } from "react-native";
 import { router } from "expo-router";
 import type { HylleRad, Kamera } from "@/lib/typer";
@@ -6,19 +5,14 @@ import { useHent } from "@/lib/useHent";
 import { F, S } from "@/lib/tema";
 import { klokke, sistTalt } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
-import { Chip, Etikett, Feilboks, Kort, Knapp, LenkeKnapp, Laster, Mono, Rad, Skjerm, Txt } from "@/components/ui";
+import { Chip, Etikett, Feilboks, Kort, LenkeKnapp, Laster, Mono, Skjerm, Txt } from "@/components/ui";
 
 export default function Kameraer() {
   const { data, feil, last } = useHent<{ kameraer: Kamera[] }>("/api/kameraer");
   const { data: hyller } = useHent<{ hyller: HylleRad[] }>("/api/hyller");
-  const [hylle, setHylle] = useState<string | null>(null);
 
   return (
-    <Skjerm
-      tittel="Kameraer"
-      fane="index"
-      bunn={<Knapp tekst={hylle ? `Start kamera på ${hylle}` : "Velg en hylle først"} ikon="telefon" deaktivert={!hylle} onPress={() => hylle && router.push({ pathname: "/kamera/[hylle]", params: { hylle } })} />}
-    >
+    <Skjerm tittel="Kameraer" fane="index">
       <Txt style={{ color: F.dempet }}>
         En gammel telefon på stativ kan følge med på en hylle. Den tar bilde med jevne mellomrom, teller selv og lagrer endringer i loggen.
       </Txt>
@@ -42,14 +36,32 @@ export default function Kameraer() {
         </Kort>
       ))}
 
-      <Etikett style={{ marginTop: 10 }}>Bruk denne telefonen som kamera</Etikett>
-      <Rad gap={8} style={{ flexWrap: "wrap" }}>
-        {(hyller?.hyller ?? []).map((h) => (
-          <Pressable key={h.id} onPress={() => setHylle(h.id)} style={[st.valg, hylle === h.id && { backgroundColor: F.tekst, borderColor: F.tekst }]}>
-            <Txt style={{ fontFamily: S.tekstHalvfet, color: hylle === h.id ? F.hvit : F.tekst }}>{h.id}</Txt>
+      {(hyller?.hyller ?? []).some((h) => h.sone && h.sone.type !== "gang") && <Etikett style={{ marginTop: 10 }}>Kamera i taket</Etikett>}
+      {(hyller?.hyller ?? []).filter((h) => h.sone && h.sone.type !== "gang").map((h) => (
+        <Kort key={h.id} style={{ flexDirection: "row", gap: 8, alignItems: "center", padding: 12 }}>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 17 }}>{h.id} kamera</Txt>
+            <Txt style={{ color: F.dempet }}>Leter etter: {h.innhold.length ? h.innhold.map((i) => i.navn).join(", ") : "ingenting valgt"}</Txt>
+          </View>
+          <Pressable
+            accessibilityLabel={`Bruk denne telefonen som kamera på ${h.id}`}
+            hitSlop={10}
+            onPress={() => router.push({ pathname: "/kamera/[hylle]", params: { hylle: h.id, tak: "1" } })}
+            style={st.innstilling}
+          >
+            <Ikon navn="kamera" size={22} />
           </Pressable>
-        ))}
-      </Rad>
+          <Pressable
+            accessibilityLabel={`Innstillinger for ${h.id}`}
+            hitSlop={10}
+            onPress={() => router.push({ pathname: "/sone/[id]", params: { id: h.id } })}
+            style={st.innstilling}
+          >
+            <Ikon navn="tannhjul" size={22} />
+          </Pressable>
+        </Kort>
+      ))}
+
       {hyller && hyller.hyller.length === 0 && (
         <Kort style={{ gap: 8 }}>
           <Txt>Du har ingen hyller ennå. Lag en hylle og legg inn varene, så kan telefonen følge med på den.</Txt>
@@ -62,5 +74,5 @@ export default function Kameraer() {
 
 const st = StyleSheet.create({
   miniatyr: { width: 56, height: 56, borderRadius: 8, backgroundColor: F.skifer, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  valg: { borderWidth: 1.5, borderColor: F.tekst, backgroundColor: F.hvit, borderRadius: 8, width: 56, height: 44, alignItems: "center", justifyContent: "center" },
+  innstilling: { width: 44, height: 44, borderRadius: 8, borderWidth: 1.5, borderColor: F.tekst, backgroundColor: F.hvit, alignItems: "center", justifyContent: "center" },
 });
