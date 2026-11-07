@@ -2,9 +2,12 @@ import Link from "next/link";
 import { hentState } from "@/lib/store";
 import { klokke, kortDato } from "@/lib/format";
 import { avvikListe } from "@/lib/rapport";
+import { oppdragFor } from "@/lib/oppdrag";
 import { AvvikChip, Filter, Innhold, Kpi, Panel, Tabell, TomRad, Topp } from "@/components/dash";
 
 export const dynamic = "force-dynamic";
+
+const SKANNER: Record<string, string> = { sendt: "Sendt", mottatt: "Mottatt", pagar: "Sjekkes", ferdig: "Sjekket", avbrutt: "Trukket" };
 
 const VALG = [
   { id: "apne", navn: "Åpne" },
@@ -34,7 +37,7 @@ export default async function AvvikListe({ searchParams }: { searchParams: Promi
           <Kpi etikett="Var salg" verdi={tell("lukket")} under="stk ført som salg" />
         </div>
         <Panel tittel={VALG.find((v) => v.id === filter)!.navn + " avvik"}>
-          <Tabell hode={["Oppdaget", "Lokasjon", "Vare", "Antall", "Status", "Lukket", ""]} hoyre={[3]}>
+          <Tabell hode={["Oppdaget", "Lokasjon", "Vare", "Antall", "Status", "Skanner", "Lukket", ""]} hoyre={[3]}>
             {rader.map((a) => (
               <tr key={a.id} className={a.status === "apen" ? "bg-rodlys" : ""}>
                 <td className="font-mono text-[12px] whitespace-nowrap text-dempet">{kortDato(a.tid)} {klokke(a.tid)}</td>
@@ -42,11 +45,12 @@ export default async function AvvikListe({ searchParams }: { searchParams: Promi
                 <td><Link href={`/varer/${encodeURIComponent(a.sku)}`} className="hover:underline">{a.navn}</Link></td>
                 <td className="text-right font-mono font-semibold">{a.antall} stk</td>
                 <td><AvvikChip status={a.status} /></td>
+                <td className="text-[12.5px] whitespace-nowrap">{(() => { const o = oppdragFor(s, a.id); return o ? <span className={o.status === "ferdig" ? "text-gronn" : o.status === "avbrutt" ? "text-dempet" : "font-semibold text-gultekst"}>{SKANNER[o.status]}</span> : <span className="text-dempet">–</span>; })()}</td>
                 <td className="font-mono text-[12px] text-dempet">{a.lukketTid ? `${kortDato(a.lukketTid)} ${klokke(a.lukketTid)}` : "–"}</td>
                 <td className="text-right"><Link href={`/avvik/${a.id}`} className="text-[13px] font-semibold underline underline-offset-2">{a.status === "apen" ? "Behandle" : "Detaljer"}</Link></td>
               </tr>
             ))}
-            {rader.length === 0 && <TomRad kolonner={7}>{filter === "apne" ? "Ingen åpne avvik akkurat nå." : "Ingen avvik her ennå."}</TomRad>}
+            {rader.length === 0 && <TomRad kolonner={8}>{filter === "apne" ? "Ingen åpne avvik akkurat nå." : "Ingen avvik her ennå."}</TomRad>}
           </Tabell>
         </Panel>
       </Innhold>

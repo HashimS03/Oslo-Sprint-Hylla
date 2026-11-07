@@ -3,6 +3,7 @@ import { hentState } from "@/lib/store";
 import { apneAvvik, beholdning, hylleStatus, sisteTelling, totalBeholdning, vare } from "@/lib/lager";
 import { fortegn, hilsen, klokke, kortDato, dagTittel, typeFarge } from "@/lib/format";
 import { lavBeholdning, rapport } from "@/lib/rapport";
+import { erAktiv, oppdragFor } from "@/lib/oppdrag";
 import { Innhold, Kpi, Ruter, Panel, PanelLenke, Prikk, Tabell, TomRad, Topp, TypeChip } from "@/components/dash";
 import { StatusChip } from "@/components/ui";
 
@@ -44,7 +45,7 @@ export default async function Oversikt() {
                   <span className="display w-12 text-[30px] text-rod" style={{ fontStretch: "100%" }}>−{Math.abs(a.endring)}</span>
                   <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                     <span className="text-[15px] font-semibold">{vare(s, a.sku)?.navn ?? a.sku} · {a.hylle}</span>
-                    <span className="text-[12.5px] text-dempet">{a.aarsak} · {tidTekst(a.tid)}</span>
+                    <span className="text-[12.5px] text-dempet">{a.aarsak} · {tidTekst(a.tid)}{(() => { const o = oppdragFor(s, a.id); return o && erAktiv(o) ? <span className="ml-1 font-semibold text-gultekst">· sendt til skanner</span> : null; })()}</span>
                   </span>
                   <Link href={`/avvik/${a.id}`} className="flex h-10 items-center rounded-[9px] bg-rod px-4 text-[13px] font-bold text-bg hover:opacity-90">Behandle</Link>
                 </li>

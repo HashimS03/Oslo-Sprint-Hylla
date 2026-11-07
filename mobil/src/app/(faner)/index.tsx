@@ -54,14 +54,13 @@ export default function Hjem() {
         <Seksjon tittel="Kom i gang">
           <Steg nr={1} tekst="Lag en hylle" ferdig={data.antallHyller > 0} onPress={() => router.push("/ny-hylle")} />
           <Steg nr={2} tekst="Legg inn varene på hylla" ferdig={data.varerPaaLager > 0} aktiv={data.antallHyller > 0} onPress={() => router.push("/ny-vare")} />
-          <Steg nr={3} tekst="Tell hylla med kameraet" ferdig={false} aktiv={data.varerPaaLager > 0} onPress={() => router.navigate("/tell")} />
+          <Steg nr={3} tekst="Skann varene" ferdig={false} aktiv={data.varerPaaLager > 0} onPress={() => router.navigate("/skann")} />
         </Seksjon>
       )}
 
       <Rad gap={8}>
         <Tall tall={data ? String(data.varerPaaLager) : "–"} tekst="varer på lager" />
-        <Tall tall={data ? `${data.taltIdag}/${data.antallHyller}` : "–"} tekst="hyller talt" onPress={() => router.navigate("/tell")} />
-        <Tall
+                <Tall
           tall={String(avvik)}
           tekst="mulig svinn"
           rod={avvik > 0}
@@ -69,7 +68,7 @@ export default function Hjem() {
         />
       </Rad>
 
-      <Knapp tekst="Tell en hylle" ikon="kamera" pil onPress={() => router.navigate("/tell")} />
+      <Knapp tekst="Skann" ikon="skann" pil onPress={() => router.navigate("/skann")} />
       <Knapp tekst="Spør Hylla" undertekst="Hold inne og snakk" ikon="mikrofon" variant="mork" onPress={() => router.navigate("/spor")} />
 
       <Seksjon tittel="Siste hendelser" hoyre={<LenkeKnapp tekst="Se alle" onPress={() => router.navigate("/logg")} />}>

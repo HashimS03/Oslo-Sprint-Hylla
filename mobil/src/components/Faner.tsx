@@ -4,11 +4,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { F, S } from "@/lib/tema";
 import { Ikon, type IkonNavn } from "./Ikon";
 
-export type FaneNavn = "index" | "tell" | "spor" | "logg" | "varer";
+export type FaneNavn = "index" | "skann" | "spor" | "logg" | "varer";
 
-export const FANER: { navn: FaneNavn; tekst: string; ikon: IkonNavn; sti: "/" | "/tell" | "/spor" | "/logg" | "/varer" }[] = [
+export const FANER: { navn: FaneNavn; tekst: string; ikon: IkonNavn; sti: "/" | "/skann" | "/spor" | "/logg" | "/varer" }[] = [
   { navn: "index", tekst: "Hjem", ikon: "hjem", sti: "/" },
-  { navn: "tell", tekst: "Tell", ikon: "skann", sti: "/tell" },
+  { navn: "skann", tekst: "Skann", ikon: "skann", sti: "/skann" },
   { navn: "spor", tekst: "Spør", ikon: "mikrofon", sti: "/spor" },
   { navn: "logg", tekst: "Logg", ikon: "logg", sti: "/logg" },
   { navn: "varer", tekst: "Varer", ikon: "varer", sti: "/varer" },
