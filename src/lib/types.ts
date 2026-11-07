@@ -109,6 +109,38 @@ export type State = {
   ordrer: Ordre[];
   kameraer: Kamera[];
   innstillinger: Innstillinger;
+  /** Oppdrag sendt til skannerne. Mangler i eldre lagrede tilstander. */
+  oppdrag?: Oppdrag[];
+};
+
+// ---------- Oppdrag til skanneren ----------
+
+/**
+ * sendt: ligger klar for skannerne · mottatt: en skanner har åpnet det ·
+ * pagar: en ansatt er på vei / sjekker · ferdig: sjekket (avviket er avklart) ·
+ * avbrutt: trukket tilbake fra dashboardet.
+ */
+export type OppdragStatus = "sendt" | "mottatt" | "pagar" | "ferdig" | "avbrutt";
+
+export type Oppdrag = {
+  id: string;
+  /** Avviket (hendelse-id) oppdraget gjelder. */
+  avvikId: string;
+  hylle: string;
+  sku: string;
+  /** Antall stk som mangler. */
+  antall: number;
+  /** Fritekst fra driftslederen, f.eks. «Sjekk bak på hylla». */
+  melding?: string;
+  /** Hvilken skanner/ansatt det er sendt til. Tom = alle skannere. */
+  til?: string;
+  status: OppdragStatus;
+  sendt: string; // ISO
+  oppdatert: string; // ISO
+  /** Skanneren som tok oppdraget. */
+  tattAv?: string;
+  /** Kort svar fra den ansatte. */
+  svar?: string;
 };
 
 // ---------- Telling ----------

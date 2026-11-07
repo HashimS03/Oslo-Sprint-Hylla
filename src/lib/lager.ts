@@ -239,6 +239,13 @@ export function lukkAvvik(s: State, id: string, handling: "funnet" | "svinn" | "
     h.type = "svinn";
     h.aarsak = "Registrert som svinn";
   }
+  // Et avklart avvik trenger ikke lenger noen på skanneren.
+  for (const o of s.oppdrag ?? []) {
+    if (o.avvikId === id && o.status !== "ferdig" && o.status !== "avbrutt") {
+      o.status = "ferdig";
+      o.oppdatert = new Date().toISOString();
+    }
+  }
   return h;
 }
 
