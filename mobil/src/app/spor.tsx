@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View, type ScrollViewInstance } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View, type ScrollViewInstance } from "react-native";
 import { requestRecordingPermissionsAsync, RecordingPresets, setAudioModeAsync, useAudioRecorder } from "expo-audio";
 import { File } from "expo-file-system";
 import * as Haptics from "expo-haptics";
 import { lesHoyt, stoppOpplesning } from "@/lib/opplesning";
 import type { Kort, SporSvar } from "@/lib/typer";
 import { ApiFeil, send, sendSkjema } from "@/lib/api";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { Ikon } from "@/components/Ikon";
 import { KortVisning } from "@/components/KortVisning";
 import { Etikett, Rad, Skjerm, Txt } from "@/components/ui";
@@ -185,7 +185,7 @@ export default function SporHylla() {
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   liste: { padding: 16, gap: 14 },
   bruker: { alignSelf: "flex-end", maxWidth: "88%", backgroundColor: F.gullys, borderWidth: 1, borderColor: F.gulkant, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 12 },
   svar: { backgroundColor: F.kort, borderWidth: 1, borderColor: F.kant, borderRadius: 10, padding: 16, gap: 10 },
@@ -196,4 +196,4 @@ const st = StyleSheet.create({
   felt: { alignSelf: "stretch", gap: 8 },
   input: { flex: 1, height: 44, borderWidth: 1, borderColor: F.kant, borderRadius: 10, backgroundColor: F.kort, paddingHorizontal: 12, fontFamily: S.tekst, fontSize: 15, color: F.tekst },
   send: { width: 44, height: 44, borderRadius: 10, backgroundColor: F.tekst, alignItems: "center", justifyContent: "center" },
-});
+}));

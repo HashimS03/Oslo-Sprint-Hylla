@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Forslag } from "@/lib/typer";
 import { send } from "@/lib/api";
 import { tilJpeg } from "@/lib/bilde";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { fortegn, klokke } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
 import { Display, Knapp, Mono, Rad, Txt } from "@/components/ui";
@@ -194,10 +194,10 @@ export default function KameraStasjon() {
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   mork: { flex: 1, backgroundColor: F.mork },
   topp: { position: "absolute", top: 0, left: 0, right: 0, paddingHorizontal: 20, paddingBottom: 12, backgroundColor: "rgba(17,21,23,0.55)" },
   prikk: { width: 10, height: 10, borderRadius: 5 },
   panel: { position: "absolute", left: 0, right: 0, bottom: 0, backgroundColor: "rgba(17,21,23,0.82)", padding: 20, gap: 10 },
   tellNa: { flexDirection: "row", gap: 8, alignItems: "center", backgroundColor: F.gul, borderRadius: 12, borderWidth: 2.5, borderColor: F.blekk, paddingHorizontal: 16, height: 48 },
-});
+}));

@@ -2,7 +2,7 @@ import { Image, Pressable, StyleSheet, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import type { SkannVare } from "@/lib/typer";
 import { useHent } from "@/lib/useHent";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { Ikon } from "@/components/Ikon";
 import { Display, Etikett, Feilboks, HylleFlis, Knapp, Kort, Laster, Mono, Rad, Seksjon, Skjerm, Txt } from "@/components/ui";
 
@@ -87,8 +87,8 @@ export default function Vare() {
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   bilde: { height: 160, borderRadius: 14, borderWidth: 1, borderColor: F.kant, alignItems: "center", justifyContent: "center", overflow: "hidden" },
   swatch: { width: 84, height: 84, borderRadius: 18, borderWidth: 2, borderColor: F.tekst },
   antall: { flexDirection: "row", alignItems: "center" },
-});
+}));

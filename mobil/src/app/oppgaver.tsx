@@ -1,10 +1,10 @@
-import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, View } from "react-native";
 import { router } from "expo-router";
 import type { Oppgave, OppgaverSvar } from "@/lib/typer";
 import { useNavn } from "@/lib/navn";
 import { useHent } from "@/lib/useHent";
 import { useOppdater } from "@/lib/useOppdater";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { klokke } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
 import { Display, Feilboks, Laster, Mono, Rad, Skjerm, Txt } from "@/components/ui";
@@ -82,7 +82,7 @@ function OppgaveKort({ o }: { o: Oppgave }) {
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   tom: { alignItems: "center", gap: 10, paddingVertical: 40 },
   kort: {
     flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: F.kort, borderWidth: 1, borderColor: F.kant,
@@ -93,4 +93,4 @@ const st = StyleSheet.create({
   ikon: { width: 46, height: 46, borderRadius: 12, alignItems: "center", justifyContent: "center", borderWidth: 1.5, borderColor: F.tekst },
   tittel: { fontFamily: S.tekstHalvfet, fontSize: 17, flexShrink: 1 },
   merke: { backgroundColor: F.rod, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
-});
+}));

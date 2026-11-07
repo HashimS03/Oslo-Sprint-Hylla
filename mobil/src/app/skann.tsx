@@ -6,7 +6,7 @@ import * as Speech from "expo-speech";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ApiFeil, hent, send } from "@/lib/api";
 import { useHent } from "@/lib/useHent";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { Etikett, Feilboks, Kort, Knapp, Laster, Skjerm, Txt } from "@/components/ui";
 
 type Vare = { sku: string; navn: string };
@@ -193,7 +193,7 @@ function Leser({
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   modus: { flexDirection: "row", gap: 8 },
   valg: { flex: 1, alignItems: "center", paddingVertical: 12, borderRadius: 10, borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort },
   ordreTopp: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
@@ -204,4 +204,4 @@ const st = StyleSheet.create({
   midt: { flex: 1, padding: 16, gap: 10, justifyContent: "center" },
   leserBunn: { position: "absolute", left: 0, right: 0, bottom: 0, padding: 16, gap: 8, backgroundColor: "rgba(17,21,23,0.85)" },
   varselBoks: { backgroundColor: F.rodlys, borderRadius: 10, padding: 12 },
-});
+}));

@@ -6,7 +6,7 @@ import type { HylleRad } from "@/lib/typer";
 import { send } from "@/lib/api";
 import { useHent } from "@/lib/useHent";
 import { tilJpeg } from "@/lib/bilde";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { Ikon } from "@/components/Ikon";
 import { Feilboks, Knapp, Mono, Rad, Skjerm, Txt } from "@/components/ui";
 
@@ -134,11 +134,11 @@ function Valg({ tekst, aktiv, onPress }: { tekst: string; aktiv: boolean; onPres
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   etikett: { fontFamily: S.tekstHalvfet, fontSize: 14, marginTop: 4 },
   input: { height: 48, borderWidth: 1, borderColor: F.kant, borderRadius: 10, backgroundColor: F.kort, paddingHorizontal: 14, fontFamily: S.tekst, fontSize: 16, color: F.tekst },
   bilde: { flex: 1, height: 88, borderRadius: 10, borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort, alignItems: "center", justifyContent: "center", gap: 4, overflow: "hidden" },
   bildeEtikett: { position: "absolute", bottom: 0, left: 0, right: 0, backgroundColor: "rgba(17,21,23,0.6)", alignItems: "center", paddingVertical: 2 },
   valg: { borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort, borderRadius: 8, paddingHorizontal: 14, height: 40, justifyContent: "center" },
   fargeRing: { padding: 3, borderRadius: 20, borderWidth: 2, borderColor: "transparent" },
-});
+}));

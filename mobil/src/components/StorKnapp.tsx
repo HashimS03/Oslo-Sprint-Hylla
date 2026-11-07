@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet, View } from "react-native";
-import { F, S } from "@/lib/tema";
+import { Pressable, View } from "react-native";
+import { F, S, lagStil } from "@/lib/tema";
 import { Ikon, type IkonNavn } from "./Ikon";
 import { Txt } from "./ui";
 
@@ -40,7 +40,7 @@ export function StorKnapp({
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   ytre: { marginBottom: 12 },
   knapp: { borderRadius: 16, alignItems: "center", justifyContent: "center", gap: 12, padding: 16 },
   kort: { backgroundColor: F.kort, borderWidth: 1, borderColor: F.kant },
@@ -53,4 +53,4 @@ const st = StyleSheet.create({
     backgroundColor: F.rod, alignItems: "center", justifyContent: "center",
   },
   merkeTekst: { color: F.bg, fontFamily: S.tekstFet, fontSize: 13 },
-});
+}));

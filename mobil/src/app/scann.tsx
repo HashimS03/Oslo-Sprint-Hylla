@@ -6,7 +6,7 @@ import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { SkannVare } from "@/lib/typer";
 import { ApiFeil, hent } from "@/lib/api";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { Ikon } from "@/components/Ikon";
 import { Display, Knapp, Skjerm, Txt } from "@/components/ui";
 
@@ -170,7 +170,7 @@ function SmaKnapp({ ikon, tekst, onPress }: { ikon: "lykt" | "lyktAv" | "sok"; t
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   skjerm: { flex: 1, backgroundColor: F.mork },
   topp: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingBottom: 12, backgroundColor: "rgba(17,21,23,0.55)" },
   rundKnapp: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(255,255,255,0.15)" },
@@ -184,4 +184,4 @@ const st = StyleSheet.create({
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
   },
   felt: { height: 56, borderRadius: 12, backgroundColor: F.kort, paddingHorizontal: 14, fontFamily: S.monoMedium, fontSize: 17, color: F.tekst },
-});
+}));

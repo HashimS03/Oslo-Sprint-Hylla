@@ -2,7 +2,7 @@ import { Image, Pressable, StyleSheet, View } from "react-native";
 import { router } from "expo-router";
 import type { HylleRad, Kamera } from "@/lib/typer";
 import { useHent } from "@/lib/useHent";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { klokke, sistTalt } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
 import { send } from "@/lib/api";
@@ -79,7 +79,7 @@ export default function Kameraer() {
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   miniatyr: { width: 56, height: 56, borderRadius: 8, backgroundColor: F.skifer, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   innstilling: { width: 44, height: 44, borderRadius: 8, borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort, alignItems: "center", justifyContent: "center" },
-});
+}));

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import type { HylleRad } from "@/lib/typer";
 import { patch } from "@/lib/api";
 import { useHent } from "@/lib/useHent";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { Etikett, Feilboks, Knapp, Laster, Skjerm, Txt } from "@/components/ui";
 
 // Innstillinger for ett kamera i taket (en sone, f.eks. T1): hva det skal lete etter.
@@ -55,7 +55,7 @@ export default function SoneInnstillinger() {
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   rad: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderColor: F.kant, backgroundColor: F.kort, borderRadius: 10, paddingHorizontal: 14, height: 52 },
   ring: { width: 18, height: 18, borderRadius: 9, borderWidth: 2, borderColor: F.tekst },
-});
+}));

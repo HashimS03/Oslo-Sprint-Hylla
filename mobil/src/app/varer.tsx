@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
-import { FlatList, Pressable, RefreshControl, StyleSheet, TextInput, View } from "react-native";
+import { FlatList, Pressable, RefreshControl, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import type { VareRad } from "@/lib/typer";
 import { useHent } from "@/lib/useHent";
-import { F, S } from "@/lib/tema";
+import { F, S, lagStil } from "@/lib/tema";
 import { Ikon } from "@/components/Ikon";
 import { Display, Feilboks, Laster, Mono, Skjerm, Swatch, Txt } from "@/components/ui";
 
@@ -67,7 +67,7 @@ export default function Varer() {
   );
 }
 
-const st = StyleSheet.create({
+const st = lagStil(() => ({
   sokRad: {
     flexDirection: "row", alignItems: "center", gap: 10, marginHorizontal: 16, marginTop: 14, height: 56,
     borderWidth: 1, borderColor: F.kant, borderRadius: 12, backgroundColor: F.kort, paddingHorizontal: 14,
@@ -77,4 +77,4 @@ const st = StyleSheet.create({
     flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: F.kort, borderWidth: 1, borderColor: F.kant,
     borderRadius: 12, padding: 12, minHeight: 72,
   },
-});
+}));
