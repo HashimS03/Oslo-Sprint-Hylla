@@ -5,6 +5,8 @@ import { beholdning, vare } from "@/lib/lager";
 import { klokke, kortDato } from "@/lib/format";
 import { AvvikChip, Innhold, Panel, Topp } from "@/components/dash";
 import { AvvikHandlinger } from "./AvvikHandlinger";
+import { SendTilSkanner } from "./SendTilSkanner";
+import { oppdragFor, oppdragVisning } from "@/lib/oppdrag";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +22,8 @@ export default async function Avvik({ params }: { params: Promise<{ id: string }
   const antallEtter = etter?.antall[h.sku];
   const status = h.avvik?.status ?? (h.type === "svinn" ? "svinn" : "apen");
   const n = Math.abs(h.endring);
+  const o = oppdragFor(s, h.id);
+  const oppdrag = o ? oppdragVisning(s, o) : undefined;
   const plass = s.hyller.find((x) => x.id === h.hylle)?.innhold.find((i) => i.sku === h.sku)?.nivaa;
   const ordrer = s.ordrer.filter((o) => o.sku === h.sku && o.status === "apen");
   const relaterte = s.hendelser
@@ -80,6 +84,13 @@ export default async function Avvik({ params }: { params: Promise<{ id: string }
                 <span className="text-dempet">Beholdning nå: {beholdning(s, h.sku, h.hylle)} stk på {h.hylle}.</span>
               </div>
             </Panel>
+            {(status === "apen" || oppdrag) && (
+              <Panel tittel="Send til skanner">
+                <div className="p-4">
+                  <SendTilSkanner avvikId={h.id} oppdrag={oppdrag} apen={status === "apen"} />
+                </div>
+              </Panel>
+            )}
             <Panel tittel={status === "apen" ? "Avklar avviket" : "Avklart"}>
               <div className="p-4">
                 {status === "apen" ? (

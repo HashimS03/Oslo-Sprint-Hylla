@@ -6,6 +6,8 @@ AI-lagerassistent for Oslo Sprint (Holio, utfordring #7 Varetelling og svinn).
 - **Spør Hylla:** spør med stemmen og få svar høyt på norsk, med et varekort på skjermen (ElevenLabs, eller nettleserens egen tale som reserve).
 - **Kameratelefon:** en telefon på stativ som følger med på en hylle og teller av seg selv når noen har vært der.
 
+Avvik kan sendes fra dashboardet til skannerne som oppdrag, se [docs/skanner-oppdrag.md](docs/skanner-oppdrag.md).
+
 Det finnes to klienter som bruker de samme API-ene i Next.js:
 
 - **Dashboardet i `src/app/`** er nettsiden for driftslederen: oversikt, varer og beholdning, lokasjoner, avvik, hendelseslogg og rapport med CSV-eksport. Det har ingen kamerafunksjoner og oppdaterer seg selv hvert 10. sekund.
