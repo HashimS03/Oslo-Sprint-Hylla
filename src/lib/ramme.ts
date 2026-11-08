@@ -86,7 +86,7 @@ export async function vurder(kameraId: string, bilde: string, tving = false, inn
   t.stille++;
   if (t.stille < stilleKrav) return { status: "stille" as RammeStatus, skalTelle: false, ...mal };
   if (t.referanse && endring < ENDRING) return { status: "uendret" as RammeStatus, skalTelle: false, ...mal };
-  if (Date.now() - t.sistTelt < PAUSE_MS) return { status: "pause" as RammeStatus, skalTelle: false, ...mal };
+  if (Date.now() - t.sistTelt < pauseMs) return { status: "pause" as RammeStatus, skalTelle: false, ...mal };
   return tell();
 }
 

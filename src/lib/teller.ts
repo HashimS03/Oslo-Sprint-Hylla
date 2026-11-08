@@ -109,12 +109,13 @@ export const claudeTeller: Teller = {
 
     const res = await client.beta.messages.create({
       model: MODELL,
-      max_tokens: 8000,
+      max_tokens: 4000,
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
       system: SYSTEM,
       output_config: {
-        effort: "medium",
+        // Lav innsats: en telling er en enkel oppgave, og kameraet trenger svaret på sekunder, ikke ti.
+        effort: (process.env.HYLLA_INNSATS as "low" | "medium" | "high" | undefined) ?? "low",
         format: { type: "json_schema", schema: SKJEMA as unknown as Record<string, unknown> },
       },
       messages: [{ role: "user", content }],
