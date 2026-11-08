@@ -291,13 +291,18 @@ export async function behandleTakbilde(opts: {
   );
 
   // Heartbeat for alle soner, også de uten endring, så matcheren kan si «ingen bevegelse».
-  await endreState((s) => {
-    s.soneSett ??= {};
-    for (const h of soner) s.soneSett[h.id] = new Date().toISOString();
-  });
+  // Hele lageret lagres hver gang, så vi skriver bare når det er over 5 sekunder siden sist.
+  const talt = new Set(resultater.filter((r) => r.status === "talt").map((r) => r.sone));
+  const trengerPuls = soner.filter((h) => !talt.has(h.id) && naa - Date.parse(state.soneSett?.[h.id] ?? "1970-01-01") > 5000);
+  if (trengerPuls.length) {
+    await endreState((s) => {
+      s.soneSett ??= {};
+      for (const h of trengerPuls) s.soneSett[h.id] = new Date().toISOString();
+    });
+  }
 
   // Nye kamerahendelser kan treffe en skanning som allerede ligger der (for eksempel feil plass).
-  await kjorMatcher();
+  if (resultater.some((r) => r.hendelser?.length)) await kjorMatcher();
 
   const lavSikkerhet = resultater.flatMap((r) => r.hendelser ?? []).some((h) => h.sikkerhet < LAV_SIKKERHET);
   return { kameraId: opts.kameraId, teller: teller.navn, soner: resultater, lavSikkerhet };
