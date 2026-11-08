@@ -18,16 +18,21 @@ export async function POST(req: Request) {
     antall?: number;
     /** Kort engelsk beskrivelse for SAM («red soda can»). */
     prompt?: string;
+    strekkode?: string;
   };
   if (!b.sku || !b.navn || !b.hylle) return NextResponse.json({ feil: "Navn, SKU og hylle må fylles ut" }, { status: 400 });
   const sku = b.sku.trim().toUpperCase();
+  const strekkode = b.strekkode?.trim();
   try {
     await endreState((s) => {
       if (s.varer.some((v) => v.sku === sku)) throw new Error(`SKU ${sku} finnes allerede`);
+      const opptatt = strekkode && s.varer.find((v) => v.strekkode === strekkode);
+      if (opptatt) throw new Error(`Strekkoden ${strekkode} hører allerede til ${opptatt.navn}`);
       s.varer.push({
         sku, navn: b.navn.trim(), farge: b.farge, storrelse: b.storrelse, swatch: b.swatch,
         bilder: (b.bilder ?? []).slice(0, 3), beskrivelse: b.beskrivelse,
         ...(b.prompt?.trim() ? { prompt: b.prompt.trim() } : {}),
+        ...(strekkode ? { strekkode } : {}),
       });
       const hylleId = b.hylle.trim().toUpperCase();
       let hylle = s.hyller.find((h) => h.id === hylleId);

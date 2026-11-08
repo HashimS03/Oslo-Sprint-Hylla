@@ -170,7 +170,10 @@ export type State = {
 
 export type StrekkodeForesporsel = {
   id: string;
-  sku: string;
+  /** Tom når varen ikke er lagret ennå (skjemaet for ny vare). Da hentes koden av skjemaet. */
+  sku?: string;
+  /** Navnet skanneren viser når varen ikke finnes ennå. */
+  navn?: string;
   tid: string; // ISO, når dashboardet ba om den
   /** venter → godtatt (skanneren har åpnet kameraet) → ferdig, eller avvist/avbrutt. */
   status: "venter" | "godtatt" | "ferdig" | "avvist" | "avbrutt";
