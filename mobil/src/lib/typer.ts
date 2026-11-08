@@ -75,12 +75,17 @@ export type SporSvar = { sporsmal?: string; svar: string; kort: Kort[]; kilde: s
 // ---------- Scannerappen ----------
 
 export type OppgaveStatus = "ny" | "pagar" | "ferdig";
+export type Utfall = "funnet" | "svinn" | "salg" | "falsk_alarm";
 
 export type Oppgave = {
   id: string; tittel: string; beskrivelse?: string; type: "pafyll" | "sjekk" | "avvik" | "pakk" | "annet";
   hylle?: string; sku?: string; avvikId?: string; prioritet: "hoy" | "normal"; status: OppgaveStatus;
   opprettet: string; opprettetAv: "driftsleder" | "ansatt" | "takkamera"; tattAv?: string; ferdigTid?: string;
-  utfall?: "funnet" | "svinn";
+  utfall?: Utfall;
+  /** Valgene for å avklare et avvik. Samme som dashbordet viser. */
+  valg?: { id: Utfall; tekst: string }[];
+  /** Pakkeoppgaver: hvor mange som er skannet ut av hvor mange. */
+  plukket?: number; antall?: number;
   vareNavn: string | null; swatch: string | null; hylleNavn: string | null;
 };
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
-import type { Oppgave } from "@/lib/typer";
+import type { Oppgave, Utfall } from "@/lib/typer";
 import { send } from "@/lib/api";
 import { hentNavn } from "@/lib/navn";
 import { useHent } from "@/lib/useHent";
@@ -12,6 +12,7 @@ import { klokke } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
 import { Display, Etikett, Feilboks, HylleFlis, Knapp, Kort, Laster, Mono, Rad, Skjerm, Swatch, Txt } from "@/components/ui";
 
+const UTFALL: Record<Utfall, string> = { funnet: "funnet", svinn: "svinn", salg: "salg", falsk_alarm: "falsk alarm" };
 const TYPE: Record<Oppgave["type"], string> = { pafyll: "Påfyll", sjekk: "Sjekk", avvik: "Avvik", pakk: "Pakking", annet: "Oppgave" };
 
 /** Én oppgave: les hva som skal gjøres, ta den, og si fra når den er ferdig. */
@@ -30,7 +31,7 @@ export default function OppgaveDetalj() {
     if (id) send(`/api/oppgaver/${encodeURIComponent(id)}`, { handling: "apnet", navn: hentNavn() }).catch(() => {});
   }, [id]);
 
-  const handling = async (h: "ta" | "ferdig", utfall?: "funnet" | "svinn") => {
+  const handling = async (h: "ta" | "ferdig", utfall?: Utfall) => {
     setSender(true);
     setSendFeil(null);
     try {
@@ -47,25 +48,31 @@ export default function OppgaveDetalj() {
     }
   };
 
-  const ferdigTrykk = () => (o?.avvikId ? setVelgUtfall(true) : handling("ferdig"));
+  const ferdigTrykk = () => (o?.valg?.length ? setVelgUtfall(true) : handling("ferdig"));
+  const alleSkannet = (o?.plukket ?? 0) >= (o?.antall ?? 1);
 
-  const bunn = !o || o.status === "ferdig" ? undefined : velgUtfall ? (
+  // Avvik: valgene vises med en gang, samme som i dashbordet. Det du velger, lukker avviket begge steder.
+  const bunn = !o || o.status === "ferdig" ? undefined : o.valg?.length && (velgUtfall || o.type === "avvik") ? (
     <View style={{ gap: 10 }}>
-      <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 17, textAlign: "center" }}>Fant du varen?</Txt>
-      <Rad gap={10}>
-        <Knapp style={{ flex: 1 }} tekst="Ja, funnet" ikon="hake" laster={sender} onPress={() => handling("ferdig", "funnet")} />
-        <Knapp style={{ flex: 1 }} tekst="Nei, svinn" variant="mork" laster={sender} onPress={() => handling("ferdig", "svinn")} />
-      </Rad>
-      <Pressable onPress={() => setVelgUtfall(false)} style={{ alignSelf: "center", padding: 6 }} hitSlop={10}>
-        <Txt style={{ textDecorationLine: "underline" }}>Avbryt</Txt>
-      </Pressable>
+      <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 17, textAlign: "center" }}>Hva fant du?</Txt>
+      {o.valg.map((v) => (
+        <Knapp key={v.id} tekst={v.tekst} variant={v.id === "svinn" ? "mork" : v.id === "falsk_alarm" ? "hvit" : "gul"} laster={sender} onPress={() => handling("ferdig", v.id)} />
+      ))}
+      {o.status === "ny" && (
+        <Pressable onPress={() => handling("ta")} style={{ alignSelf: "center", padding: 6 }} hitSlop={10}>
+          <Txt style={{ textDecorationLine: "underline" }}>Jeg tar den, sjekker først</Txt>
+        </Pressable>
+      )}
     </View>
   ) : o.status === "ny" ? (
     <Knapp tekst="Jeg tar den" ikon="pilHoyre" laster={sender} onPress={() => handling("ta")} />
   ) : o.type === "pakk" ? (
     <View style={{ gap: 10 }}>
-      <Knapp tekst="Skann varene ut" ikon="skann" onPress={() => router.push("/skann")} />
-      <Knapp tekst="Ferdig pakket" ikon="hake" variant="mork" laster={sender} onPress={() => handling("ferdig")} />
+      <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 17, textAlign: "center" }}>
+        {alleSkannet ? "Alt er skannet ut. Trykk Ferdig." : `Skannet ut: ${o.plukket ?? 0} av ${o.antall ?? 1}`}
+      </Txt>
+      {!alleSkannet && <Knapp tekst="Skann varen ut" ikon="skann" onPress={() => router.push("/skann")} />}
+      <Knapp tekst="Ferdig" ikon="hake" variant={alleSkannet ? "gul" : "hvit"} deaktivert={!alleSkannet} laster={sender} onPress={() => handling("ferdig")} />
     </View>
   ) : (
     <Knapp tekst="Ferdig" ikon="hake" laster={sender} onPress={ferdigTrykk} />
@@ -126,7 +133,7 @@ export default function OppgaveDetalj() {
 function Status({ o }: { o: Oppgave }) {
   const [bg, tekst] =
     o.status === "ferdig"
-      ? [F.gronnlys, `Ferdig${o.ferdigTid ? ` ${klokke(o.ferdigTid)}` : ""}${o.utfall ? ` · ${o.utfall === "funnet" ? "funnet" : "svinn"}` : ""}`]
+      ? [F.gronnlys, `Ferdig${o.ferdigTid ? ` ${klokke(o.ferdigTid)}` : ""}${o.utfall ? ` · ${UTFALL[o.utfall]}` : ""}`]
       : o.status === "pagar"
         ? [F.gullys, `${o.tattAv ?? "Noen"} jobber med den`]
         : [F.graa, "Ingen har tatt den ennå"];

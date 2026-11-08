@@ -249,6 +249,8 @@ export type MatcherAvvik = {
   /** Hvem som løste det og når. Avviket blir liggende i loggen etterpå. */
   loestAv?: string;
   loestTid?: string;
+  /** Hva kontrollen viste. */
+  utfall?: "funnet" | "salg" | "svinn" | "falsk_alarm";
 };
 
 // ---------- Oppgaver (scannerappen) ----------
@@ -272,7 +274,12 @@ export type Oppgave = {
   tattAv?: string;
   ferdigTid?: string;
   /** Hva den ansatte svarte for en avvik-oppgave. */
-  utfall?: "funnet" | "svinn";
+  utfall?: "funnet" | "svinn" | "salg" | "falsk_alarm";
+  /** Valgene appen og dashbordet viser for å avklare avviket. Fylles ut når listen lages. */
+  valg?: { id: "funnet" | "svinn" | "salg" | "falsk_alarm"; tekst: string }[];
+  /** Pakkeoppgaver: hvor mange som er skannet ut av hvor mange. */
+  plukket?: number;
+  antall?: number;
 };
 
 // ---------- Telling ----------

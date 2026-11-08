@@ -13,6 +13,7 @@ import { apneAvvik, beholdning, lukkAvvik, nyId, vare } from "./lager";
 import { erAktiv, oppdaterOppdrag, sendOppdrag } from "./oppdrag";
 import { avvikTittel } from "./matcher-tekst";
 import { rest } from "./bestillinger";
+import { losKameraAvvik, UTFALL_TEKST, valgFor, type KameraUtfall } from "./kameraavvik";
 import type { Hendelse, MatcherAvvik, Oppdrag, Oppgave, OppgaveType, Ordre, State } from "./types";
 
 export const OPPGAVE_TYPER: OppgaveType[] = ["pafyll", "sjekk", "avvik", "pakk", "annet"];
@@ -36,6 +37,13 @@ function avvikLukket(s: State, o: Oppgave): boolean {
 // ---------- Oppdrag fra dashbordet (Hashims «Send til skanner») ----------
 // Oppdragene eies av src/lib/oppdrag.ts og endres ikke her. Scannerappen viser dem i samme liste som
 // oppgavene, så den ansatte bare har ett sted å se. Id-en til et oppdrag starter med "o_".
+
+/** Valgene for et avvik fra telling, samme som på avvik-siden i dashbordet. */
+const TELLE_VALG: Oppgave["valg"] = [
+  { id: "funnet", tekst: "Varene er funnet" },
+  { id: "salg", tekst: "Det var et salg" },
+  { id: "svinn", tekst: "Bekreft svinn" },
+];
 
 const OPPDRAG_STATUS: Record<Oppdrag["status"], Oppgave["status"]> = {
   sendt: "ny", mottatt: "ny", pagar: "pagar", ferdig: "ferdig", avbrutt: "ferdig",
@@ -61,7 +69,8 @@ function oppdragSomOppgave(s: State, o: Oppdrag): Oppgave {
     opprettetAv: "driftsleder",
     ...(o.tattAv ? { tattAv: o.tattAv } : {}),
     ...(o.status === "ferdig" || o.status === "avbrutt" ? { ferdigTid: o.oppdatert } : {}),
-    ...(h?.avvik?.status === "funnet" || h?.avvik?.status === "svinn" ? { utfall: h.avvik.status } : {}),
+    ...(h?.avvik?.status === "funnet" || h?.avvik?.status === "svinn" ? { utfall: h.avvik.status } : h?.avvik?.status === "lukket" ? { utfall: "salg" as const } : {}),
+    ...(erAktiv(o) ? { valg: TELLE_VALG } : {}),
   };
 }
 
@@ -110,6 +119,8 @@ function kameraAvvikSomOppgave(s: State, a: MatcherAvvik): Oppgave {
     opprettetAv: "takkamera",
     ...(a.tattAv || a.loestAv ? { tattAv: a.tattAv ?? a.loestAv } : {}),
     ...(ferdig ? { ferdigTid: a.loestTid ?? a.tid } : {}),
+    ...(a.utfall ? { utfall: a.utfall } : {}),
+    ...(!ferdig ? { valg: valgFor(a).map((id) => ({ id, tekst: UTFALL_TEKST[id] })) } : {}),
   };
 }
 
@@ -144,6 +155,8 @@ function ordreSomOppgave(s: State, o: Ordre): Oppgave {
     opprettetAv: "driftsleder",
     ...(o.tattAv ? { tattAv: o.tattAv } : {}),
     ...(ferdig ? { ferdigTid: o.plukketTid ?? o.tid } : {}),
+    plukket,
+    antall: o.antall,
   };
 }
 
@@ -160,7 +173,7 @@ function synligeOrdrer(s: State): Oppgave[] {
  */
 export function oppgaveListe(s: State): Oppgave[] {
   const egne = (s.oppgaver ?? []).map((o) =>
-    o.status !== "ferdig" && avvikLukket(s, o) ? { ...o, status: "ferdig" as const } : o,
+    o.status !== "ferdig" && avvikLukket(s, o) ? { ...o, status: "ferdig" as const } : o.avvikId && o.status !== "ferdig" ? { ...o, valg: TELLE_VALG } : o,
   );
   const liste = [...egne, ...synligeOppdrag(s), ...synligeKameraAvvik(s), ...synligeOrdrer(s)];
   const vekt = (o: Oppgave) => (o.status === "ferdig" ? 2 : o.prioritet === "hoy" ? 0 : 1);
@@ -299,39 +312,50 @@ export function taOppgave(s: State, id: string, navn?: string): Oppgave {
  * Oppgaven er gjort. For en avvik-oppgave må den ansatte si om varen ble funnet eller er svinn,
  * og da lukkes avviket med den vanlige lukkAvvik() – akkurat som når driftsleder gjør det i dashbordet.
  */
-export function fullforOppgave(s: State, id: string, navn?: string, utfall?: "funnet" | "svinn", svar?: string): Oppgave {
+export type Utfall = "funnet" | "svinn" | "salg" | "falsk_alarm";
+
+/**
+ * Oppgaven er gjort. For et avvik må den ansatte velge hva kontrollen viste (samme valg som i dashbordet),
+ * og avviket lukkes med samme kode som dashbordet bruker. Da forsvinner det fra de åpne begge steder.
+ * En pakkeoppgave kan bare fullføres når alle varene er skannet ut.
+ */
+export function fullforOppgave(s: State, id: string, navn?: string, utfall?: Utfall, svar?: string): Oppgave {
   const kam = s.matcherAvvik?.find((x) => x.id === id);
   if (kam) {
-    if (kam.status !== "apen") throw new Error("Avviket er allerede løst");
-    kam.status = "loest";
-    kam.loestAv = navn?.trim() || kam.tattAv || "En ansatt";
-    kam.loestTid = new Date().toISOString();
+    if (!utfall) throw new Error("Velg hva du fant");
+    losKameraAvvik(s, id, utfall as KameraUtfall, navn);
     return kameraAvvikSomOppgave(s, kam);
   }
   const ordre = ordreFraId(s, id);
   if (ordre) {
-    if (ordre.status !== "apen") return ordreSomOppgave(s, ordre); // ble ferdig da siste vare ble skannet
-    const igjen = rest(ordre);
-    if (igjen > 0) throw new Error(`Skann varene først: ${ordre.plukket ?? 0} av ${ordre.antall} er skannet ut.`);
+    if (ordre.status !== "apen") return ordreSomOppgave(s, ordre);
+    if (rest(ordre) > 0) throw new Error(`Skann varene ut først: ${ordre.plukket ?? 0} av ${ordre.antall} er skannet.`);
+    ordre.status = "plukket";
+    ordre.plukketTid = new Date().toISOString();
+    if (navn?.trim()) ordre.tattAv ??= navn.trim();
     return ordreSomOppgave(s, ordre);
   }
+  const telleValg = (u?: Utfall): "funnet" | "svinn" | "salg" => {
+    if (u !== "funnet" && u !== "svinn" && u !== "salg") throw new Error("Velg om varen ble funnet, var et salg eller er svinn");
+    return u;
+  };
   const opp = s.oppdrag?.find((x) => x.id === id);
   if (opp) {
     // Oppdrag: avklar avviket med den vanlige lukkAvvik(). Den setter oppdraget til «ferdig» selv.
     if (!erAktiv(opp)) throw new Error("Oppdraget er allerede avsluttet");
-    if (utfall !== "funnet" && utfall !== "svinn") throw new Error("Velg om varen ble funnet eller er svinn");
+    const valgt = telleValg(utfall);
     oppdaterOppdrag(s, id, { ...(navn?.trim() ? { tattAv: navn } : {}), ...(svar?.trim() ? { svar } : {}) });
     const h = s.hendelser.find((x) => x.id === opp.avvikId);
-    if (h?.avvik?.status === "apen") lukkAvvik(s, opp.avvikId, utfall);
+    if (h?.avvik?.status === "apen") lukkAvvik(s, opp.avvikId, valgt);
     if (erAktiv(opp)) oppdaterOppdrag(s, id, { status: "ferdig" });
     return oppdragSomOppgave(s, opp);
   }
   const o = finnOppgave(s, id);
   if (o.status === "ferdig") throw new Error("Oppgaven er allerede ferdig");
   if (o.avvikId && !avvikLukket(s, o)) {
-    if (utfall !== "funnet" && utfall !== "svinn") throw new Error("Velg om varen ble funnet eller er svinn");
-    lukkAvvik(s, o.avvikId, utfall);
-    o.utfall = utfall;
+    const valgt = telleValg(utfall);
+    lukkAvvik(s, o.avvikId, valgt);
+    o.utfall = valgt;
   }
   o.status = "ferdig";
   o.ferdigTid = new Date().toISOString();

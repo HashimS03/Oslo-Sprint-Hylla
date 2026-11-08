@@ -13,10 +13,10 @@ export function apneOrdrer(s: State): Ordre[] {
   return s.ordrer.filter((o) => o.status === "apen").sort((a, b) => a.tid.localeCompare(b.tid));
 }
 
-/** Fører et antall mot en ordre. Lukker ordren når alt er plukket. */
-export function plukkMotOrdre(o: Ordre, antall: number) {
+/** Fører et antall mot en ordre. Med `lukk` lukkes ordren når alt er plukket (telling); skanning venter på «Ferdig». */
+export function plukkMotOrdre(o: Ordre, antall: number, lukk = true) {
   o.plukket = (o.plukket ?? 0) + antall;
-  if (rest(o) <= 0) {
+  if (lukk && rest(o) <= 0) {
     o.status = "plukket";
     o.plukketTid = new Date().toISOString();
   }
@@ -25,7 +25,7 @@ export function plukkMotOrdre(o: Ordre, antall: number) {
 /** En skannet vare føres mot den eldste åpne ordren på varen. Returnerer ordren, hvis det fantes en. */
 export function skannMotOrdre(s: State, sku: string, antall: number): Ordre | undefined {
   const o = apneOrdrer(s).find((x) => x.sku === sku && rest(x) > 0);
-  if (o) plukkMotOrdre(o, Math.min(antall, rest(o)));
+  if (o) plukkMotOrdre(o, Math.min(antall, rest(o)), false);
   return o;
 }
 

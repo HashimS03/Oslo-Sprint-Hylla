@@ -15,12 +15,12 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 /**
  * { handling: "apnet", navn }                    – den ansatte åpnet oppgaven (oppdrag blir «mottatt»)
  * { handling: "ta", navn }                       – en ansatt tar oppgaven
- * { handling: "ferdig", navn, utfall?, svar? }   – ferdig. For avvik-oppgaver og oppdrag: utfall "funnet" | "svinn"
+ * { handling: "ferdig", navn, utfall?, svar? }   – ferdig. For avvik-oppgaver og oppdrag: utfall "funnet" | "salg" | "svinn" (kamera: også "falsk_alarm")
  * Id-en kan være en oppgave ("opg_…") eller et oppdrag fra dashbordet ("o_…").
  */
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const b = (await req.json().catch(() => ({}))) as { handling?: string; navn?: string; utfall?: "funnet" | "svinn"; svar?: string };
+  const b = (await req.json().catch(() => ({}))) as { handling?: string; navn?: string; utfall?: "funnet" | "svinn" | "salg" | "falsk_alarm"; svar?: string };
   if (b.handling !== "ta" && b.handling !== "ferdig" && b.handling !== "apnet") return NextResponse.json({ feil: "Ukjent handling" }, { status: 400 });
   try {
     const { s, o } = await endreState((s) => {
