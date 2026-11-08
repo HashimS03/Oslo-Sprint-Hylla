@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
+import { hent } from "@/lib/api";
+import { lastNokkel } from "@/lib/enhet";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useFonts, Archivo_700Bold, Archivo_800ExtraBold } from "@expo-google-fonts/archivo";
@@ -20,14 +22,26 @@ export default function RotLayout() {
   const { lastet: navnLastet } = useNavn();
   const tema = useTema();
   const [temaLastet, setTemaLastet] = useState(false);
+  const [nokkelLastet, setNokkelLastet] = useState(false);
 
-  // Hent navnet til den ansatte og valgt modus (mørk/lys) fra telefonen én gang ved oppstart.
+  // Hent navnet til den ansatte, valgt modus (mørk/lys) og koblingsnøkkelen fra telefonen én gang ved oppstart.
   useEffect(() => {
     lastNavn();
     lastTema().finally(() => setTemaLastet(true));
+    lastNokkel().finally(() => setNokkelLastet(true));
   }, []);
 
-  const klar = (fonter || !!feil) && navnLastet && temaLastet;
+  const klar = (fonter || !!feil) && navnLastet && temaLastet && nokkelLastet;
+
+  // Er ikke telefonen koblet til (og serveren krever det), åpnes koblingsskjermen med en gang.
+  useEffect(() => {
+    if (!klar) return;
+    hent<{ kreverKobling: boolean; koblet: boolean }>("/api/enheter/meg")
+      .then((m) => {
+        if (m.kreverKobling && !m.koblet) router.replace("/koble");
+      })
+      .catch(() => {});
+  }, [klar]);
   // Si fra når dashboardet ber om å få skannet en strekkode.
   useStrekkodeForesporsler(klar);
   useEffect(() => {
@@ -52,6 +66,8 @@ export default function RotLayout() {
         <Stack.Screen name="meld-avvik" options={{ presentation: "modal" }} />
         <Stack.Screen name="spor" />
         <Stack.Screen name="innstillinger" />
+        {/* Tilgang: koble telefonen til Hylla (QR-koden vises i driftslederens dashboard) */}
+        <Stack.Screen name="koble" options={{ gestureEnabled: false }} />
         {/* Takkamera (Daniel) */}
         <Stack.Screen name="takkamera" />
         <Stack.Screen name="skann" options={{ contentStyle: { backgroundColor: F.bg } }} />

@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   const rader = [...s.hendelser]
     .filter((h) => (!type || h.type === type || (type === "mulig_svinn" && h.type === "svinn")) && (!sku || h.sku === sku))
     .sort((a, b) => b.tid.localeCompare(a.tid))
-    .slice(0, Number(u.searchParams.get("antall") ?? 100))
+    .slice(0, Math.min(Math.max(Number(u.searchParams.get("antall") ?? 100) || 100, 1), 500))
     .map((h) => logRad(s, h));
   const apneAvvik = s.hendelser.filter((h) => h.type === "mulig_svinn" && h.avvik?.status === "apen").length;
   return NextResponse.json({ rader, apneAvvik });

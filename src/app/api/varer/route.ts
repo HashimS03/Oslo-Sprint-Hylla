@@ -2,46 +2,46 @@ import { NextResponse } from "next/server";
 import { endreState, hentState } from "@/lib/store";
 import { nyId } from "@/lib/lager";
 import { varerVisning } from "@/lib/visning";
+import { NyVareSkjema } from "@/lib/skjema";
+import { lesJson } from "@/lib/vern";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+/** Øvre grenser, så ingen kan fylle databasen med falske varer og hyller. */
+const MAKS_VARER = 2000;
+const MAKS_HYLLER = 500;
 
 export async function GET() {
   return NextResponse.json({ varer: varerVisning(await hentState()) });
 }
 
+// Body: { sku, navn, swatch, hylle, farge?, storrelse?, nivaa?, bilder?, beskrivelse?,
+//         antall? (startbeholdning), prompt? (kort engelsk beskrivelse for SAM), strekkode? }
 export async function POST(req: Request) {
-  const b = (await req.json()) as {
-    sku: string; navn: string; farge: string; storrelse: string; swatch: string;
-    hylle: string; nivaa?: string; bilder?: string[]; beskrivelse?: string;
-    /** Hvor mange som ligger på hylla nå. Blir startbeholdningen som tellingene sammenlignes med. */
-    antall?: number;
-    /** Kort engelsk beskrivelse for SAM («red soda can»). */
-    prompt?: string;
-    strekkode?: string;
-  };
-  if (!b.sku || !b.navn || !b.hylle) return NextResponse.json({ feil: "Navn, SKU og hylle må fylles ut" }, { status: 400 });
-  const sku = b.sku.trim().toUpperCase();
-  const strekkode = b.strekkode?.trim();
+  const b = await lesJson(req, NyVareSkjema);
+  if ("svar" in b) return b.svar;
+  const { sku, navn, farge, storrelse, swatch, hylle: hylleId, nivaa, bilder, beskrivelse, prompt } = b.data;
+  const strekkode = b.data.strekkode || undefined;
   try {
     await endreState((s) => {
       if (s.varer.some((v) => v.sku === sku)) throw new Error(`SKU ${sku} finnes allerede`);
+      if (s.varer.length >= MAKS_VARER) throw new Error("Det er for mange varer");
       const opptatt = strekkode && s.varer.find((v) => v.strekkode === strekkode);
       if (opptatt) throw new Error(`Strekkoden ${strekkode} hører allerede til ${opptatt.navn}`);
-      s.varer.push({
-        sku, navn: b.navn.trim(), farge: b.farge, storrelse: b.storrelse, swatch: b.swatch,
-        bilder: (b.bilder ?? []).slice(0, 3), beskrivelse: b.beskrivelse,
-        ...(b.prompt?.trim() ? { prompt: b.prompt.trim() } : {}),
-        ...(strekkode ? { strekkode } : {}),
-      });
-      const hylleId = b.hylle.trim().toUpperCase();
       let hylle = s.hyller.find((h) => h.id === hylleId);
       if (!hylle) {
+        if (s.hyller.length >= MAKS_HYLLER) throw new Error("Det er for mange hyller");
         hylle = { id: hylleId, reol: hylleId[0], navn: `Reol ${hylleId[0]}, hylle ${hylleId.slice(1)}`, innhold: [] };
         s.hyller.push(hylle);
       }
-      hylle.innhold.push({ sku, nivaa: b.nivaa || "hele hylla" });
-      const antall = Math.max(0, Math.round(Number(b.antall) || 0));
+      s.varer.push({
+        sku, navn, farge, storrelse, swatch, bilder: bilder ?? [], beskrivelse,
+        ...(prompt ? { prompt } : {}),
+        ...(strekkode ? { strekkode } : {}),
+      });
+      hylle.innhold.push({ sku, nivaa: nivaa || "hele hylla" });
+      const antall = b.data.antall ?? 0;
       if (antall > 0) {
         s.hendelser.push({
           id: nyId("h"), tid: new Date().toISOString(), hylle: hylleId, sku,

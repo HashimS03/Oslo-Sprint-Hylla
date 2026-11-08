@@ -170,7 +170,7 @@ export function forklar(s: State, hylle: string, sku: string, diff: number): For
 /** Lagrer en godkjent telling: ny telling, hendelser i loggen, oppdaterte innkjøp og ordrer. */
 export function lagreForslag(
   s: State,
-  f: Forslag,
+  f: Pick<Forslag, "hylle" | "antall" | "teller" | "forrigeTellingId">,
   opts: { kilde: Telling["kilde"]; bilde?: string; korrigert?: Record<string, number> },
 ): { tellingId: string; hendelser: Hendelse[] } {
   // Brukeren kan ha rettet et usikkert tall; da regnes forklaringen ut på nytt.

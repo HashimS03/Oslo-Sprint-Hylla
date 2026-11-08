@@ -2,13 +2,20 @@ import { NextResponse } from "next/server";
 import { hentState } from "@/lib/store";
 import { lagForslag } from "@/lib/lager";
 import { velgTeller } from "@/lib/teller";
+import { TellSkjema } from "@/lib/skjema";
+import { begrens, demomodus, lesJson } from "@/lib/vern";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 // Teller en hylle fra et bilde og returnerer et forslag. Ingenting lagres før /api/tell/lagre.
 export async function POST(req: Request) {
-  const { hylle: hylleId, bilde, demo } = (await req.json()) as { hylle: string; bilde?: string; demo?: boolean };
+  const stopp = begrens(req, "ai");
+  if (stopp) return stopp;
+  const b = await lesJson(req, TellSkjema);
+  if ("svar" in b) return b.svar;
+  const { hylle: hylleId, bilde } = b.data;
+  const demo = demomodus() && b.data.demo;
   const state = await hentState();
   const hylle = state.hyller.find((h) => h.id === hylleId);
   if (!hylle) return NextResponse.json({ feil: `Ukjent hylle ${hylleId}` }, { status: 404 });

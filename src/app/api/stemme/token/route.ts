@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
+import { begrens } from "@/lib/vern";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 // Henter et kortlivet samtaletoken fra ElevenLabs, så API-nøkkelen aldri når nettleseren.
-export async function GET() {
+export async function GET(req: Request) {
+  const stopp = begrens(req, "ai");
+  if (stopp) return stopp;
   const key = process.env.ELEVENLABS_API_KEY;
   const agentId = process.env.ELEVENLABS_AGENT_ID;
   if (!key || !agentId) return NextResponse.json({ aktiv: false });

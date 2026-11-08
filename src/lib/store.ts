@@ -67,7 +67,11 @@ export function endreState<T>(fn: (s: State) => T | Promise<T>): Promise<T> {
   return neste;
 }
 
-/** Tilbake til demodataene, eller et helt tomt lager med `tom`. */
+/** Tilbake til demodataene, eller et helt tomt lager med `tom`. Koblede enheter beholdes, så ingen blir låst ute. */
 export async function nullstill(tom = false): Promise<void> {
-  await lagreState(tom ? lagTom() : lagSeed());
+  await endreState((s) => {
+    const { enheter, koblingskoder } = s;
+    for (const k of Object.keys(s)) delete (s as Record<string, unknown>)[k];
+    Object.assign(s, tom ? lagTom() : lagSeed(), { enheter, koblingskoder });
+  });
 }

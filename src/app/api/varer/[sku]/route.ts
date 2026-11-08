@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { endreState, hentState } from "@/lib/store";
 import { vareVisning } from "@/lib/visning";
 import { slettVare } from "@/lib/kameraoppsett";
+import { EndreVareSkjema } from "@/lib/skjema";
+import { lesJson } from "@/lib/vern";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET(_: Request, { params }: { params: Promise<{ sku: string }> }) {
@@ -17,7 +19,9 @@ type Endring = { navn?: string; farge?: string; storrelse?: string; leverandor?:
  */
 async function endre(req: Request, { params }: { params: Promise<{ sku: string }> }) {
   const sku = decodeURIComponent((await params).sku);
-  const b = (await req.json().catch(() => ({}))) as Endring;
+  const lest = await lesJson(req, EndreVareSkjema);
+  if ("svar" in lest) return lest.svar;
+  const b: Endring = lest.data;
   try {
     await endreState((s) => {
       const v = s.varer.find((x) => x.sku === sku);
