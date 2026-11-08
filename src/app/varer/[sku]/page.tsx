@@ -6,7 +6,7 @@ import { apneAvvik, beholdning, beholdningPerHylle, innkjopForVare, plukketSiden
 import { fortegn, klokke, kortDato, typeFarge } from "@/lib/format";
 import { LAV_BEHOLDNING, rapport } from "@/lib/rapport";
 import { SlettVare } from "./SlettVare";
-import { Sokeord } from "./Sokeord";
+import { VareInfo } from "./VareInfo";
 import { samPrompt } from "@/lib/prompt";
 import { Innhold, Kpi, Panel, Tabell, TomRad, Topp, TypeChip } from "@/components/dash";
 
@@ -26,12 +26,6 @@ export default async function VareSide({ params }: { params: Promise<{ sku: stri
   const avvik = apneAvvik(s).filter((a) => a.sku === v.sku);
   const apneSalg = s.ordrer.filter((o) => o.sku === v.sku && o.status === "apen");
   const r30 = rapport(s, 30).varer.find((x) => x.sku === v.sku);
-  const Info = ({ k, v: verdi }: { k: string; v?: string }) => (
-    <div className="flex justify-between gap-4 border-t border-kant px-4 py-2.5 text-[13.5px] first:border-0">
-      <span className="text-dempet">{k}</span>
-      <span className={verdi ? "font-semibold" : "text-dempet"}>{verdi || "Ikke oppgitt"}</span>
-    </div>
-  );
 
   return (
     <>
@@ -48,20 +42,18 @@ export default async function VareSide({ params }: { params: Promise<{ sku: stri
 
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
           <div className="flex flex-col gap-5">
-            <Panel tittel="Vareinformasjon">
-              <div className="flex items-center gap-4 border-b border-kant p-4">
-                <span className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-kant" style={{ background: v.swatch }}>
-                  {v.bilder[0] && <img src={v.bilder[0]} alt="" className="h-full w-full object-cover" />}
-                </span>
-                <span className="text-[13.5px] text-dempet">{v.beskrivelse || "Ingen beskrivelse"}</span>
-              </div>
-              <div>
-                <Info k="Farge" v={v.farge} />
-                <Info k="Størrelse" v={v.storrelse} />
-                <Info k="Leverandør" v={v.leverandor} />
-              </div>
-              <Sokeord sku={v.sku} naa={v.prompt ?? ""} forslag={samPrompt({ navn: v.navn, farge: v.farge })} />
-            </Panel>
+            <VareInfo
+              vare={v}
+              forslag={samPrompt({ navn: v.navn, farge: v.farge })}
+              topp={
+                <div className="flex items-center gap-4 border-b border-kant p-4">
+                  <span className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-kant" style={{ background: v.swatch }}>
+                    {v.bilder[0] && <img src={v.bilder[0]} alt="" className="h-full w-full object-cover" />}
+                  </span>
+                  <span className="text-[13.5px] text-dempet">{v.beskrivelse || "Ingen beskrivelse"}</span>
+                </div>
+              }
+            />
 
             <Panel tittel="Beholdning per lokasjon">
               <Tabell hode={["Lokasjon", "Plassering", "Antall"]} hoyre={[2]}>
