@@ -21,8 +21,12 @@ type Tilstand = {
   referanse?: Buffer;
   stille: number;
   teller: boolean;
+  /** Når tellingen som pågår, startet. En telling som har hengt lenger enn TELLING_MAKS_MS, slippes. */
+  tellerFra?: number;
   sistTelt: number;
 };
+
+const TELLING_MAKS_MS = 60_000;
 
 type Global = { __hyllaRamme?: Map<string, Tilstand> };
 const g = globalThis as unknown as Global;
@@ -64,11 +68,17 @@ export async function vurder(kameraId: string, bilde: string, tving = false, inn
   t.forrige = na;
 
   const mal = { bevegelse, endring };
+  if (t.teller && Date.now() - (t.tellerFra ?? 0) > TELLING_MAKS_MS) t.teller = false; // hengt telling
   if (t.teller) return { status: "teller" as RammeStatus, skalTelle: false, ...mal };
-  if (tving) {
+  const tell = () => {
     t.teller = true;
+    t.tellerFra = Date.now();
     return { status: "teller" as RammeStatus, skalTelle: true, ...mal };
-  }
+  };
+  if (tving) return tell();
+  // Har vi ikke telt ennå (kameraet har nettopp startet, eller serveren er ny), teller vi med en gang.
+  // Ellers måtte noen trykke «Tell nå» før kameraet kom i gang.
+  if (!t.referanse && bevegelse <= BEVEGELSE) return tell();
   if (bevegelse > BEVEGELSE) {
     t.stille = 0;
     return { status: "bevegelse" as RammeStatus, skalTelle: false, ...mal };
@@ -76,9 +86,8 @@ export async function vurder(kameraId: string, bilde: string, tving = false, inn
   t.stille++;
   if (t.stille < stilleKrav) return { status: "stille" as RammeStatus, skalTelle: false, ...mal };
   if (t.referanse && endring < ENDRING) return { status: "uendret" as RammeStatus, skalTelle: false, ...mal };
-  if (Date.now() - t.sistTelt < pauseMs) return { status: "pause" as RammeStatus, skalTelle: false, ...mal };
-  t.teller = true;
-  return { status: "teller" as RammeStatus, skalTelle: true, ...mal };
+  if (Date.now() - t.sistTelt < PAUSE_MS) return { status: "pause" as RammeStatus, skalTelle: false, ...mal };
+  return tell();
 }
 
 /** Kalles når telling er ferdig (ok = bildet er nå referansen vi sammenligner mot). */

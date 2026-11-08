@@ -6,6 +6,8 @@ import { apneAvvik, beholdning, beholdningPerHylle, innkjopForVare, plukketSiden
 import { fortegn, klokke, kortDato, typeFarge } from "@/lib/format";
 import { LAV_BEHOLDNING, rapport } from "@/lib/rapport";
 import { SlettVare } from "./SlettVare";
+import { Sokeord } from "./Sokeord";
+import { samPrompt } from "@/lib/prompt";
 import { Innhold, Kpi, Panel, Tabell, TomRad, Topp, TypeChip } from "@/components/dash";
 
 export const dynamic = "force-dynamic";
@@ -58,6 +60,7 @@ export default async function VareSide({ params }: { params: Promise<{ sku: stri
                 <Info k="Størrelse" v={v.storrelse} />
                 <Info k="Leverandør" v={v.leverandor} />
               </div>
+              <Sokeord sku={v.sku} naa={v.prompt ?? ""} forslag={samPrompt({ navn: v.navn, farge: v.farge })} />
             </Panel>
 
             <Panel tittel="Beholdning per lokasjon">

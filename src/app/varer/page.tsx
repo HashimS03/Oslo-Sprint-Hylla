@@ -20,7 +20,7 @@ export default async function Varer({ searchParams }: { searchParams: Promise<{ 
       swatch: v.swatch,
       variant: [v.farge, v.storrelse].filter(Boolean).join(" · "),
       leverandor: v.leverandor ?? "",
-      hylle: s.hyller.filter((h) => h.innhold.some((i) => i.sku === v.sku)).map((h) => h.id).join(", "),
+      hylle: s.hyller.filter((h) => h.innhold.some((i) => i.sku === v.sku) || beholdning(s, v.sku, h.id) > 0).map((h) => h.id).join(", "),
       antall,
       apneSalg: s.ordrer.filter((o) => o.sku === v.sku && o.status === "apen").reduce((n, o) => n + o.antall, 0),
       avvik: avvik.filter((a) => a.sku === v.sku).reduce((n, a) => n - a.endring, 0),

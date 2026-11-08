@@ -1,7 +1,7 @@
 import "server-only";
 import sharp from "sharp";
 import { endreState, hentState } from "./store";
-import { nyId, vare } from "./lager";
+import { beholdning, nyId, vare } from "./lager";
 import { ferdigTelt, vurder, type RammeStatus } from "./ramme";
 import { velgTeller } from "./teller";
 import { kjorMatcher } from "./matcher";
@@ -34,6 +34,12 @@ export type SoneResultat = {
   /** Antall funnet per vare i sonen, også varer som ikke hører hjemme her. */
   funnet?: { sku: string; navn: string; antall: number; hjemmehorende: boolean; bokser: Bokse[] }[];
   hendelser?: KameraHendelse[];
+  /** Ting telleren så, men som ikke er registrert som varer. */
+  ukjente?: string[];
+  /** Kort kommentar fra telleren om bildet. */
+  kommentar?: string;
+  /** Hvilken teller som telte (claude, sam31, demo …). «demo» betyr at ingen ekte teller er satt opp. */
+  teller?: string;
   feil?: string;
 };
 
@@ -174,6 +180,27 @@ export async function behandleTakbilde(opts: {
 
           const stand = (s.soneStand[hylle.id] ??= {});
           const forste = Object.keys(stand).length === 0;
+
+          // Kameraet eier antallet på hyllene det ser. Det det teller, blir beholdningen for varen på denne hylla.
+          // Første bilde etter start retter beholdningen til det kameraet ser. Senere endringer bokføres som
+          // uttak eller påfylling. Skanneren bekrefter (matcheren), men skriver ikke selv til disse hyllene.
+          for (const f of funnet) {
+            if (!f.hjemmehorende) continue;
+            const iLoggen = beholdning(s, f.sku, hylle.id);
+            const forskjell = f.antall - iLoggen;
+            if (forskjell === 0) continue;
+            s.hendelser.push({
+              id: nyId("h"),
+              tid: new Date().toISOString(),
+              hylle: hylle.id,
+              sku: f.sku,
+              endring: forskjell,
+              type: forste ? "korrigering" : forskjell < 0 ? "plukk" : "mottak",
+              aarsak: forste ? "Talt av kamera" : forskjell < 0 ? "Kamera: tatt ut" : "Kamera: lagt på plass",
+              ref: "kamera",
+            });
+          }
+
           for (const f of funnet) {
             const for_ = stand[f.sku] ?? 0;
             const diff = f.antall - for_;
@@ -207,6 +234,9 @@ export async function behandleTakbilde(opts: {
           ...mal,
           funnet: funnet.map(({ sikkerhet: _s, ...rest }) => rest),
           hendelser,
+          ukjente: tall.ukjente ?? [],
+          kommentar: tall.kommentar ?? "",
+          teller: oppgitt ? "demo" : teller.navn,
         };
       } catch (e) {
         console.error(`Telling av sone ${hylle.id} feilet`, e);
