@@ -9,3 +9,4 @@ create table if not exists hylla_state (
 -- Bare serveren (service role) skal lese og skrive.
 alter table hylla_state enable row level security;
 
+
