@@ -161,6 +161,8 @@ export type State = {
   kameraHendelser?: KameraHendelse[];
   /** Sist kjente antall per sone og vare, så kameraet kan se hva som har endret seg. */
   soneStand?: Record<string, Record<string, number>>;
+  /** Endringer kameraet har sett én gang, men ikke bekreftet ennå (sone → vare → nytt antall). Bokføres først når neste telling viser det samme. */
+  soneVent?: Record<string, Record<string, number>>;
   /** Når kameraet sist så hver sone (heartbeat), så matcheren vet at «ingen hendelse» betyr «ingen bevegelse». */
   soneSett?: Record<string, string>;
   /** Skanninger fra skanneren (eller simulatoren). */
