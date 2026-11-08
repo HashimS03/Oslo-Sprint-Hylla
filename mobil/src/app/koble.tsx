@@ -26,10 +26,10 @@ export default function Koble() {
     try {
       const res = await send<{ nokkel: string }>("/api/enheter/koble", { ...bevis, navn: Device.modelName ?? "Telefon" }, { "x-hylla-app": "1" });
       await lagreNokkel(res.nokkel);
+      // Ferdig: skanneren skal ikke koble til en gang til mens skjermen lukkes (opptatt blir stående).
       router.replace("/");
     } catch (e) {
       setFeil(e instanceof Error ? e.message : "Kunne ikke koble til");
-    } finally {
       opptatt.current = false;
       setJobber(false);
     }
