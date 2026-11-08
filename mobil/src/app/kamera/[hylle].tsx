@@ -74,7 +74,7 @@ export default function KameraStasjon() {
   const runde = useCallback(async () => {
     if (!kamera.current) return;
     const b = await kamera.current.takePictureAsync({ quality: 0.5, shutterSound: false, skipProcessing: true });
-    const [bilde, liten] = await Promise.all([tilJpeg(b.uri, 1024, 0.65), tilJpeg(b.uri, 320, 0.5)]);
+    const [bilde, liten] = await Promise.all([tilJpeg(b.uri, 800, 0.6), tilJpeg(b.uri, 320, 0.5)]);
     const tvang = tving.current;
     tving.current = false;
     if (tak) {
@@ -126,11 +126,11 @@ export default function KameraStasjon() {
           leggTilLogg({ tid: new Date().toISOString(), tekst: e instanceof Error ? e.message : "Fikk ikke kontakt med backend" });
           await new Promise((r) => setTimeout(r, 4000));
         }
-        await new Promise((r) => setTimeout(r, 700));
+        await new Promise((r) => setTimeout(r, tak ? 150 : 700));
       }
     })();
     return () => { stopp = true; };
-  }, [klar, runde, leggTilLogg]);
+  }, [klar, runde, leggTilLogg, tak]);
 
   const avslutt = () =>
     Alert.alert("Stoppe kameraet?", `Hylle ${hylle} blir ikke fulgt med på lenger.`, [

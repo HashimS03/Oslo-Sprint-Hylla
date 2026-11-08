@@ -53,7 +53,9 @@ function avstand(a: Buffer, b: Buffer): number {
 }
 
 /** Tar imot et nytt bilde og sier om det er verdt å telle. Etter vellykket telling må kalleren kalle `ferdigTelt`. */
-export async function vurder(kameraId: string, bilde: string, tving = false) {
+export async function vurder(kameraId: string, bilde: string, tving = false, innst?: { stille?: number; pause?: number }) {
+  const stilleKrav = innst?.stille ?? STILLE_RAMMER;
+  const pauseMs = innst?.pause ?? PAUSE_MS;
   const t = alle().get(kameraId) ?? { stille: 0, teller: false, sistTelt: 0 };
   alle().set(kameraId, t);
   const na = await gra(bilde);
@@ -72,9 +74,9 @@ export async function vurder(kameraId: string, bilde: string, tving = false) {
     return { status: "bevegelse" as RammeStatus, skalTelle: false, ...mal };
   }
   t.stille++;
-  if (t.stille < STILLE_RAMMER) return { status: "stille" as RammeStatus, skalTelle: false, ...mal };
+  if (t.stille < stilleKrav) return { status: "stille" as RammeStatus, skalTelle: false, ...mal };
   if (t.referanse && endring < ENDRING) return { status: "uendret" as RammeStatus, skalTelle: false, ...mal };
-  if (Date.now() - t.sistTelt < PAUSE_MS) return { status: "pause" as RammeStatus, skalTelle: false, ...mal };
+  if (Date.now() - t.sistTelt < pauseMs) return { status: "pause" as RammeStatus, skalTelle: false, ...mal };
   t.teller = true;
   return { status: "teller" as RammeStatus, skalTelle: true, ...mal };
 }
