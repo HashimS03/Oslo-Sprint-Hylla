@@ -77,7 +77,7 @@ export type SporSvar = { sporsmal?: string; svar: string; kort: Kort[]; kilde: s
 export type OppgaveStatus = "ny" | "pagar" | "ferdig";
 
 export type Oppgave = {
-  id: string; tittel: string; beskrivelse?: string; type: "pafyll" | "sjekk" | "avvik" | "annet";
+  id: string; tittel: string; beskrivelse?: string; type: "pafyll" | "sjekk" | "avvik" | "pakk" | "annet";
   hylle?: string; sku?: string; avvikId?: string; prioritet: "hoy" | "normal"; status: OppgaveStatus;
   opprettet: string; opprettetAv: "driftsleder" | "ansatt" | "takkamera"; tattAv?: string; ferdigTid?: string;
   utfall?: "funnet" | "svinn";

@@ -189,6 +189,10 @@ export async function behandleTakbilde(opts: {
             const iLoggen = beholdning(s, f.sku, hylle.id);
             const forskjell = f.antall - iLoggen;
             if (forskjell === 0) continue;
+            // Ble varen nettopp skannet ut mot en bestilling? Da står ordren i loggen på uttaket.
+            const skann = forskjell < 0 && !forste ? [...(s.skanninger ?? [])].reverse().find((x) => x.sku === f.sku && x.ordre && !x.ordreBokfort && Date.now() - Date.parse(x.tid) < 120_000) : undefined;
+            if (skann) skann.ordreBokfort = true;
+            const ordre = skann?.ordre;
             s.hendelser.push({
               id: nyId("h"),
               tid: new Date().toISOString(),
@@ -196,7 +200,7 @@ export async function behandleTakbilde(opts: {
               sku: f.sku,
               endring: forskjell,
               type: forste ? "korrigering" : forskjell < 0 ? "plukk" : "mottak",
-              aarsak: forste ? "Talt av kamera" : forskjell < 0 ? "Kamera: tatt ut" : "Kamera: lagt på plass",
+              aarsak: forste ? "Talt av kamera" : forskjell < 0 ? (ordre ? `Kamera: tatt ut, ordre ${ordre}` : "Kamera: tatt ut") : "Kamera: lagt på plass",
               ref: "kamera",
             });
           }

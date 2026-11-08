@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { endreState, hentState } from "@/lib/store";
-import { lagOppgave, oppgaveListe, oppgaveVisning, sikreDemoOppgaver, type NyOppgave } from "@/lib/oppgaver";
+import { lagOppgave, oppgaveListe, oppgaveVisning, sikreAvvikOppdrag, sikreDemoOppgaver, trengerAvvikOppdrag, type NyOppgave } from "@/lib/oppgaver";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,6 +10,8 @@ export async function GET() {
   let s = await hentState();
   // Første gang: legg inn demo-oppgaver, så demoen har noe å vise.
   if (!s.oppgaver) s = await endreState((st) => (sikreDemoOppgaver(st), st));
+  // Åpne avvik som ingen har fått beskjed om, blir oppgaver her.
+  if (trengerAvvikOppdrag(s)) s = await endreState((st) => (sikreAvvikOppdrag(st), st));
   const oppgaver = oppgaveListe(s).map((o) => oppgaveVisning(s, o));
   return NextResponse.json({ oppgaver, nye: oppgaver.filter((o) => o.status === "ny").length });
 }

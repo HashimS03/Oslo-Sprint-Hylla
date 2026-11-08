@@ -6,18 +6,21 @@ import type { Oppgave } from "@/lib/typer";
 import { send } from "@/lib/api";
 import { hentNavn } from "@/lib/navn";
 import { useHent } from "@/lib/useHent";
+import { useOppdater } from "@/lib/useOppdater";
 import { F, S, lagStil } from "@/lib/tema";
 import { klokke } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
 import { Display, Etikett, Feilboks, HylleFlis, Knapp, Kort, Laster, Mono, Rad, Skjerm, Swatch, Txt } from "@/components/ui";
 
-const TYPE: Record<Oppgave["type"], string> = { pafyll: "Påfyll", sjekk: "Sjekk", avvik: "Avvik", annet: "Oppgave" };
+const TYPE: Record<Oppgave["type"], string> = { pafyll: "Påfyll", sjekk: "Sjekk", avvik: "Avvik", pakk: "Pakking", annet: "Oppgave" };
 
 /** Én oppgave: les hva som skal gjøres, ta den, og si fra når den er ferdig. */
 export default function OppgaveDetalj() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data, feil, last, setData } = useHent<{ oppgave: Oppgave }>(`/api/oppgaver/${encodeURIComponent(id ?? "")}`);
   const o = data?.oppgave;
+  // Pakkeoppgaven oppdaterer seg når varene skannes ut på skanneskjermen.
+  useOppdater(last, 4);
   const [sender, setSender] = useState(false);
   const [sendFeil, setSendFeil] = useState<string | null>(null);
   const [velgUtfall, setVelgUtfall] = useState(false);
@@ -59,6 +62,11 @@ export default function OppgaveDetalj() {
     </View>
   ) : o.status === "ny" ? (
     <Knapp tekst="Jeg tar den" ikon="pilHoyre" laster={sender} onPress={() => handling("ta")} />
+  ) : o.type === "pakk" ? (
+    <View style={{ gap: 10 }}>
+      <Knapp tekst="Skann varene ut" ikon="skann" onPress={() => router.push("/skann")} />
+      <Knapp tekst="Ferdig pakket" ikon="hake" variant="mork" laster={sender} onPress={() => handling("ferdig")} />
+    </View>
   ) : (
     <Knapp tekst="Ferdig" ikon="hake" laster={sender} onPress={ferdigTrykk} />
   );

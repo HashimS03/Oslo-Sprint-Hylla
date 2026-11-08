@@ -1,3 +1,4 @@
+import { plukkMotOrdre } from "./bestillinger";
 import type {
   Forslag,
   ForslagEndring,
@@ -149,7 +150,8 @@ export function forklar(s: State, hylle: string, sku: string, diff: number): For
   } else {
     for (const o of s.ordrer.filter((x) => x.sku === sku && x.hylle === hylle && x.status === "apen")) {
       if (rest >= 0) break;
-      const n = Math.min(-rest, o.antall);
+      const n = Math.min(-rest, o.antall - (o.plukket ?? 0));
+      if (n <= 0) continue;
       deler.push({ type: "plukk", endring: -n, aarsak: `Salg, ordre ${o.id}`, ref: o.id });
       rest += n;
     }
@@ -207,10 +209,7 @@ export function lagreForslag(
       if (d.type === "plukk" && d.ref) {
         const o = s.ordrer.find((x) => x.id === d.ref);
         // Bare det som faktisk ble tatt trekkes fra; resten av ordren venter på neste telling.
-        if (o) {
-          o.antall += d.endring;
-          if (o.antall <= 0) o.status = "plukket";
-        }
+        if (o) plukkMotOrdre(o, -d.endring);
       }
       s.hendelser.push(hend);
       nye.push(hend);

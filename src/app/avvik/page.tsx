@@ -25,6 +25,8 @@ export default async function AvvikListe({ searchParams }: { searchParams: Promi
   const alle = avvikListe(s, "alle");
   const apne = alle.filter((a) => a.status === "apen");
   const kamera = apneKameraAvvik(s);
+  const kameraLukket = (s.matcherAvvik ?? []).filter((a) => a.status !== "apen").sort((a, b) => (b.loestTid ?? b.tid).localeCompare(a.loestTid ?? a.tid)).slice(0, 20);
+  const kameraVis = filter === "apne" ? kamera : filter === "lukket" ? kameraLukket : [...kamera, ...kameraLukket];
   const tell = (st: string) => alle.filter((a) => a.status === st).reduce((n, a) => n + a.antall, 0);
 
   return (
@@ -39,9 +41,9 @@ export default async function AvvikListe({ searchParams }: { searchParams: Promi
           <Kpi etikett="Bekreftet svinn" verdi={tell("svinn")} under="stk trukket fra" />
           <Kpi etikett="Var salg" verdi={tell("lukket")} under="stk ført som salg" />
         </div>
-        {kamera.length > 0 && filter !== "lukket" && (
+        {kameraVis.length > 0 && (
           <Panel tittel="Fra kameraet">
-            <ul className="divide-y divide-linje">{kamera.map((a) => <KameraAvvikRad key={a.id} a={a} />)}</ul>
+            <ul className="divide-y divide-linje">{kameraVis.map((a) => <KameraAvvikRad key={a.id} a={a} />)}</ul>
           </Panel>
         )}
         <Panel tittel={VALG.find((v) => v.id === filter)!.navn + " avvik"}>

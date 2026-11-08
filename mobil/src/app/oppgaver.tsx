@@ -33,7 +33,7 @@ export default function Oppgaver() {
           <View style={st.tom}>
             <Ikon navn="hake" size={48} />
             <Display style={{ fontSize: 24 }}>Ingen oppgaver nå</Display>
-            <Txt style={{ color: F.dempet, fontSize: 16, textAlign: "center" }}>Nye oppgaver fra driftsleder dukker opp her.</Txt>
+            <Txt style={{ color: F.dempet, fontSize: 16, textAlign: "center" }}>Avvik, bestillinger og oppgaver fra driftsleder dukker opp her.</Txt>
           </View>
         )}
         <Gruppe tittel="Mine" liste={mine} />
@@ -62,8 +62,8 @@ function OppgaveKort({ o }: { o: Oppgave }) {
       onPress={() => router.push({ pathname: "/oppgave/[id]", params: { id: o.id } })}
       style={({ pressed }) => [st.kort, ferdig && st.ferdig, o.prioritet === "hoy" && !ferdig && st.hoy, pressed && { opacity: 0.7 }]}
     >
-      <View style={[st.ikon, { backgroundColor: ferdig ? F.graa : o.type === "avvik" ? F.rodlys : F.gronnlys }]}>
-        <Ikon navn={ferdig ? "hake" : o.type === "pafyll" ? "varer" : o.type === "sjekk" ? "sok" : o.type === "avvik" ? "advarsel" : "logg"} size={24} />
+      <View style={[st.ikon, { backgroundColor: ferdig ? F.graa : o.type === "avvik" ? F.rodlys : o.type === "pakk" ? F.gullys : F.gronnlys }]}>
+        <Ikon navn={ferdig ? "hake" : o.type === "pafyll" ? "varer" : o.type === "sjekk" ? "sok" : o.type === "avvik" ? "advarsel" : o.type === "pakk" ? "skann" : "logg"} size={24} />
       </View>
       <View style={{ flex: 1, gap: 3 }}>
         <Rad gap={6}>

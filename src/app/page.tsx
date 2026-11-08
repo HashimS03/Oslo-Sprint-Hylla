@@ -8,6 +8,7 @@ import { Innhold, Kpi, Ruter, Panel, PanelLenke, Prikk, Tabell, TomRad, Topp, Ty
 import { StatusChip } from "@/components/ui";
 import { KameraAvvikRad } from "./kamera/KameraAvvikRad";
 import { alleRader } from "@/lib/kamerafeed";
+import { DemoBestillinger } from "./DemoBestillinger";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,11 @@ export default async function Oversikt() {
   const uke = rapport(s, 7);
   const idag = rapport(s, 1);
   const siste = alleRader(s).slice(0, 8);
+  const grense = Date.now() - 12 * 3600e3;
+  const bestillinger = s.ordrer
+    .filter((o) => o.status === "apen" || (o.plukketTid && Date.parse(o.plukketTid) > grense))
+    .sort((a, b) => Number(a.status !== "apen") - Number(b.status !== "apen") || b.tid.localeCompare(a.tid))
+    .slice(0, 8);
   const dato = new Date().toLocaleDateString("nb-NO", { timeZone: "Europe/Oslo", weekday: "long", day: "numeric", month: "long" });
 
   return (
@@ -77,6 +83,26 @@ export default async function Oversikt() {
             </ul>
           </Panel>
         </div>
+
+        <Panel tittel="Bestillinger til pakking" handling={<DemoBestillinger />}>
+          <Tabell hode={["Ordre", "Vare", "Lokasjon", "Skannet ut", "Status"]} hoyre={[3]}>
+            {bestillinger.map((o) => {
+              const ferdig = o.status === "plukket";
+              return (
+                <tr key={o.id}>
+                  <td className="font-mono text-[12.5px]">{o.id}<div className="text-[11.5px] text-dempet">{tidTekst(o.tid)}</div></td>
+                  <td><Link href={`/varer/${encodeURIComponent(o.sku)}`} className="hover:underline">{vare(s, o.sku)?.navn ?? o.sku}</Link></td>
+                  <td className="font-semibold">{o.hylle}</td>
+                  <td className="text-right font-mono">{o.plukket ?? 0} / {o.antall}</td>
+                  <td className={`text-[13px] ${ferdig ? "font-semibold text-gronn" : o.tattAv ? "font-semibold text-gultekst" : "text-dempet"}`}>
+                    {ferdig ? `Pakket${o.plukketTid ? ` ${klokke(o.plukketTid)}` : ""}, ført som salg` : o.tattAv ? `${o.tattAv} pakker` : "Venter i appen"}
+                  </td>
+                </tr>
+              );
+            })}
+            {bestillinger.length === 0 && <TomRad kolonner={5}>Ingen bestillinger å pakke. Trykk «Lag demo-bestillinger» for å legge inn noen.</TomRad>}
+          </Tabell>
+        </Panel>
 
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           <Panel tittel="Siste hendelser og kamera" handling={<PanelLenke href="/logg">Hele loggen</PanelLenke>}>

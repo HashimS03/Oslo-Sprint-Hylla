@@ -117,6 +117,11 @@ export type Ordre = {
   antall: number;
   tid: string;
   status: "apen" | "plukket";
+  /** Hvor mange som er skannet ut eller talt bort mot ordren. Resten venter. */
+  plukket?: number;
+  /** Den ansatte som tok pakkeoppgaven i appen. */
+  tattAv?: string;
+  plukketTid?: string;
 };
 
 export type Kamera = {
@@ -217,6 +222,10 @@ export type Skann = {
   sku: string;
   antall: number;
   type: "plukk" | "plassering";
+  /** Ordren skanningen ble ført mot, når det fantes en åpen bestilling på varen. */
+  ordre?: string;
+  /** Satt når kameraets uttak er ført på ordren, så samme skanning ikke forklarer to uttak. */
+  ordreBokfort?: boolean;
 };
 
 export type MatcherAvvikType = "feil_vare" | "feil_plass" | "uregistrert_uttak" | "skannet_uten_uttak" | "mulig_feilplassert" | "gjenglemt";
@@ -235,12 +244,17 @@ export type MatcherAvvik = {
   status: "apen" | "loest" | "falsk_alarm";
   /** Meldingen som sendes til skanneren (pip + tekst). */
   varsel?: { melding: string };
+  /** Den ansatte som tok avviket som oppgave i appen. */
+  tattAv?: string;
+  /** Hvem som løste det og når. Avviket blir liggende i loggen etterpå. */
+  loestAv?: string;
+  loestTid?: string;
 };
 
 // ---------- Oppgaver (scannerappen) ----------
 
 export type OppgaveStatus = "ny" | "pagar" | "ferdig";
-export type OppgaveType = "pafyll" | "sjekk" | "avvik" | "annet";
+export type OppgaveType = "pafyll" | "sjekk" | "avvik" | "pakk" | "annet";
 
 export type Oppgave = {
   id: string;
