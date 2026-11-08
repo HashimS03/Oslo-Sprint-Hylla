@@ -5,6 +5,7 @@ import { klokke, kortDato } from "@/lib/format";
 import { Innhold, Panel, Prikk, Tabell, TomRad, Topp } from "@/components/dash";
 import { StatusChip } from "@/components/ui";
 import { kameraSer } from "@/lib/kamerafeed";
+import { SlettHylle } from "./SlettHylle";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +48,7 @@ export default async function Lokasjoner() {
                   <div key={hy.id} id={hy.id} className="scroll-mt-24">
                     <Panel
                       tittel={`${hy.id} · ${hy.navn}`}
-                      handling={<StatusChip status={hylleStatus(s, hy.id)} />}
+                      handling={<div className="flex items-center gap-2"><StatusChip status={hylleStatus(s, hy.id)} /><SlettHylle id={hy.id} navn={hy.navn || hy.id} antall={sum} /></div>}
                     >
                       <div className="flex flex-wrap gap-x-6 gap-y-1 border-b border-kant bg-thead px-4 py-2.5 text-[12.5px] text-dempet">
                         <span><b className="font-semibold text-tekst">{sum}</b> stk</span>

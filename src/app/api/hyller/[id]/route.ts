@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { endreState, hentState } from "@/lib/store";
 import { hylleVisning } from "@/lib/visning";
+import { slettHylle } from "@/lib/kameraoppsett";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -26,6 +27,16 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       return hylle.innhold;
     });
     return NextResponse.json({ innhold: ut });
+  } catch (e) {
+    return NextResponse.json({ feil: e instanceof Error ? e.message : "Noe gikk galt" }, { status: 404 });
+  }
+}
+
+// Sletter hylla. Står det varer på den, føres de ut med en korrigering, og svaret sier hvilke.
+export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
+  const id = (await params).id;
+  try {
+    return NextResponse.json(await endreState((s) => slettHylle(s, id)));
   } catch (e) {
     return NextResponse.json({ feil: e instanceof Error ? e.message : "Noe gikk galt" }, { status: 404 });
   }

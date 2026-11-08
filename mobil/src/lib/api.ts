@@ -79,3 +79,7 @@ export async function patch<T>(sti: string, body: unknown): Promise<T> {
     throw new ApiFeil(`Får ikke kontakt med Hylla-serveren på ${apiUrl()} (${e instanceof Error ? e.message : String(e)})`, 0);
   }
 }
+
+export function slett<T>(sti: string): Promise<T> {
+  return kall<T>(sti, { method: "DELETE" }, `Får ikke kontakt med Hylla-serveren på ${apiUrl()}`);
+}

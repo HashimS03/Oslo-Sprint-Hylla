@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import type { HylleRad } from "@/lib/typer";
-import { patch } from "@/lib/api";
+import { patch, slett } from "@/lib/api";
 import { useHent } from "@/lib/useHent";
 import { F, S, lagStil } from "@/lib/tema";
 import { Etikett, Feilboks, Knapp, Laster, Skjerm, Txt } from "@/components/ui";
@@ -35,6 +35,23 @@ export default function SoneInnstillinger() {
     }
   }
 
+  function sporSlett() {
+    const antall = (hylle?.innhold ?? []).reduce((n, i) => n + i.antall, 0);
+    Alert.alert(
+      `Slette ${hylle?.navn || id}?`,
+      antall > 0 ? `Det står ${antall} stk på hylla. De trekkes ut av beholdningen med en korrigering i loggen.` : "Hylla og kameraet til hylla blir borte.",
+      [
+        { text: "Avbryt", style: "cancel" },
+        {
+          text: "Slett", style: "destructive", onPress: async () => {
+            try { await slett(`/api/hyller/${encodeURIComponent(id)}`); router.back(); }
+            catch (e) { setLagreFeil(e instanceof Error ? e.message : "Fikk ikke slettet hylla"); }
+          },
+        },
+      ],
+    );
+  }
+
   return (
     <Skjerm tittel={hylle?.navn || id} bunn={<Knapp tekst={lagrer ? "Lagrer …" : `Lagre (${valgt?.length ?? 0} valgt)`} laster={lagrer} deaktivert={!valgt?.length} onPress={lagre} />}>
       {feil && <Feilboks melding={feil} igjen={last} />}
@@ -51,6 +68,7 @@ export default function SoneInnstillinger() {
         );
       })}
       {lagreFeil && <Txt style={{ color: F.rod }}>{lagreFeil}</Txt>}
+      {hylle && <Knapp tekst="Slett hylla" variant="hvit" onPress={sporSlett} />}
     </Skjerm>
   );
 }
