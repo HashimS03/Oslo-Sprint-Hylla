@@ -13,7 +13,7 @@ import type { State } from "./types";
 
 const RAD_ID = process.env.HYLLA_LAGER_ID ?? "nydalen";
 
-type Global = { __hyllaState?: State; __hyllaSupabase?: SupabaseClient | null; __hyllaHurtig?: { state: State; tid: number }; __hyllaVenter?: { id: string; data: State; oppdatert: string }; __hyllaSkriver?: boolean };
+type Global = { __hyllaState?: State; __hyllaSupabase?: SupabaseClient | null; __hyllaHurtig?: { state: State; tid: number }; };
 const g = globalThis as unknown as Global;
 
 function supabase(): SupabaseClient | null {
@@ -61,35 +61,59 @@ export async function lagreState(state: State): Promise<void> {
     g.__hyllaState = state;
     return;
   }
+  const { error } = await sb.from("hylla_state").upsert({ id: RAD_ID, data: state, oppdatert: new Date().toISOString() });
+  if (error) throw new Error(`Supabase: ${error.message}`);
   g.__hyllaHurtig = { state, tid: Date.now() };
-  // Bare siste versjon skrives: kommer det flere endringer mens en skriving pågår, hoppes de mellomliggende over.
-  g.__hyllaVenter = { id: RAD_ID, data: state, oppdatert: new Date().toISOString() };
-  if (g.__hyllaSkriver) return;
-  g.__hyllaSkriver = true;
-  void (async () => {
-    try {
-      while (g.__hyllaVenter) {
-        const rad = g.__hyllaVenter;
-        g.__hyllaVenter = undefined;
-        const { error } = await sb.from("hylla_state").upsert(rad);
-        if (error) console.error(`Supabase: ${error.message}`);
-      }
-    } catch (e) {
-      console.error("Supabase-skriving feilet", e);
-    } finally {
-      g.__hyllaSkriver = false;
-    }
-  })();
 }
 
-/** Les, endre og lagre i ett steg. Kjøres i kø så samtidige kall ikke overskriver hverandre. */
+/**
+ * Les, endre og lagre i ett steg.
+ *
+ * På Vercel kjører dashboardet og kameraet på hver sin serverinstans. Leste vi fra minnet og skrev i bakgrunnen,
+ * skrev kameraet (som lagrer ved hvert bilde) over endringer fra dashboardet: avvik som ble løst og
+ * demobestillinger forsvant med en gang. Derfor leser vi alltid ferskt her, venter på at skrivingen er ferdig,
+ * og skriver bare hvis ingen andre har lagret siden vi leste (ellers prøver vi igjen på den nye tilstanden).
+ * Vanlige lesinger (sidene) bruker fortsatt kopien i minnet.
+ */
 let ko: Promise<unknown> = Promise.resolve();
 export function endreState<T>(fn: (s: State) => T | Promise<T>): Promise<T> {
   const neste = ko.then(async () => {
-    const s = structuredClone(await hentState());
-    const res = await fn(s);
-    await lagreState(s);
-    return res;
+    const sb = supabase();
+    if (!sb) {
+      const s = structuredClone(await hentState());
+      const res = await fn(s);
+      await lagreState(s);
+      return res;
+    }
+    for (let forsok = 0; ; forsok++) {
+      const { data, error } = await sb.from("hylla_state").select("data, oppdatert").eq("id", RAD_ID).maybeSingle();
+      if (error) throw new Error(`Supabase: ${error.message}`);
+      if (!data?.data) {
+        const s = lagStart();
+        const res = await fn(s);
+        await lagreState(s);
+        return res;
+      }
+      const s = data.data as State;
+      const res = await fn(s);
+      beskjaer(s);
+      const { data: skrevet, error: feil } = await sb
+        .from("hylla_state")
+        .update({ data: s, oppdatert: new Date().toISOString() })
+        .eq("id", RAD_ID)
+        .eq("oppdatert", data.oppdatert as string)
+        .select("id");
+      if (feil) throw new Error(`Supabase: ${feil.message}`);
+      if (skrevet && skrevet.length > 0) {
+        g.__hyllaHurtig = { state: s, tid: Date.now() };
+        return res;
+      }
+      // Noen andre lagret i mellomtiden. Prøv igjen på det de lagret (et par ganger, så tar vi siste ord).
+      if (forsok >= 4) {
+        await lagreState(s);
+        return res;
+      }
+    }
   });
   ko = neste.catch(() => undefined);
   return neste;
