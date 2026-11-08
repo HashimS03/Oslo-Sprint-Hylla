@@ -1,5 +1,5 @@
 import "server-only";
-import { endreState, endreStateHvisEndret, hentState } from "./store";
+import { endreState, hentState } from "./store";
 import { beholdning, nyId, vare } from "./lager";
 import { skannMotOrdre } from "./bestillinger";
 import type { KameraHendelse, MatcherAvvik, MatcherAvvikType, Skann, State } from "./types";
@@ -206,7 +206,7 @@ export async function kjorMatcherVedBehov() {
 
 /** Kjør matcheren mot lagret state (brukes når kameraet har sendt nye hendelser). */
 export function kjorMatcher() {
-  return endreStateHvisEndret((s) => avstem(s));
+  return endreState((s) => avstem(s));
 }
 
 /** Alt dashboardet trenger: avvik, nøkkeltall, tell-liste og lagerkart. */

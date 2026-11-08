@@ -19,12 +19,7 @@ const GJENGLEMT_MS = Number(process.env.GJENGLEMT_MS ?? 10 * 60 * 1000);
 const LAV_SIKKERHET = 0.6;
 /** Takkameraet teller raskere enn den gamle telle-flyten: ett stille bilde holder, og bare en kort pause mellom tellinger. */
 const TAK_STILLE = Number(process.env.KAMERA_STILLE ?? 1);
-// Kort pause: telefonen venter uansett på svaret før neste bilde, og en ventende endring skal bekreftes med en gang.
-const TAK_PAUSE_MS = Number(process.env.KAMERA_PAUSE_MS ?? 250);
-// KAMERA_BEKREFT=0 bokfører endringer etter én telling (raskere, men en feiltelling går rett i beholdningen).
-const TAK_BEKREFT = process.env.KAMERA_BEKREFT !== "0";
-const PULS_MS = 5000;
-const MAKS_BILDER = 60;
+const TAK_PAUSE_MS = Number(process.env.KAMERA_PAUSE_MS ?? 1200);
 /** Har kameraet ikke sett sonen på så lenge, regnes neste bilde som en ny start: det setter bare utgangspunktet. */
 const NY_START_MS = Number(process.env.KAMERA_NY_START_S ?? 60) * 1000;
 
@@ -215,7 +210,7 @@ export async function behandleTakbilde(opts: {
           s.soneVent ??= {};
           const vent = (s.soneVent[hylle.id] ??= {});
           for (const f of funnet) {
-            if (!f.hjemmehorende || forste || oppgitt || !TAK_BEKREFT) continue; // demotall er sikre, de trenger ingen bekreftelse
+            if (!f.hjemmehorende || forste || oppgitt) continue; // demotall er sikre, de trenger ingen bekreftelse
             const iLoggen = beholdning(s, f.sku, hylle.id);
             const forrige = stand[f.sku] ?? 0;
             if (f.antall === forrige && f.antall === iLoggen) { delete vent[f.sku]; continue; }
@@ -267,11 +262,6 @@ export async function behandleTakbilde(opts: {
               sikkerhet: f.sikkerhet,
             });
           }
-          // Bildene ligger i tilstanden som leses ved hvert kamerabilde og hver oppdatering av dashboardet.
-          // Vi beholder dem bare på de nyeste hendelsene, så den ikke vokser og gjør alt tregere.
-          const medBilde = s.kameraHendelser.filter((k) => k.bilde);
-          for (const k of medBilde.slice(0, Math.max(0, medBilde.length - MAKS_BILDER))) delete k.bilde;
-
           const kam = s.kameraer.find((k) => k.id === opts.kameraId);
           if (kam) {
             kam.sistSett = new Date().toISOString();
@@ -301,19 +291,13 @@ export async function behandleTakbilde(opts: {
   );
 
   // Heartbeat for alle soner, også de uten endring, så matcheren kan si «ingen bevegelse».
-  // Hele tilstanden leses og skrives hver gang, så vi skriver bare når det er noen sekunder siden sist.
-  // Soner som ble talt, har allerede fått ny tid.
-  const talt = new Set(resultater.filter((r) => r.status === "talt").map((r) => r.sone));
-  const trengerPuls = soner.filter((h) => !talt.has(h.id) && naa - Date.parse(state.soneSett?.[h.id] ?? "1970-01-01") > PULS_MS);
-  if (trengerPuls.length) {
-    await endreState((s) => {
-      s.soneSett ??= {};
-      for (const h of trengerPuls) s.soneSett[h.id] = new Date().toISOString();
-    });
-  }
+  await endreState((s) => {
+    s.soneSett ??= {};
+    for (const h of soner) s.soneSett[h.id] = new Date().toISOString();
+  });
 
   // Nye kamerahendelser kan treffe en skanning som allerede ligger der (for eksempel feil plass).
-  if (resultater.some((r) => r.hendelser?.length)) await kjorMatcher();
+  await kjorMatcher();
 
   const lavSikkerhet = resultater.flatMap((r) => r.hendelser ?? []).some((h) => h.sikkerhet < LAV_SIKKERHET);
   return { kameraId: opts.kameraId, teller: teller.navn, soner: resultater, lavSikkerhet };
