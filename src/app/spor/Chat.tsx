@@ -42,11 +42,14 @@ export function Chat({ stemme }: { stemme: boolean }) {
       leggTil({ rolle: "bruker", tekst });
       setTenker(true);
       try {
-        const res = await fetch("/api/spor", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ historikk }) });
+        // Høyt svar går via samme rute som mobilen, så vi får ElevenLabs sin norske stemme når den er satt opp.
+        const res = lesHoyt
+          ? await fetch("/api/stemme/sporsmal", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ tekst, historikk: historikk.slice(0, -1) }) })
+          : await fetch("/api/spor", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ historikk }) });
         const data = await res.json();
         const svar = data.svar ?? data.feil ?? "Noe gikk galt.";
         leggTil({ rolle: "hylla", tekst: svar, kort: data.kort });
-        if (lesHoyt) les(svar);
+        if (lesHoyt) les(svar, data.lyd);
       } finally {
         setTenker(false);
       }
@@ -118,14 +121,35 @@ type Gjenkjenner = {
   onerror: (e: { error: string }) => void;
 };
 
-function les(tekst: string) {
-  if (typeof window === "undefined" || !window.speechSynthesis) return;
-  const u = new SpeechSynthesisUtterance(tekst);
-  u.lang = "nb-NO";
-  const stemme = window.speechSynthesis.getVoices().find((v) => v.lang.startsWith("nb") || v.lang.startsWith("no"));
-  if (stemme) u.voice = stemme;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(u);
+let spiller: HTMLAudioElement | null = null;
+
+/** Spiller ElevenLabs-lyden når serveren sendte den. Ellers nettleserens egen norske stemme. */
+function les(tekst: string, lyd?: string) {
+  if (typeof window === "undefined") return;
+  spiller?.pause();
+  window.speechSynthesis?.cancel();
+  if (lyd?.startsWith("data:")) {
+    spiller = new Audio(lyd);
+    spiller.play().catch(() => lesMedNettleser(tekst));
+    return;
+  }
+  lesMedNettleser(tekst);
+}
+
+const norskStemme = () => window.speechSynthesis.getVoices().find((v) => /^(nb|no|nn)\b/i.test(v.lang));
+
+function lesMedNettleser(tekst: string) {
+  if (!window.speechSynthesis) return;
+  const snakk = () => {
+    const u = new SpeechSynthesisUtterance(tekst);
+    u.lang = "nb-NO";
+    const stemme = norskStemme();
+    if (stemme) u.voice = stemme;
+    window.speechSynthesis.speak(u);
+  };
+  // Chrome laster stemmene etter hvert. Uten å vente velger den en engelsk standardstemme.
+  if (window.speechSynthesis.getVoices().length) return snakk();
+  window.speechSynthesis.addEventListener("voiceschanged", snakk, { once: true });
 }
 
 function NettleserStemme({ onTekst, opptatt }: { onTekst: (t: string) => void; opptatt: boolean }) {
@@ -163,6 +187,7 @@ function NettleserStemme({ onTekst, opptatt }: { onTekst: (t: string) => void; o
   const start = () => {
     if (!rec.current || lytter) return;
     window.speechSynthesis?.cancel();
+    spiller?.pause();
     tekst.current = "";
     try {
       rec.current.start();
