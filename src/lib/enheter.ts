@@ -38,13 +38,17 @@ function glemMellomlager() {
 
 export async function finnEnhet(nokkel: string | null | undefined): Promise<Enhet | null> {
   if (!nokkel || nokkel.length > 200) return null;
+  const h = hash(nokkel);
   let m = g.__hyllaEnheter;
-  if (!m || Date.now() - m.tid > 30_000) {
+  // Ukjent nøkkel: les enhetene på nytt med en gang (høyst hvert halve sekund). Innloggingen kjører ofte på en
+  // annen serverinstans, så en telefon som nettopp ble koblet til, ble ellers avvist i opptil 30 sekunder og
+  // sendt tilbake til QR-skanningen.
+  if (!m || Date.now() - m.tid > 30_000 || (!m.perHash.has(h) && Date.now() - m.tid > 500)) {
     const s = await hentState();
     m = { tid: Date.now(), perHash: new Map((s.enheter ?? []).map((e) => [e.nokkelHash, e])) };
     g.__hyllaEnheter = m;
   }
-  return m.perHash.get(hash(nokkel)) ?? null;
+  return m.perHash.get(h) ?? null;
 }
 
 /** Henter nøkkelen fra `authorization: Bearer …` (appen) eller fra cookien (nettleseren). */
