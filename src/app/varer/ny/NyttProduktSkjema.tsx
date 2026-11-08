@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { filTilJpeg } from "@/lib/bilde";
 import { Ikon } from "@/components/ui";
+import { SkannStrekkode } from "../[sku]/SkannStrekkode";
 
 const FARGER = [
   { navn: "svart", hex: "#1E1E20" },
@@ -29,6 +30,7 @@ export function NyttProduktSkjema({ hyller }: { hyller: string[] }) {
   const [bilder, setBilder] = useState<string[]>([]);
   const [antall, setAntall] = useState("");
   const [prompt, setPrompt] = useState("");
+  const [strekkode, setStrekkode] = useState("");
   const [feil, setFeil] = useState("");
   const [lagrer, setLagrer] = useState(false);
 
@@ -53,6 +55,7 @@ export function NyttProduktSkjema({ hyller }: { hyller: string[] }) {
         bilder,
         antall: Number(antall) || 0,
         prompt,
+        strekkode,
         beskrivelse: `${navn}, ${farge.navn}, størrelse ${str}`,
       }),
     });
@@ -119,6 +122,11 @@ export function NyttProduktSkjema({ hyller }: { hyller: string[] }) {
             <label htmlFor="prompt" className="text-[13px] font-semibold">På engelsk (for kameraet)</label>
             <input id="prompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="red soda can" className={felt} />
           </div>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="strekkode" className="text-[13px] font-semibold">Strekkode</label>
+          <input id="strekkode" inputMode="numeric" value={strekkode} onChange={(e) => setStrekkode(e.target.value.trim())} placeholder="Skriv inn, eller skann med skanneren" className={`${felt} font-mono text-sm`} />
+          <SkannStrekkode navn={navn || undefined} vedKode={setStrekkode} ramme={false} />
         </div>
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px] font-semibold">Størrelse</span>

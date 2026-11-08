@@ -6,13 +6,16 @@ type Status = "venter" | "godtatt" | "ferdig" | "avvist" | "avbrutt";
 const TEKST: Record<Status, string> = {
   venter: "Sendt til skanneren. Venter på at noen godtar …",
   godtatt: "Skanneren er klar. Skann strekkoden på pakken …",
-  ferdig: "Strekkoden er registrert.",
+  ferdig: "Strekkoden er skannet:",
   avvist: "Skanneren avviste forespørselen.",
   avbrutt: "Forespørselen ble avbrutt eller gikk ut.",
 };
 
-/** «Skann med skanneren»: sender en forespørsel til skannerappen og venter til koden kommer tilbake. */
-export function SkannStrekkode({ sku }: { sku: string }) {
+/**
+ * «Skann med skanneren»: sender en forespørsel til skannerappen og venter til koden kommer tilbake.
+ * Med sku lagres koden på varen. Uten (ny vare som ikke er lagret) får `vedKode` koden i stedet.
+ */
+export function SkannStrekkode({ sku, navn, vedKode, ramme = true }: { sku?: string; navn?: string; vedKode?: (kode: string) => void; ramme?: boolean }) {
   const router = useRouter();
   const [id, setId] = useState<string | null>(null);
   const [status, setStatus] = useState<Status | null>(null);
@@ -22,7 +25,7 @@ export function SkannStrekkode({ sku }: { sku: string }) {
   const start = async () => {
     setFeil(null);
     setKode(null);
-    const r = await fetch("/api/strekkode", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sku }) }).catch(() => null);
+    const r = await fetch("/api/strekkode", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(sku ? { sku } : { navn }) }).catch(() => null);
     const d = await r?.json().catch(() => null);
     if (!r?.ok || !d?.id) return setFeil(d?.feil ?? "Fikk ikke sendt forespørselen");
     setId(d.id);
@@ -44,15 +47,16 @@ export function SkannStrekkode({ sku }: { sku: string }) {
       setStatus(d.status);
       if (d.status === "ferdig") {
         setKode(d.kode ?? null);
-        router.refresh();
+        if (vedKode && d.kode) vedKode(d.kode);
+        else router.refresh();
       }
     }, 2000);
     return () => clearInterval(t);
-  }, [id, status, router]);
+  }, [id, status, router, vedKode]);
 
   const aktiv = status === "venter" || status === "godtatt";
   return (
-    <div className="flex flex-col gap-2 border-t border-kant px-4 py-3">
+    <div className={`flex flex-col gap-2 ${ramme ? "border-t border-kant px-4 py-3" : ""}`}>
       <div className="flex items-center justify-between gap-3">
         <span className="text-[13px] text-dempet">Registrer strekkoden med skanneren</span>
         {aktiv ? (

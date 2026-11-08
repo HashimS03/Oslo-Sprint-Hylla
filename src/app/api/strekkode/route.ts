@@ -11,11 +11,11 @@ export async function GET() {
 }
 
 // POST { sku } → dashboardet ber skanneren skanne strekkoden til varen.
+// POST { navn } → samme for en vare som ikke er lagret ennå; skjemaet henter koden fra svaret.
 export async function POST(req: Request) {
-  const { sku } = (await req.json().catch(() => ({}))) as { sku?: string };
-  if (!sku) return NextResponse.json({ feil: "sku må være med" }, { status: 400 });
+  const { sku, navn } = (await req.json().catch(() => ({}))) as { sku?: string; navn?: string };
   try {
-    return NextResponse.json(await endreState((s) => nyForesporsel(s, sku)));
+    return NextResponse.json(await endreState((s) => nyForesporsel(s, sku || undefined, navn)));
   } catch (e) {
     return NextResponse.json({ feil: e instanceof Error ? e.message : "Feil" }, { status: 400 });
   }
