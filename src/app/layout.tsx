@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { kreverKobling } from "@/lib/enheter";
 import { hentState } from "@/lib/store";
 import { apneAvvik, apneKameraAvvik } from "@/lib/lager";
 import { kjorMatcherVedBehov } from "@/lib/matcher";
@@ -30,11 +31,21 @@ export const viewport: Viewport = {
 export const dynamic = "force-dynamic";
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const tema: Tema = (await cookies()).get("tema")?.value === "lys" ? "lys" : "mork";
+  // En enhet som ikke er koblet til (bare /koble slipper gjennom middleware), får ingen meny og ingen lagerdata.
+  if (kreverKobling() && !(await headers()).get("x-hylla-enhet")) {
+    return (
+      <html lang="nb" data-theme={tema === "mork" ? "dark" : "light"} className={`${archivo.variable} ${plex.variable} ${plexMono.variable}`}>
+        <body className="antialiased">
+          <div className="flex min-h-dvh flex-col bg-bg">{children}</div>
+        </body>
+      </html>
+    );
+  }
   // Avvik som venter på at tidsvinduet går ut, dukker opp uten at kameraet må sende noe nytt.
   await kjorMatcherVedBehov().catch(() => undefined);
   const s = await hentState();
-  // Mørk modus er standard. Valget fra bryteren i menyen ligger i informasjonskapselen «tema».
-  const tema: Tema = (await cookies()).get("tema")?.value === "lys" ? "lys" : "mork";
+  // Mørk modus er standard (tema leses øverst). Valget fra bryteren i menyen ligger i informasjonskapselen «tema».
   return (
     <html lang="nb" data-theme={tema === "mork" ? "dark" : "light"} className={`${archivo.variable} ${plex.variable} ${plexMono.variable}`}>
       <body className="antialiased">

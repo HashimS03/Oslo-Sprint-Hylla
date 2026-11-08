@@ -97,7 +97,7 @@ export function hentLogg(s: State, opts: { sku?: string; hylle?: string; type?: 
   return s.hendelser
     .filter((h) => (!opts.sku || h.sku === opts.sku) && (!opts.hylle || h.hylle === opts.hylle) && (!opts.type || h.type === opts.type))
     .sort((a, b) => b.tid.localeCompare(a.tid))
-    .slice(0, opts.antall ?? 10)
+    .slice(0, Math.min(Math.max(Math.trunc(opts.antall ?? 10), 1), 100))
     .map((h) => ({ tid: kl(h.tid), hylle: h.hylle, sku: h.sku, vare: vare(s, h.sku)?.navn, endring: h.endring, type: h.type, aarsak: h.aarsak, ref: h.ref }));
 }
 

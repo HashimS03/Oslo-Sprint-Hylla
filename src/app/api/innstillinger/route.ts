@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { endreState, hentState, lagringstype } from "@/lib/store";
 import type { Innstillinger } from "@/lib/types";
+import { InnstillingerSkjema } from "@/lib/skjema";
+import { lesJson } from "@/lib/vern";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,7 +20,9 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const endring = (await req.json()) as Partial<Innstillinger>;
+  const b = await lesJson(req, InnstillingerSkjema);
+  if ("svar" in b) return b.svar;
+  const endring: Partial<Innstillinger> = b.data;
   const innstillinger = await endreState((s) => {
     s.innstillinger = { ...s.innstillinger, ...endring };
     return s.innstillinger;

@@ -1,4 +1,6 @@
 import Constants from "expo-constants";
+import { router } from "expo-router";
+import { hentNokkel } from "./enhet";
 
 // Adressen til Next.js-backenden.
 // 1. EXPO_PUBLIC_API_URL hvis den er satt (f.eks. https://hylla.vercel.app)
@@ -32,7 +34,11 @@ export class ApiFeil extends Error {
 
 async function svar<T>(res: Response): Promise<T> {
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new ApiFeil((data as { feil?: string }).feil ?? `Feil fra serveren (${res.status})`, res.status, data);
+  if (!res.ok) {
+    // Serveren kjenner ikke telefonen (ikke koblet, eller fjernet): send brukeren til koblingsskjermen.
+    if (res.status === 401 && (data as { trengerKobling?: boolean }).trengerKobling) router.replace("/koble");
+    throw new ApiFeil((data as { feil?: string }).feil ?? `Feil fra serveren (${res.status})`, res.status, data);
+  }
   return data as T;
 }
 
@@ -41,6 +47,9 @@ async function kall<T>(sti: string, init: RequestInit, nettverksfeil: string): P
   const usikker = usikkerAdresse();
   if (usikker) throw new ApiFeil(usikker, 0);
   const headers = new Headers(init.headers);
+  // Nøkkelen som viser at telefonen er koblet til Hylla (se lib/enhet.ts).
+  const nokkel = hentNokkel();
+  if (nokkel) headers.set("authorization", `Bearer ${nokkel}`);
   // Tidsavbrudd litt over serverens grense (60 s), så skjermen aldri henger for alltid.
   const avbryt = new AbortController();
   const tidsur = setTimeout(() => avbryt.abort(), 70_000);
@@ -59,10 +68,10 @@ export function hent<T>(sti: string): Promise<T> {
   return kall<T>(sti, { headers: { accept: "application/json" } }, `Får ikke kontakt med Hylla-serveren på ${apiUrl()}`);
 }
 
-export function send<T>(sti: string, body: unknown): Promise<T> {
+export function send<T>(sti: string, body: unknown, ekstra: Record<string, string> = {}): Promise<T> {
   return kall<T>(
     sti,
-    { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) },
+    { method: "POST", headers: { "content-type": "application/json", ...ekstra }, body: JSON.stringify(body) },
     `Får ikke kontakt med Hylla-serveren på ${apiUrl()}`,
   );
 }
@@ -71,13 +80,13 @@ export function sendSkjema<T>(sti: string, skjema: FormData): Promise<T> {
   return kall<T>(sti, { method: "POST", body: skjema }, `Kunne ikke sende opptaket til ${apiUrl()}`);
 }
 
-export async function patch<T>(sti: string, body: unknown): Promise<T> {
-  try {
-    return await svar<T>(await fetch(apiUrl() + sti, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }));
-  } catch (e) {
-    if (e instanceof ApiFeil) throw e;
-    throw new ApiFeil(`Får ikke kontakt med Hylla-serveren på ${apiUrl()} (${e instanceof Error ? e.message : String(e)})`, 0);
-  }
+export function patch<T>(sti: string, body: unknown): Promise<T> {
+  // Går også gjennom kall(), så nøkkelen og adressesjekken er med.
+  return kall<T>(
+    sti,
+    { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(body) },
+    `Får ikke kontakt med Hylla-serveren på ${apiUrl()}`,
+  );
 }
 
 export function slett<T>(sti: string): Promise<T> {

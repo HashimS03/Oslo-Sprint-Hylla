@@ -143,8 +143,22 @@ export type Innstillinger = {
   kameraIntervallMin: number;
 };
 
+/** En telefon eller PC som er koblet til Hylla. Selve nøkkelen lagres aldri, bare en hash av den. */
+export type Enhet = {
+  id: string;
+  navn: string;
+  nokkelHash: string;
+  opprettet: string;
+};
+
+/** Engangskode fra QR-koden. Gjelder i noen minutter, og kan koble til flere telefoner i den tiden. */
+export type Koblingskode = { kodeHash: string; utloper: string };
+
 export type State = {
   versjon: number;
+  /** Koblede enheter (se src/lib/enheter.ts). */
+  enheter?: Enhet[];
+  koblingskoder?: Koblingskode[];
   varer: Vare[];
   hyller: Hylle[];
   hendelser: Hendelse[];

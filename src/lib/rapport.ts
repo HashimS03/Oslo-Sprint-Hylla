@@ -125,7 +125,8 @@ export function avvikListe(s: State, filter: "apne" | "lukket" | "alle") {
 
 export function tilCsv(rader: (string | number)[][]): string {
   const celle = (v: string | number) => {
-    const t = String(v);
+    // Tekst som starter med = + - @ kjøres som formel i Excel (CSV-injeksjon). En ' foran gjør den til vanlig tekst.
+    const t = typeof v === "string" && /^[=+\-@\t\r]/.test(v) ? `'${v}` : String(v);
     return /[";\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
   };
   // Semikolon og BOM så Excel med norsk oppsett åpner filen riktig.

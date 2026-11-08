@@ -47,6 +47,13 @@ export default async function Innstillinger() {
           <div className="flex items-center justify-between border-t border-kant px-3.5 py-[13px]"><span>Svar høyt</span><Bryter felt="svarHoyt" pa={i.svarHoyt} /></div>
         </div>
 
+        <span className="etikett mt-1">Tilgang</span>
+        <div className="kort overflow-hidden">
+          <Link href="/innstillinger/telefoner" className="flex items-center justify-between px-3.5 py-[13px] font-semibold hover:bg-graa">
+            <span>Telefoner</span><span className="text-dempet">{s.enheter?.length ?? 0} koblet til ›</span>
+          </Link>
+        </div>
+
         <span className="etikett mt-1">Data</span>
         <div className="kort overflow-hidden">
           <Rad forste v="Lagring" h={lagringstype() === "supabase" ? "Supabase" : "minne (lokal demo)"} />

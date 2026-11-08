@@ -29,21 +29,25 @@ export function TerskelVelger({ verdi }: { verdi: number }) {
   );
 }
 
+/** Svar fra /api/demo/nullstill: "ok", eller "av" når nullstilling er slått av på serveren. */
+type Utfall = "" | "ok" | "av";
+
 export function NullstillDemo() {
   const router = useRouter();
-  const [ferdig, setFerdig] = useState(false);
+  const [utfall, setUtfall] = useState<Utfall>("");
+  const ferdig = utfall === "ok";
   return (
     <button
       onClick={async () => {
-        await fetch("/api/demo/nullstill", { method: "POST" });
-        setFerdig(true);
+        const res = await fetch("/api/demo/nullstill", { method: "POST" });
+        setUtfall(res.ok ? "ok" : "av");
         router.refresh();
-        setTimeout(() => setFerdig(false), 2500);
+        setTimeout(() => setUtfall(""), 2500);
       }}
       className="flex items-center justify-between rounded-[14px] border-[1.5px] border-rodkant bg-kort px-3.5 py-[13px] text-left"
     >
       <span>
-        <b className="font-semibold text-rod">{ferdig ? "Demoen er nullstilt" : "Nullstill demo"}</b>
+        <b className="font-semibold text-rod">{ferdig ? "Demoen er nullstilt" : utfall === "av" ? "Nullstilling er slått av" : "Nullstill demo"}</b>
         <br />
         <span className="text-xs text-dempet">Bord 1 tilbake til startbeholdningen</span>
       </span>
@@ -54,20 +58,21 @@ export function NullstillDemo() {
 
 export function TomLager() {
   const router = useRouter();
-  const [ferdig, setFerdig] = useState(false);
+  const [utfall, setUtfall] = useState<Utfall>("");
+  const ferdig = utfall === "ok";
   return (
     <button
       onClick={async () => {
         if (!confirm("Tømme lageret? Alle varer, hyller og all historikk slettes.")) return;
-        await fetch("/api/demo/nullstill", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ tom: true }) });
-        setFerdig(true);
+        const res = await fetch("/api/demo/nullstill", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ tom: true }) });
+        setUtfall(res.ok ? "ok" : "av");
         router.refresh();
-        setTimeout(() => setFerdig(false), 2500);
+        setTimeout(() => setUtfall(""), 2500);
       }}
       className="flex items-center justify-between rounded-[14px] border-[1.5px] border-rodkant bg-kort px-3.5 py-[13px] text-left"
     >
       <span>
-        <b className="font-semibold text-rod">{ferdig ? "Lageret er tomt" : "Tøm lageret"}</b>
+        <b className="font-semibold text-rod">{ferdig ? "Lageret er tomt" : utfall === "av" ? "Tømming er slått av" : "Tøm lageret"}</b>
         <br />
         <span className="text-xs text-dempet">Start uten varer, og registrer dine egne</span>
       </span>
