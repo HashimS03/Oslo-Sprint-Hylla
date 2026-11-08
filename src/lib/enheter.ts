@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import { endreState, hentState } from "./store";
+import { endreState, hentEnheter, hentState } from "./store";
 import { nyId } from "./lager";
 import { likeHemmeligheter } from "./vern";
 import type { Enhet } from "./types";
@@ -38,13 +38,17 @@ function glemMellomlager() {
 
 export async function finnEnhet(nokkel: string | null | undefined): Promise<Enhet | null> {
   if (!nokkel || nokkel.length > 200) return null;
+  const h = hash(nokkel);
   let m = g.__hyllaEnheter;
-  if (!m || Date.now() - m.tid > 30_000) {
-    const s = await hentState();
-    m = { tid: Date.now(), perHash: new Map((s.enheter ?? []).map((e) => [e.nokkelHash, e])) };
+  // Ukjent nøkkel: spør på nytt med en gang (bare litt struping). Middleware kjører på en annen serverinstans
+  // enn innloggingen, så en enhet som nettopp ble koblet til, ville ellers blitt sendt tilbake til /koble i
+  // opptil et halvt minutt.
+  const gammel = !m || Date.now() - m.tid > 30_000 || (!m.perHash.has(h) && Date.now() - m.tid > 500);
+  if (gammel) {
+    m = { tid: Date.now(), perHash: new Map((await hentEnheter()).map((e) => [e.nokkelHash, e])) };
     g.__hyllaEnheter = m;
   }
-  return m.perHash.get(hash(nokkel)) ?? null;
+  return m!.perHash.get(h) ?? null;
 }
 
 /** Henter nøkkelen fra `authorization: Bearer …` (appen) eller fra cookien (nettleseren). */
