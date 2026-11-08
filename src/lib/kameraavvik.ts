@@ -13,10 +13,17 @@ export const UTFALL_TEKST: Record<KameraUtfall, string> = {
   falsk_alarm: "Falsk alarm",
 };
 
-/** Valgene som gir mening for avvikstypen. Uttak kan være salg eller svinn; resten er funnet eller falsk alarm. */
-export function valgFor(a: MatcherAvvik): KameraUtfall[] {
-  return a.type === "uregistrert_uttak" || a.type === "feil_plass" ? ["salg", "svinn", "funnet", "falsk_alarm"] : ["funnet", "falsk_alarm"];
+/** Valgene for å avklare et kameraavvik. De samme for alle typer, i dashbordet og i appen. */
+export function valgFor(_a: MatcherAvvik): KameraUtfall[] {
+  return ["salg", "svinn", "funnet", "falsk_alarm"];
 }
+
+export const UTFALL_FORKLARING: Record<KameraUtfall, string> = {
+  salg: "Varen er solgt. Uttaket føres som salg, ikke svinn.",
+  svinn: "Varen er borte. Uttaket føres som svinn i rapporten.",
+  funnet: "Varen er på plass igjen. Kameraet teller den inn neste gang.",
+  falsk_alarm: "Det var ingenting galt. Avviket lukkes uten endring.",
+};
 
 export function losKameraAvvik(s: State, id: string, utfall: KameraUtfall, navn?: string): MatcherAvvik {
   const a = s.matcherAvvik?.find((x) => x.id === id);

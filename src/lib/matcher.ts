@@ -20,6 +20,7 @@ import type { KameraHendelse, MatcherAvvik, MatcherAvvikType, Skann, State } fro
 // Mengder sammenlignes ikke ennå: ett uttak og ett plukk av samme vare regnes som samsvar.
 
 const VINDU_MS = Number(process.env.MATCH_VINDU_S ?? 15) * 1000;
+const ORDRE_VINDU_MS = 120_000;
 const t = (iso: string) => Date.parse(iso);
 
 const TITTEL: Record<MatcherAvvikType, string> = {
@@ -60,6 +61,11 @@ export function avstem(s: State, naa = Date.now()): MatcherAvvik[] {
     const skann = naermest(k, ledige("plukk", k.sku));
     if (skann) m[k.id] = m[skann.id] = "ok";
   }
+  // 1a'. Skannet mot en bestilling: den ansatte kan bruke litt tid mellom å ta varen og å skanne, så vinduet er romsligere.
+  for (const k of uttak.filter((x) => !m[x.id])) {
+    const skann = ledige("plukk", k.sku).find((x) => x.ordre && Math.abs(t(x.tid) - t(k.tid)) <= ORDRE_VINDU_MS);
+    if (skann) m[k.id] = m[skann.id] = "ok";
+  }
   // 1b. En annen vare skannet enn den som ble tatt: feil vare plukket, varsel til skanneren med en gang.
   for (const k of uttak.filter((x) => !m[x.id])) {
     const feil = naermest(k, ledige("plukk"));
@@ -78,7 +84,8 @@ export function avstem(s: State, naa = Date.now()): MatcherAvvik[] {
         k.id,
         feil.id,
       );
-    } else if (naa - t(k.tid) > VINDU_MS) {
+    } else if (naa - t(k.tid) > (s.ordrer.some((o) => o.sku === k.sku && o.status === "apen" && o.antall > (o.plukket ?? 0)) ? ORDRE_VINDU_MS : VINDU_MS)) {
+      // Har varen en åpen bestilling, venter vi litt lenger på at den ansatte skanner den ut.
       lag({ type: "uregistrert_uttak", sone: k.sone, sku: k.sku, antall: k.antall, bilde: k.bilde, tekst: `${k.antall} × ${navn(k.sku)} er tatt fra ${k.sone}, men ikke skannet` }, k.id);
     }
   }
@@ -120,7 +127,12 @@ export function avstem(s: State, naa = Date.now()): MatcherAvvik[] {
 
   // 4. Skanninger uten uttak: bare hvis kameraet har sett varens hjemmesone etter skanningen (ellers er kameraet kanskje av).
   for (const x of s.skanninger.filter((y) => y.type === "plukk" && !m[y.id])) {
-    if (naa - t(x.tid) <= VINDU_MS) continue;
+    if (naa - t(x.tid) <= (x.ordre ? ORDRE_VINDU_MS : VINDU_MS)) continue;
+    // Skannet mot en bestilling og allerede trukket fra: ikke et avvik om kameraet ikke fikk med seg uttaket.
+    if (x.ordre) {
+      m[x.id] = "ok";
+      continue;
+    }
     const soner = hjem(s, x.sku);
     const sett = Math.max(0, ...soner.map((z) => (s.soneSett?.[z] ? t(s.soneSett[z]) : 0)));
     if (!sett || sett < t(x.tid) + VINDU_MS) continue;
