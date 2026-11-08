@@ -54,9 +54,8 @@ export function lagSeed(): State {
     h(1, 16, 0, T, "EPLE-GRONN", -2, "plukk", "Plukk, 2 ordrer", "20497–20498"),
     h(3, 9, 0, T, "BANAN", 5, "mottak", "Mottak PO-3010", "PO-3010"),
     h(0, 8, 30, T, "BANAN", -2, "plukk", "Plukk, 2 ordrer", "20499–20500"),
-    // Takkamera: hylle 1 har cola, hylle 2 har Red Bull.
-    h(3, 9, 0, "T2", "COLA-BOKS", 6, "mottak", "Mottak PO-3020", "PO-3020"),
-    h(3, 9, 0, "T1", "REDBULL", 6, "mottak", "Mottak PO-3020", "PO-3020"),
+    h(3, 9, 0, T, "COLA-BOKS", 6, "mottak", "Mottak PO-3020", "PO-3020"),
+    h(3, 9, 0, T, "REDBULL", 6, "mottak", "Mottak PO-3020", "PO-3020"),
   ];
   // Beholdning etter dette: brus 4, vann 3, sjokolade 5, korn 2, kaffekopp 3, krus 3, notatbok 4, penn 3, eple 4, banan 3.
 
@@ -79,30 +78,12 @@ export function lagSeed(): State {
     hyller: [
       {
         id: T, reol: "B", navn: "Bord 1",
-        innhold: ["BRUS-RED", "VANN-KLAR", "SJOK-MEL", "KORN-PK", "KAFFE-KOPP", "KRUS-HVIT", "NOTAT-BLA", "PENN-SVART", "EPLE-GRONN", "BANAN"].map((sku) => ({ sku, nivaa: "hele bordet" })),
-      },
-      // Takkamera "kam_tak": T1 (Red Bull) til venstre, T2 (Coca-Cola) i midten, gang til høyre.
-      {
-        id: "T1", reol: "T", navn: "T1",
-        innhold: [{ sku: "REDBULL", nivaa: "hele hylla" }],
-        sone: { kamera: "kam_tak", x: 0, y: 0, b: 0.35, h: 1 },
-      },
-      {
-        id: "T2", reol: "T", navn: "T2",
-        innhold: [{ sku: "COLA-BOKS", nivaa: "hele hylla" }],
-        sone: { kamera: "kam_tak", x: 0.35, y: 0, b: 0.35, h: 1 },
-      },
-      {
-        id: "GANG", reol: "G", navn: "Gang",
-        innhold: [],
-        sone: { kamera: "kam_tak", x: 0.7, y: 0, b: 0.3, h: 1, type: "gang" },
+        innhold: ["BRUS-RED", "VANN-KLAR", "SJOK-MEL", "KORN-PK", "KAFFE-KOPP", "KRUS-HVIT", "NOTAT-BLA", "PENN-SVART", "EPLE-GRONN", "BANAN", "COLA-BOKS", "REDBULL"].map((sku) => ({ sku, nivaa: "hele bordet" })),
       },
     ],
     hendelser,
     tellinger: [
-      { id: "t_bord_0800", tid: osloTid(8, 0), hylle: T, kilde: "mobil", antall: { "BRUS-RED": 4, "VANN-KLAR": 3, "SJOK-MEL": 5, "KORN-PK": 2, "KAFFE-KOPP": 3, "KRUS-HVIT": 3, "NOTAT-BLA": 4, "PENN-SVART": 3, "EPLE-GRONN": 4, "BANAN": 3 }, teller: "demo" },
-      { id: "t_t2_0800", tid: osloTid(8, 0), hylle: "T2", kilde: "kamera", antall: { "COLA-BOKS": 6 }, teller: "demo" },
-      { id: "t_t1_cam_0800", tid: osloTid(8, 0), hylle: "T1", kilde: "kamera", antall: { "REDBULL": 6 }, teller: "demo" },
+      { id: "t_bord_0800", tid: osloTid(8, 0), hylle: T, kilde: "mobil", antall: { "BRUS-RED": 4, "VANN-KLAR": 3, "SJOK-MEL": 5, "KORN-PK": 2, "KAFFE-KOPP": 3, "KRUS-HVIT": 3, "NOTAT-BLA": 4, "PENN-SVART": 3, "EPLE-GRONN": 4, "BANAN": 3, "COLA-BOKS": 6, "REDBULL": 6 }, teller: "demo" },
     ],
     innkjop: [
       { id: "PO-3001", sku: "KAFFE-KOPP", hylle: T, bestilt: 5, mottatt: 3, bestiltDato: osloTid(9, 0, 5), leverandor: "Kontorlevering" },
@@ -112,13 +93,12 @@ export function lagSeed(): State {
     ],
     kameraer: [
       { id: "kam_t1", navn: "Bord · kameratelefon", hylle: T, sistSett: osloTid(8, 50), bilderIdag: 0, lader: true },
-      { id: "kam_tak", navn: "Takkamera · T1 og T2", hylle: "T1", sistSett: osloTid(8, 50), bilderIdag: 0, lader: true },
     ],
     kameraHendelser: [],
     skanninger: [],
     matcherAvvik: [],
     matchet: {},
-    soneStand: { T1: { REDBULL: 6 }, T2: { "COLA-BOKS": 6 }, GANG: {} },
+    soneStand: {},
     innstillinger: standardInnstillinger(),
   };
 }

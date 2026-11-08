@@ -5,12 +5,13 @@ import { useHent } from "@/lib/useHent";
 import { F, S, lagStil } from "@/lib/tema";
 import { klokke, sistTalt } from "@/lib/format";
 import { Ikon } from "@/components/Ikon";
-import { send } from "@/lib/api";
 import { Chip, Etikett, Feilboks, Kort, Knapp, LenkeKnapp, Laster, Mono, Skjerm, Txt } from "@/components/ui";
 
 export default function Kameraer() {
   const { data, feil, last } = useHent<{ kameraer: Kamera[] }>("/api/kameraer");
-  const { data: hyller, last: oppdaterHyller } = useHent<{ hyller: HylleRad[] }>("/api/hyller");
+  const { data: hyller } = useHent<{ hyller: HylleRad[] }>("/api/hyller");
+  // Alle hyllene dere har laget kan få et kamera, med navnet dere ga dem. Gang-sonen er ingen hylle.
+  const kamerahyller = (hyller?.hyller ?? []).filter((h) => h.sone?.type !== "gang");
 
   return (
     <Skjerm tittel="Kameraer" fane="index">
@@ -37,29 +38,24 @@ export default function Kameraer() {
         </Kort>
       ))}
 
-      {hyller && !hyller.hyller.some((h) => h.sone) && (
-        <Kort style={{ gap: 8 }}>
-          <Txt>Takkameraet er ikke satt opp i denne databasen ennå.</Txt>
-          <Knapp tekst="Sett opp takkamera (sone T1, T2 og gang)" onPress={async () => { await send("/api/kamera/oppsett", {}).catch(() => undefined); oppdaterHyller(); }} />
-        </Kort>
-      )}
-      {(hyller?.hyller ?? []).some((h) => h.sone && h.sone.type !== "gang") && <Etikett style={{ marginTop: 10 }}>Kamera i taket</Etikett>}
-      {(hyller?.hyller ?? []).filter((h) => h.sone && h.sone.type !== "gang").map((h) => (
+      {kamerahyller.length > 0 && <Etikett style={{ marginTop: 10 }}>Kamera på hyllene</Etikett>}
+      {kamerahyller.map((h) => (
         <Kort key={h.id} style={{ flexDirection: "row", gap: 8, alignItems: "center", padding: 12 }}>
           <View style={{ flex: 1, gap: 2 }}>
-            <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 17 }}>{h.id} kamera</Txt>
-            <Txt style={{ color: F.dempet }}>Leter etter: {h.innhold.length ? h.innhold.map((i) => i.navn).join(", ") : "ingenting valgt"}</Txt>
+            <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 17 }}>{h.navn || h.id}</Txt>
+            {h.navn && h.navn !== h.id ? <Mono style={{ color: F.dempet }}>{h.id}</Mono> : null}
+            <Txt style={{ color: F.dempet }}>Leter etter: {h.innhold.length ? h.innhold.map((i) => i.navn).join(", ") : "alle varene (ingen valgt for hylla)"}</Txt>
           </View>
           <Pressable
-            accessibilityLabel={`Bruk denne telefonen som kamera på ${h.id}`}
+            accessibilityLabel={`Bruk denne telefonen som kamera på ${h.navn || h.id}`}
             hitSlop={10}
-            onPress={() => router.push({ pathname: "/kamera/[hylle]", params: { hylle: h.id, tak: "1" } })}
+            onPress={() => router.push({ pathname: "/kamera/[hylle]", params: { hylle: h.id, tak: "1", navn: h.navn || h.id } })}
             style={st.innstilling}
           >
             <Ikon navn="kamera" size={22} />
           </Pressable>
           <Pressable
-            accessibilityLabel={`Innstillinger for ${h.id}`}
+            accessibilityLabel={`Velg varer for ${h.navn || h.id}`}
             hitSlop={10}
             onPress={() => router.push({ pathname: "/sone/[id]", params: { id: h.id } })}
             style={st.innstilling}
