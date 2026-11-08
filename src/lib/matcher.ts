@@ -156,8 +156,19 @@ export function registrerSkann(s: State, inn: { sku: string; antall?: number; ty
   // Skanneren oppdaterer lagerloggen for hyller uten kamera. Varen bokføres på hylla den hører hjemme på.
   // Hyller med kamerasone telles av kameraet, så der bekrefter skanningen bare (matcheren) og skriver ikke til loggen.
   const kameraTeller = hjem(s, inn.sku).length > 0 || s.hyller.some((h) => h.sone && beholdning(s, inn.sku, h.id) > 0);
-  const hylle = kameraTeller ? undefined : s.hyller.find((h) => h.innhold.some((p) => p.sku === inn.sku))?.id;
-  if (hylle) {
+  // En vare skannet ut mot en bestilling trekkes fra med en gang, også på kamerahyller. Kameraet sammenligner
+  // med loggen og ser da at antallet allerede stemmer, så det blir ikke trukket fra to ganger.
+  const hylle = ordre ? ordre.hylle : kameraTeller ? undefined : s.hyller.find((h) => h.innhold.some((p) => p.sku === inn.sku))?.id;
+  // Har kameraet allerede sett varen bli tatt (rett før skanningen)? Da føres det uttaket på ordren i stedet for et nytt.
+  const kameraUttak = ordre
+    ? [...s.hendelser].reverse().find((h) => h.sku === inn.sku && h.hylle === ordre.hylle && h.ref === "kamera" && h.type === "plukk" && h.endring < 0 && Date.parse(skann.tid) - Date.parse(h.tid) < 60_000)
+    : undefined;
+  if (kameraUttak && ordre) {
+    kameraUttak.aarsak = `Kamera: tatt ut, ordre ${ordre.id}`;
+    kameraUttak.ref = ordre.id;
+    skann.ordreBokfort = true;
+  } else if (hylle) {
+    if (ordre) skann.ordreBokfort = true;
     s.hendelser.push({
       id: nyId("h"),
       tid: skann.tid,

@@ -4,6 +4,7 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import * as Speech from "expo-speech";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { router, useLocalSearchParams } from "expo-router";
 import { ApiFeil, hent, send } from "@/lib/api";
 import { useHent } from "@/lib/useHent";
 import { F, S, lagStil } from "@/lib/tema";
@@ -17,8 +18,13 @@ type Modus = "plukk" | "plassering";
 // Kameraet i taket ser hvor den ble tatt fra, og Hylla sier fra med en gang hvis du tok feil vare.
 export default function Skann() {
   const { data, feil, last } = useHent<{ varer: Vare[] }>("/api/skanner");
-  const [modus, setModus] = useState<Modus>("plukk");
-  const [apen, setApen] = useState(false);
+  const [modus, setModus] = useState<Modus>("plukk"); // pakkeoppgaver skanner alltid ut (plukk)
+  // Åpnet fra en pakkeoppgave: kameraet starter med en gang, og vi går tilbake til oppgaven når varen er skannet.
+  const fraOppgave = useLocalSearchParams<{ oppgave?: string; sku?: string; antall?: string }>();
+  const tilOppgave = !!fraOppgave.oppgave;
+  const skalSkanne = Math.max(1, Number(fraOppgave.antall) || 1);
+  const skannetForOppgave = useRef(0);
+  const [apen, setApen] = useState(tilOppgave);
   const [varsler, setVarsler] = useState<Varsel[]>([]);
   const [ordre, setOrdre] = useState<Record<string, number>>({});
   const [plukket, setPlukket] = useState<Record<string, number>>({});
@@ -99,10 +105,23 @@ export default function Skann() {
           varer={varer}
           varsler={varsler}
           onSkannet={(sku) => {
+            if (tilOppgave && (!fraOppgave.sku || sku === fraOppgave.sku)) {
+              skannetForOppgave.current += 1;
+              if (skannetForOppgave.current >= skalSkanne) {
+                // Litt pause så den ansatte ser «Plukket: …», så tilbake til oppgaven, som henter seg selv på nytt.
+                setTimeout(() => {
+                  setApen(false);
+                  router.back();
+                }, 700);
+              }
+            }
             if (modus === "plukk") setPlukket((p) => ({ ...p, [sku]: (p[sku] ?? 0) + 1 }));
           }}
           onVarsler={nye}
-          onFerdig={() => setApen(false)}
+          onFerdig={() => {
+            setApen(false);
+            if (tilOppgave) router.back();
+          }}
         />
       </Modal>
     </Skjerm>

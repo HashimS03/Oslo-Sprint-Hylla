@@ -71,7 +71,7 @@ export default function OppgaveDetalj() {
       <Txt style={{ fontFamily: S.tekstHalvfet, fontSize: 17, textAlign: "center" }}>
         {alleSkannet ? "Alt er skannet ut. Trykk Ferdig." : `Skannet ut: ${o.plukket ?? 0} av ${o.antall ?? 1}`}
       </Txt>
-      {!alleSkannet && <Knapp tekst="Skann varen ut" ikon="skann" onPress={() => router.push("/skann")} />}
+      {!alleSkannet && <Knapp tekst="Skann varen ut" ikon="skann" onPress={() => router.push({ pathname: "/skann", params: { oppgave: o.id, sku: o.sku ?? "", antall: String(Math.max(1, (o.antall ?? 1) - (o.plukket ?? 0))) } })} />}
       <Knapp tekst="Ferdig" ikon="hake" variant={alleSkannet ? "gul" : "hvit"} deaktivert={!alleSkannet} laster={sender} onPress={() => handling("ferdig")} />
     </View>
   ) : (

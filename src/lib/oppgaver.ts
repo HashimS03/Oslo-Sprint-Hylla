@@ -109,7 +109,7 @@ function kameraAvvikSomOppgave(s: State, a: MatcherAvvik): Oppgave {
   return {
     id: a.id,
     tittel: `${avvikTittel(a.type)}${navn ? `: ${navn.toLowerCase()}` : ""}`,
-    beskrivelse: `${a.tekst}. Sjekk hylla og rett opp, så trykk Ferdig.`,
+    beskrivelse: `${a.tekst}. Sjekk hylla, og velg hva du fant.`,
     type: "avvik",
     hylle: a.sone,
     ...(a.sku ? { sku: a.sku } : {}),
@@ -145,7 +145,7 @@ function ordreSomOppgave(s: State, o: Ordre): Oppgave {
     tittel: `Pakk ordre ${o.id}: ${o.antall} × ${navn}`,
     beskrivelse: ferdig
       ? `Alle ${o.antall} er skannet ut. Ført som salg på ordre ${o.id}.`
-      : `Hent ${o.antall} × ${navn} fra ${o.hylle} og skann hver vare når du tar den ut. Da blir det ført som salg, ikke svinn.${plukket ? ` ${plukket} av ${o.antall} er skannet.` : ""}`,
+      : `Hent ${o.antall} × ${navn} fra ${o.hylle} og skann den ut. Da blir det ført som salg, ikke svinn. Trykk Ferdig når alt er skannet.${plukket ? ` ${plukket} av ${o.antall} er skannet.` : ""}`,
     type: "pakk",
     hylle: o.hylle,
     sku: o.sku,
