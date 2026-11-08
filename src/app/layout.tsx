@@ -53,7 +53,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <Sidemeny lager={s.innstillinger.lager} avvik={apneAvvik(s).length + apneKameraAvvik(s).length} tema={tema} />
           <div className="flex min-w-0 flex-1 flex-col">{children}</div>
         </div>
-        <AutoOppdater sekunder={3} />
+        <AutoOppdater sekunder={1} />
       </body>
     </html>
   );
