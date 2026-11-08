@@ -172,7 +172,9 @@ export async function behandleTakbilde(opts: {
           hjemmehorende: egne.includes(r.sku),
         }));
 
+        const venter = new Set<string>();
         const hendelser = await endreState((s) => {
+          venter.clear();
           s.kameraHendelser ??= [];
           s.soneStand ??= {};
           s.soneSett ??= {};
@@ -202,11 +204,26 @@ export async function behandleTakbilde(opts: {
           const stand = (s.soneStand[hylle.id] ??= {});
           const forste = Object.keys(stand).length === 0;
 
+          // En enkelt feiltelling (en boks som skjules av en hånd, et uskarpt bilde) skal ikke bli et uttak.
+          // En endring bokføres derfor først når to tellinger på rad viser det samme antallet. Første gang lagres
+          // den som ventende, og bildet blir ikke ny referanse, så kameraet teller én gang til når det er stille.
+          s.soneVent ??= {};
+          const vent = (s.soneVent[hylle.id] ??= {});
+          for (const f of funnet) {
+            if (!f.hjemmehorende || forste || oppgitt) continue; // demotall er sikre, de trenger ingen bekreftelse
+            const iLoggen = beholdning(s, f.sku, hylle.id);
+            const forrige = stand[f.sku] ?? 0;
+            if (f.antall === forrige && f.antall === iLoggen) { delete vent[f.sku]; continue; }
+            if (vent[f.sku] === f.antall) { delete vent[f.sku]; continue; } // bekreftet: bokføres under
+            vent[f.sku] = f.antall;
+            venter.add(f.sku);
+          }
+
           // Kameraet eier antallet på hyllene det ser. Det det teller, blir beholdningen for varen på denne hylla.
           // Første bilde etter start retter beholdningen til det kameraet ser. Senere endringer bokføres som
           // uttak eller påfylling. Skanneren bekrefter (matcheren), men skriver ikke selv til disse hyllene.
           for (const f of funnet) {
-            if (!f.hjemmehorende) continue;
+            if (!f.hjemmehorende || venter.has(f.sku)) continue;
             const iLoggen = beholdning(s, f.sku, hylle.id);
             const forskjell = f.antall - iLoggen;
             if (forskjell === 0) continue;
@@ -227,6 +244,7 @@ export async function behandleTakbilde(opts: {
           }
 
           for (const f of funnet) {
+            if (venter.has(f.sku)) continue;
             const for_ = stand[f.sku] ?? 0;
             const diff = f.antall - for_;
             stand[f.sku] = f.antall;
@@ -252,7 +270,8 @@ export async function behandleTakbilde(opts: {
           }
           return ut;
         });
-        await ferdigTelt(nokkel, klipp, true);
+        // Venter en endring på bekreftelse, beholder vi forrige referanse, så neste stille bilde telles igjen.
+        await ferdigTelt(nokkel, klipp, venter.size === 0);
         return {
           ...grunn,
           status: "talt",
