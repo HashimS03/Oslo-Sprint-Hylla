@@ -87,6 +87,15 @@ export async function kobleTil(navn: string, bevis: { kode?: string; lederkode?:
     s.enheter.push(ny);
     return ny;
   });
+  // Kameraet lagrer hele tilstanden flere ganger i sekundet fra en annen server. Lagret det rett over oss,
+  // forsvant den nye enheten igjen. Vi sjekker derfor at den ble liggende, og legger den inn på nytt om ikke.
+  for (let forsok = 0; enhet && forsok < 3; forsok++) {
+    if ((await hentState()).enheter?.some((e) => e.id === enhet.id)) break;
+    await endreState((s) => {
+      s.enheter ??= [];
+      if (!s.enheter.some((e) => e.id === enhet.id)) s.enheter.push(enhet);
+    });
+  }
   glemMellomlager();
   return enhet ? { nokkel, enhet } : null;
 }

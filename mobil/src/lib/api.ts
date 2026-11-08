@@ -32,11 +32,13 @@ export class ApiFeil extends Error {
 
 }
 
-async function svar<T>(res: Response): Promise<T> {
+async function svar<T>(res: Response, nokkelBrukt: string | null): Promise<T> {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     // Serveren kjenner ikke telefonen (ikke koblet, eller fjernet): send brukeren til koblingsskjermen.
-    if (res.status === 401 && (data as { trengerKobling?: boolean }).trengerKobling) router.replace("/koble");
+    // Bare når kallet ble sendt med nøkkelen telefonen har nå. Et kall som gikk før telefonen ble koblet
+    // (for eksempel en jevnlig sjekk), kan komme tilbake etterpå og skal ikke sende brukeren tilbake.
+    if (res.status === 401 && (data as { trengerKobling?: boolean }).trengerKobling && nokkelBrukt === hentNokkel()) router.replace("/koble");
     throw new ApiFeil((data as { feil?: string }).feil ?? `Feil fra serveren (${res.status})`, res.status, data);
   }
   return data as T;
@@ -54,7 +56,7 @@ async function kall<T>(sti: string, init: RequestInit, nettverksfeil: string): P
   const avbryt = new AbortController();
   const tidsur = setTimeout(() => avbryt.abort(), 70_000);
   try {
-    return await svar<T>(await fetch(apiUrl() + sti, { ...init, headers, signal: avbryt.signal }));
+    return await svar<T>(await fetch(apiUrl() + sti, { ...init, headers, signal: avbryt.signal }), nokkel);
   } catch (e) {
     if (e instanceof ApiFeil) throw e;
     if (avbryt.signal.aborted) throw new ApiFeil("Serveren svarte ikke på 70 sekunder. Prøv igjen.", 0);
