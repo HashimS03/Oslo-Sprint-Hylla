@@ -95,7 +95,7 @@ export default async function Oversikt() {
                   <td className="font-semibold">{o.hylle}</td>
                   <td className="text-right font-mono">{o.plukket ?? 0} / {o.antall}</td>
                   <td className={`text-[13px] ${ferdig ? "font-semibold text-gronn" : o.tattAv ? "font-semibold text-gultekst" : "text-dempet"}`}>
-                    {ferdig ? `Pakket${o.plukketTid ? ` ${klokke(o.plukketTid)}` : ""}, ført som salg` : o.tattAv ? `${o.tattAv} pakker` : "Venter i appen"}
+                    {ferdig ? `Pakket${o.plukketTid ? ` ${klokke(o.plukketTid)}` : ""}, ført som salg` : (o.plukket ?? 0) >= o.antall ? "Skannet, venter på Ferdig" : o.tattAv ? `${o.tattAv} pakker` : "Venter i appen"}
                   </td>
                 </tr>
               );
