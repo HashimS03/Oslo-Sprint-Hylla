@@ -31,6 +31,12 @@ export type SoneResultat = {
   /** Antall funnet per vare i sonen, også varer som ikke hører hjemme her. */
   funnet?: { sku: string; navn: string; antall: number; hjemmehorende: boolean; bokser: Bokse[] }[];
   hendelser?: KameraHendelse[];
+  /** Ting telleren så, men som ikke er registrert som varer. */
+  ukjente?: string[];
+  /** Kort kommentar fra telleren om bildet. */
+  kommentar?: string;
+  /** Hvilken teller som telte (claude, sam31, demo …). «demo» betyr at ingen ekte teller er satt opp. */
+  teller?: string;
   feil?: string;
 };
 
@@ -225,6 +231,9 @@ export async function behandleTakbilde(opts: {
           ...mal,
           funnet: funnet.map(({ sikkerhet: _s, ...rest }) => rest),
           hendelser,
+          ukjente: tall.ukjente ?? [],
+          kommentar: tall.kommentar ?? "",
+          teller: oppgitt ? "demo" : teller.navn,
         };
       } catch (e) {
         console.error(`Telling av sone ${hylle.id} feilet`, e);

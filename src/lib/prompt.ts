@@ -12,7 +12,10 @@ const FARGER: Record<string, string> = {
 const TING: [string, string][] = [
   ["vannflaske", "water bottle"], ["termos", "thermos bottle"], ["drikkeflaske", "drinking bottle"], ["flaske", "bottle"],
   ["brusboks", "soda can"], ["boks", "can"], ["kaffekopp", "coffee cup"], ["kopp", "cup"], ["krus", "mug"], ["glass", "drinking glass"],
-  ["sjokolade", "chocolate bar"], ["kornpakke", "cereal box"], ["frokostblanding", "cereal box"], ["eske", "box"], ["pakke", "package"],
+  ["nudler", "instant noodle packet"], ["nudel", "instant noodle packet"], ["tyggegummi", "chewing gum pack"], ["tyggis", "chewing gum pack"],
+  ["chips", "bag of chips"], ["potetgull", "bag of chips"], ["godteri", "candy bag"], ["snacks", "snack bag"], ["kjeks", "biscuit packet"],
+  ["energidrikk", "energy drink can"], ["red bull", "energy drink can"], ["sprite", "soda bottle"], ["cola", "soda can"], ["brus", "soda bottle"],
+  ["pose", "bag"], ["sjokolade", "chocolate bar"], ["kornpakke", "cereal box"], ["frokostblanding", "cereal box"], ["eske", "box"], ["pakke", "package"],
   ["notatbok", "notebook"], ["bok", "book"], ["penn", "pen"], ["blyant", "pencil"], ["saks", "scissors"], ["tape", "tape roll"],
   ["eple", "apple"], ["banan", "banana"], ["appelsin", "orange fruit"], ["sitron", "lemon"],
   ["hettegenser", "folded hoodie"], ["t-skjorte", "folded t-shirt"], ["skjorte", "folded shirt"], ["genser", "folded sweater"],
