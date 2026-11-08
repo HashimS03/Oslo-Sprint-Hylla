@@ -20,9 +20,10 @@ export function KameraAvvikRad({ a, knapper = true }: { a: MatcherAvvik; knapper
           <span className={`rounded-md px-2 py-[3px] font-mono text-[10.5px] tracking-[.04em] uppercase ${ROD.has(a.type) ? "bg-rod text-bg" : "bg-gullys text-gultekst"}`}>{avvikTittel(a.type)}</span>
           <span className="text-[14px] font-semibold">{a.sone}{a.sone2 ? ` → ${a.sone2}` : ""}</span>
           <span className="font-mono text-[11.5px] text-dempet">{kortDato(a.tid)} {klokke(a.tid)}</span>
-          {!apen && <span className="font-mono text-[11px] text-dempet uppercase">{a.status === "loest" ? "løst" : "falsk alarm"}</span>}
+          {!apen && <span className="font-mono text-[11px] text-dempet uppercase">{a.status === "loest" ? "løst" : "falsk alarm"}{a.loestAv ? ` av ${a.loestAv}` : ""}{a.loestTid ? ` ${klokke(a.loestTid)}` : ""}</span>}
         </span>
         <span className="text-[13.5px]">{a.tekst}</span>
+        {apen && <span className="text-[12px] font-semibold text-gultekst">{a.tattAv ? `${a.tattAv} sjekker nå` : "Sendt som oppgave til appen"}</span>}
         {a.varsel && <span className="text-[12px] text-dempet">Varslet på skanneren</span>}
       </span>
       {apen && knapper && <KameraAvvikKnapper id={a.id} />}

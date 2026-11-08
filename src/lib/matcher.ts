@@ -1,6 +1,7 @@
 import "server-only";
 import { endreState, hentState } from "./store";
 import { beholdning, nyId, vare } from "./lager";
+import { skannMotOrdre } from "./bestillinger";
 import type { KameraHendelse, MatcherAvvik, MatcherAvvikType, Skann, State } from "./types";
 
 // Matcheren sammenligner det kameraet ser med det skanneren sier, i et tidsvindu på ±15 s.
@@ -149,6 +150,9 @@ export function registrerSkann(s: State, inn: { sku: string; antall?: number; ty
   const antall = Math.max(1, Math.round(inn.antall ?? 1));
   const skann: Skann = { id: nyId("s"), tid: new Date().toISOString(), sku: inn.sku, antall, type: inn.type };
   (s.skanninger ??= []).push(skann);
+  // Et plukk med en åpen bestilling på varen er et salg mot den ordren, ikke svinn.
+  const ordre = inn.type === "plukk" ? skannMotOrdre(s, inn.sku, antall) : undefined;
+  if (ordre) skann.ordre = ordre.id;
   // Skanneren oppdaterer lagerloggen for hyller uten kamera. Varen bokføres på hylla den hører hjemme på.
   // Hyller med kamerasone telles av kameraet, så der bekrefter skanningen bare (matcheren) og skriver ikke til loggen.
   const kameraTeller = hjem(s, inn.sku).length > 0 || s.hyller.some((h) => h.sone && beholdning(s, inn.sku, h.id) > 0);
@@ -161,7 +165,8 @@ export function registrerSkann(s: State, inn: { sku: string; antall?: number; ty
       sku: inn.sku,
       endring: inn.type === "plukk" ? -antall : antall,
       type: inn.type === "plukk" ? "plukk" : "mottak",
-      aarsak: inn.type === "plukk" ? "Skannet plukk" : "Skannet plassering",
+      aarsak: inn.type === "plukk" ? (ordre ? `Salg, ordre ${ordre.id} (skannet)` : "Skannet plukk") : "Skannet plassering",
+      ...(ordre ? { ref: ordre.id } : {}),
     });
   }
   const nye = avstem(s);
@@ -219,6 +224,11 @@ export async function settAvvikStatus(id: string, status: MatcherAvvik["status"]
     const a = s.matcherAvvik?.find((x) => x.id === id);
     if (!a) throw new Error("Fant ikke avviket");
     a.status = status;
+    if (status === "apen") delete a.loestTid;
+    else {
+      a.loestTid = new Date().toISOString();
+      a.loestAv ??= "Driftsleder";
+    }
     return a;
   });
 }

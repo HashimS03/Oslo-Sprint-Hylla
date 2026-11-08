@@ -10,10 +10,12 @@
 // Alle funksjonene er rene funksjoner over State, og kalles inne i endreState() fra API-rutene.
 
 import { apneAvvik, beholdning, lukkAvvik, nyId, vare } from "./lager";
-import { erAktiv, oppdaterOppdrag } from "./oppdrag";
-import type { Hendelse, Oppdrag, Oppgave, OppgaveType, State } from "./types";
+import { erAktiv, oppdaterOppdrag, sendOppdrag } from "./oppdrag";
+import { avvikTittel } from "./matcher-tekst";
+import { rest } from "./bestillinger";
+import type { Hendelse, MatcherAvvik, Oppdrag, Oppgave, OppgaveType, Ordre, State } from "./types";
 
-export const OPPGAVE_TYPER: OppgaveType[] = ["pafyll", "sjekk", "avvik", "annet"];
+export const OPPGAVE_TYPER: OppgaveType[] = ["pafyll", "sjekk", "avvik", "pakk", "annet"];
 export const AVVIK_GRUNNER = ["mangler", "skadet", "feil_plass", "annet"] as const;
 export type AvvikGrunn = (typeof AVVIK_GRUNNER)[number];
 
@@ -71,6 +73,87 @@ function synligeOppdrag(s: State): Oppgave[] {
     .map((o) => oppdragSomOppgave(s, o));
 }
 
+// ---------- Avvik blir oppgaver av seg selv ----------
+// Hvert åpent avvik skal ha noen på lageret som sjekker det. Avvik fra telling får et oppdrag
+// (samme som «Send til skanner»), og avvik fra kameraet vises direkte som oppgaver.
+// Når den ansatte er ferdig, lukkes avviket. Det forsvinner fra de åpne i dashbordet, men blir i loggen.
+
+/** Lager oppdrag for åpne avvik som aldri er sendt til skanneren. Returnerer true hvis staten ble endret. */
+export function sikreAvvikOppdrag(s: State): boolean {
+  let endret = false;
+  for (const h of apneAvvik(s)) {
+    if ((s.oppdrag ?? []).some((o) => o.avvikId === h.id)) continue;
+    sendOppdrag(s, h.id, { melding: "Laget automatisk fra avviket." });
+    endret = true;
+  }
+  return endret;
+}
+
+export const trengerAvvikOppdrag = (s: State) => apneAvvik(s).some((h) => !(s.oppdrag ?? []).some((o) => o.avvikId === h.id));
+
+const GRENSE_MS = 12 * 3600e3;
+
+/** Et kameraavvik (matcheren) i samme form som en oppgave. Id-en er avvikets egen ("m_…"). */
+function kameraAvvikSomOppgave(s: State, a: MatcherAvvik): Oppgave {
+  const navn = a.sku ? vare(s, a.sku)?.navn ?? a.sku : undefined;
+  const ferdig = a.status !== "apen";
+  return {
+    id: a.id,
+    tittel: `${avvikTittel(a.type)}${navn ? `: ${navn.toLowerCase()}` : ""}`,
+    beskrivelse: `${a.tekst}. Sjekk hylla og rett opp, så trykk Ferdig.`,
+    type: "avvik",
+    hylle: a.sone,
+    ...(a.sku ? { sku: a.sku } : {}),
+    prioritet: "hoy",
+    status: ferdig ? "ferdig" : a.tattAv ? "pagar" : "ny",
+    opprettet: a.tid,
+    opprettetAv: "takkamera",
+    ...(a.tattAv || a.loestAv ? { tattAv: a.tattAv ?? a.loestAv } : {}),
+    ...(ferdig ? { ferdigTid: a.loestTid ?? a.tid } : {}),
+  };
+}
+
+function synligeKameraAvvik(s: State): Oppgave[] {
+  const grense = Date.now() - GRENSE_MS;
+  return (s.matcherAvvik ?? [])
+    .filter((a) => a.status === "apen" || (a.loestTid && Date.parse(a.loestTid) > grense))
+    .map((a) => kameraAvvikSomOppgave(s, a));
+}
+
+// ---------- Bestillinger blir pakkeoppgaver ----------
+
+const ORDRE = "ordre_";
+const ordreFraId = (s: State, id: string) => (id.startsWith(ORDRE) ? s.ordrer.find((o) => o.id === id.slice(ORDRE.length)) : undefined);
+
+function ordreSomOppgave(s: State, o: Ordre): Oppgave {
+  const navn = vare(s, o.sku)?.navn ?? o.sku;
+  const ferdig = o.status === "plukket";
+  const plukket = o.plukket ?? 0;
+  return {
+    id: ORDRE + o.id,
+    tittel: `Pakk ordre ${o.id}: ${o.antall} × ${navn}`,
+    beskrivelse: ferdig
+      ? `Alle ${o.antall} er skannet ut. Ført som salg på ordre ${o.id}.`
+      : `Hent ${o.antall} × ${navn} fra ${o.hylle} og skann hver vare når du tar den ut. Da blir det ført som salg, ikke svinn.${plukket ? ` ${plukket} av ${o.antall} er skannet.` : ""}`,
+    type: "pakk",
+    hylle: o.hylle,
+    sku: o.sku,
+    prioritet: "normal",
+    status: ferdig ? "ferdig" : o.tattAv ? "pagar" : "ny",
+    opprettet: o.tid,
+    opprettetAv: "driftsleder",
+    ...(o.tattAv ? { tattAv: o.tattAv } : {}),
+    ...(ferdig ? { ferdigTid: o.plukketTid ?? o.tid } : {}),
+  };
+}
+
+function synligeOrdrer(s: State): Oppgave[] {
+  const grense = Date.now() - GRENSE_MS;
+  return s.ordrer
+    .filter((o) => o.status === "apen" || (o.plukketTid && Date.parse(o.plukketTid) > grense))
+    .map((o) => ordreSomOppgave(s, o));
+}
+
 /**
  * Alle oppgavene, sortert: ikke-ferdige først (høy prioritet, så eldst først), deretter ferdige (nyest først).
  * Tar også med oppdrag fra dashbordet. En avvik-oppgave regnes som ferdig hvis avviket allerede er lukket.
@@ -79,7 +162,7 @@ export function oppgaveListe(s: State): Oppgave[] {
   const egne = (s.oppgaver ?? []).map((o) =>
     o.status !== "ferdig" && avvikLukket(s, o) ? { ...o, status: "ferdig" as const } : o,
   );
-  const liste = [...egne, ...synligeOppdrag(s)];
+  const liste = [...egne, ...synligeOppdrag(s), ...synligeKameraAvvik(s), ...synligeOrdrer(s)];
   const vekt = (o: Oppgave) => (o.status === "ferdig" ? 2 : o.prioritet === "hoy" ? 0 : 1);
   return liste.sort((a, b) => {
     const v = vekt(a) - vekt(b);
@@ -187,6 +270,19 @@ export function apnetOppgave(s: State, id: string, navn?: string): void {
 
 /** En ansatt tar oppgaven («Jeg tar den»). Gjelder både egne oppgaver og oppdrag fra dashbordet. */
 export function taOppgave(s: State, id: string, navn?: string): Oppgave {
+  const hvem = navn?.trim() || "En ansatt";
+  const kam = s.matcherAvvik?.find((x) => x.id === id);
+  if (kam) {
+    if (kam.status !== "apen") throw new Error("Avviket er allerede løst");
+    kam.tattAv = hvem;
+    return kameraAvvikSomOppgave(s, kam);
+  }
+  const ordre = ordreFraId(s, id);
+  if (ordre) {
+    if (ordre.status !== "apen") throw new Error("Ordren er allerede pakket");
+    ordre.tattAv = hvem;
+    return ordreSomOppgave(s, ordre);
+  }
   const opp = s.oppdrag?.find((x) => x.id === id);
   if (opp) {
     if (!erAktiv(opp)) throw new Error("Oppdraget er allerede avsluttet");
@@ -204,6 +300,21 @@ export function taOppgave(s: State, id: string, navn?: string): Oppgave {
  * og da lukkes avviket med den vanlige lukkAvvik() – akkurat som når driftsleder gjør det i dashbordet.
  */
 export function fullforOppgave(s: State, id: string, navn?: string, utfall?: "funnet" | "svinn", svar?: string): Oppgave {
+  const kam = s.matcherAvvik?.find((x) => x.id === id);
+  if (kam) {
+    if (kam.status !== "apen") throw new Error("Avviket er allerede løst");
+    kam.status = "loest";
+    kam.loestAv = navn?.trim() || kam.tattAv || "En ansatt";
+    kam.loestTid = new Date().toISOString();
+    return kameraAvvikSomOppgave(s, kam);
+  }
+  const ordre = ordreFraId(s, id);
+  if (ordre) {
+    if (ordre.status !== "apen") return ordreSomOppgave(s, ordre); // ble ferdig da siste vare ble skannet
+    const igjen = rest(ordre);
+    if (igjen > 0) throw new Error(`Skann varene først: ${ordre.plukket ?? 0} av ${ordre.antall} er skannet ut.`);
+    return ordreSomOppgave(s, ordre);
+  }
   const opp = s.oppdrag?.find((x) => x.id === id);
   if (opp) {
     // Oppdrag: avklar avviket med den vanlige lukkAvvik(). Den setter oppdraget til «ferdig» selv.
