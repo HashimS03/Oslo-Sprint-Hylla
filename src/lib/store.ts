@@ -30,8 +30,11 @@ export function lagringstype(): "supabase" | "minne" {
 
 // Hele tilstanden er én stor JSON-rad (med bilder). Å hente den ved hver side og hvert kall gjorde alt tregt.
 // Vi husker den i minnet og spør Supabase bare om når raden sist ble endret. Er den lik, bruker vi kopien vi har.
-type Hurtig = { oppdatert: string; state: State };
-const hurtig = globalThis as unknown as { __hyllaHurtig?: Hurtig };
+// Har vi sjekket det siste sekundet, bruker vi kopien uten å spørre (en side kaller hentState flere ganger).
+// endreState spør alltid, så en skriving bygger på det nyeste.
+type Hurtig = { oppdatert: string; state: State; sjekket: number };
+const hurtig = globalThis as unknown as { __hyllaHurtig?: Hurtig; __hyllaHenter?: Promise<State> };
+const FERSK_MS = 1000;
 
 /** Når tilstanden sist ble lagret. Et lite oppslag, brukes av dashboardet for å se om noe er nytt. */
 export async function sistEndret(): Promise<string> {
@@ -42,23 +45,48 @@ export async function sistEndret(): Promise<string> {
   return (data?.oppdatert as string | undefined) ?? "";
 }
 
-export async function hentState(): Promise<State> {
+/** Bare de koblede enhetene, uten resten av lageret. Middleware spør om dette ved nesten hvert kall. */
+export async function hentEnheter(): Promise<NonNullable<State["enheter"]>> {
+  const sb = supabase();
+  if (!sb) return (await hentState()).enheter ?? [];
+  const { data, error } = await sb.from("hylla_state").select("enheter:data->enheter").eq("id", RAD_ID).maybeSingle();
+  if (error) throw new Error(`Supabase: ${error.message}`);
+  return ((data as { enheter?: State["enheter"] } | null)?.enheter ?? []) as NonNullable<State["enheter"]>;
+}
+
+export async function hentState(fersk = false): Promise<State> {
   const sb = supabase();
   if (!sb) {
     if (!g.__hyllaState) g.__hyllaState = lagStart();
     return g.__hyllaState;
   }
   const h = hurtig.__hyllaHurtig;
-  if (h && Date.parse(await sistEndret()) === Date.parse(h.oppdatert)) return h.state;
-  const { data, error } = await sb.from("hylla_state").select("data, oppdatert").eq("id", RAD_ID).maybeSingle();
-  if (error) throw new Error(`Supabase: ${error.message}`);
-  if (data?.data) {
-    hurtig.__hyllaHurtig = { oppdatert: data.oppdatert as string, state: data.data as State };
-    return data.data as State;
+  if (h && !fersk && Date.now() - h.sjekket < FERSK_MS) return h.state;
+  if (h) {
+    const sjekket = Date.now();
+    if (Date.parse(await sistEndret()) === Date.parse(h.oppdatert)) {
+      h.sjekket = sjekket;
+      return h.state;
+    }
   }
-  const start = lagStart();
-  await lagreState(start);
-  return start;
+  // Mange kall samtidig (en side og flere API-kall) deler på én nedlasting.
+  hurtig.__hyllaHenter ??= (async () => {
+    try {
+      const sjekket = Date.now();
+      const { data, error } = await sb.from("hylla_state").select("data, oppdatert").eq("id", RAD_ID).maybeSingle();
+      if (error) throw new Error(`Supabase: ${error.message}`);
+      if (data?.data) {
+        hurtig.__hyllaHurtig = { oppdatert: data.oppdatert as string, state: data.data as State, sjekket };
+        return data.data as State;
+      }
+      const start = lagStart();
+      await lagreState(start);
+      return start;
+    } finally {
+      hurtig.__hyllaHenter = undefined;
+    }
+  })();
+  return hurtig.__hyllaHenter;
 }
 
 /** Bilder tar mest plass. Vi beholder dem bare på de nyeste oppføringene. */
@@ -81,14 +109,14 @@ export async function lagreState(state: State): Promise<void> {
   }
   const { error } = await sb.from("hylla_state").upsert({ id: RAD_ID, data: state, oppdatert });
   if (error) throw new Error(`Supabase: ${error.message}`);
-  hurtig.__hyllaHurtig = { oppdatert, state };
+  hurtig.__hyllaHurtig = { oppdatert, state, sjekket: Date.now() };
 }
 
 /** Les, endre og lagre i ett steg. Kjøres i kø så samtidige kall ikke overskriver hverandre. */
 let ko: Promise<unknown> = Promise.resolve();
 export function endreState<T>(fn: (s: State) => T | Promise<T>): Promise<T> {
   const neste = ko.then(async () => {
-    const s = structuredClone(await hentState());
+    const s = structuredClone(await hentState(true));
     const res = await fn(s);
     await lagreState(s);
     return res;
@@ -100,7 +128,7 @@ export function endreState<T>(fn: (s: State) => T | Promise<T>): Promise<T> {
 /** Som endreState, men lagrer bare når noe faktisk ble endret. Brukes av matcheren, som kjøres ved hver sidevisning. */
 export function endreStateHvisEndret<T>(fn: (s: State) => T | Promise<T>): Promise<T> {
   const neste = ko.then(async () => {
-    const original = await hentState();
+    const original = await hentState(true);
     const s = structuredClone(original);
     const res = await fn(s);
     if (JSON.stringify(s) !== JSON.stringify(original)) await lagreState(s);
