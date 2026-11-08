@@ -7,6 +7,7 @@ import { IBMPlexSans_400Regular, IBMPlexSans_500Medium, IBMPlexSans_600SemiBold,
 import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from "@expo-google-fonts/ibm-plex-mono";
 import { F, lastTema, useTema } from "@/lib/tema";
 import { lastNavn, useNavn } from "@/lib/navn";
+import { useStrekkodeForesporsler } from "@/lib/strekkodeForesporsel";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,6 +28,8 @@ export default function RotLayout() {
   }, []);
 
   const klar = (fonter || !!feil) && navnLastet && temaLastet;
+  // Si fra når dashboardet ber om å få skannet en strekkode.
+  useStrekkodeForesporsler(klar);
   useEffect(() => {
     if (klar) SplashScreen.hideAsync();
   }, [klar]);
@@ -56,6 +59,7 @@ export default function RotLayout() {
         <Stack.Screen name="kamera/[hylle]" options={{ gestureEnabled: false, contentStyle: { backgroundColor: F.mork } }} />
         <Stack.Screen name="ny-hylle" />
         <Stack.Screen name="ny-vare" />
+        <Stack.Screen name="strekkode/[id]" options={{ contentStyle: { backgroundColor: F.mork } }} />
       </Stack>
     </>
   );

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Vare } from "@/lib/types";
 import { Panel } from "@/components/dash";
+import { SkannStrekkode } from "./SkannStrekkode";
 
 type Felt = { k: keyof Skjema; navn: string; hint?: string; mono?: boolean };
 type Skjema = { navn: string; farge: string; storrelse: string; leverandor: string; beskrivelse: string; strekkode: string; prompt: string };
@@ -52,7 +53,7 @@ export function VareInfo({ vare, forslag, topp }: { vare: Vare; forslag: string;
   const knapper = redigerer ? (
     <div className="flex items-center gap-2">
       <button onClick={() => { setSkjema(fraVare(vare)); setRedigerer(false); setFeil(null); }} className="h-8 rounded-lg border border-kant px-3 text-[13px] font-semibold">Avbryt</button>
-      <button onClick={lagre} disabled={lagrer} className="knapp-gul h-8 rounded-lg px-3 text-[13px] font-semibold">{lagrer ? "Lagrer …" : "Lagre"}</button>
+      <button onClick={lagre} disabled={lagrer} className="h-8 rounded-lg bg-gul px-3 text-[13px] font-semibold text-[#1B2226] disabled:opacity-50">{lagrer ? "Lagrer …" : "Lagre"}</button>
     </div>
   ) : (
     <button onClick={() => { setSkjema(fraVare(vare)); setRedigerer(true); }} className="text-[13px] underline underline-offset-2">Rediger</button>
@@ -86,6 +87,7 @@ export function VareInfo({ vare, forslag, topp }: { vare: Vare; forslag: string;
               <span className={`text-right ${verdi(f) ? "font-semibold" : "text-dempet"} ${f.mono ? "font-mono" : ""}`}>{verdi(f) || "Ikke oppgitt"}</span>
             </div>
           ))}
+          <SkannStrekkode sku={vare.sku} />
         </>
       )}
     </Panel>

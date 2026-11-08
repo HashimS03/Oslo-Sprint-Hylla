@@ -164,6 +164,18 @@ export type State = {
   matcherAvvik?: MatcherAvvik[];
   /** Hvilke kamerahendelser og skanninger matcheren har behandlet: id → "ok" eller avvik-id. */
   matchet?: Record<string, string>;
+  /** Forespørsler fra dashboardet om å skanne strekkoden til en vare med skanneren. */
+  strekkodeForesporsler?: StrekkodeForesporsel[];
+};
+
+export type StrekkodeForesporsel = {
+  id: string;
+  sku: string;
+  tid: string; // ISO, når dashboardet ba om den
+  /** venter → godtatt (skanneren har åpnet kameraet) → ferdig, eller avvist/avbrutt. */
+  status: "venter" | "godtatt" | "ferdig" | "avvist" | "avbrutt";
+  kode?: string;
+  ferdigTid?: string;
 };
 
 // ---------- Oppdrag til skanneren ----------
