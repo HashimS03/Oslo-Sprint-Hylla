@@ -78,7 +78,11 @@ export default function KameraStasjon() {
     const tvang = tving.current;
     tving.current = false;
     if (tak) {
-      type SoneSvar = { status: Status | "talt"; bevegelse: number; endring: number; feil?: string; funnet?: { navn: string; antall: number }[]; hendelser?: { type: string; antall: number; sku?: string }[] };
+      type SoneSvar = {
+        status: Status | "talt"; bevegelse: number; endring: number; feil?: string;
+        funnet?: { navn: string; antall: number }[]; hendelser?: { type: string; antall: number; sku?: string }[];
+        ukjente?: string[]; kommentar?: string; teller?: string;
+      };
       const r = (await send<{ soner: SoneSvar[] }>("/api/kamera/tak", { kameraId: "kam_tak", sone: hylle, bilde, liten, tving: tvang })).soner[0];
       setStatus(r.status === "talt" ? "uendret" : r.status);
       setMal({ bevegelse: r.bevegelse, endring: r.endring });
@@ -87,6 +91,9 @@ export default function KameraStasjon() {
         const funnet = (r.funnet ?? []).filter((f) => f.antall > 0).map((f) => `${f.antall} × ${f.navn}`).join(", ") || "ingenting";
         if (!r.hendelser?.length) leggTilLogg({ tid: new Date().toISOString(), tekst: `Ingen endring · ser ${funnet}` });
         for (const h of r.hendelser ?? []) leggTilLogg({ tid: new Date().toISOString(), tekst: `${tittel[h.type] ?? h.type} · ${h.antall} × ${h.sku ?? "ukjent"}` });
+        // Si fra når kameraet ser noe som ikke er registrert, eller når serveren mangler en ekte teller.
+        if (r.ukjente?.length) leggTilLogg({ tid: new Date().toISOString(), tekst: `Ikke registrert: ${r.ukjente.join(", ")}. Legg den inn som ny vare.`, ny: true });
+        if (r.teller === "demo") leggTilLogg({ tid: new Date().toISOString(), tekst: "Serveren teller ikke ekte bilder. Sett ANTHROPIC_API_KEY i Vercel og redeploy.", ny: true });
       } else if (r.status === "feil") {
         leggTilLogg({ tid: new Date().toISOString(), tekst: r.feil ?? "Tellingen feilet" });
       }
