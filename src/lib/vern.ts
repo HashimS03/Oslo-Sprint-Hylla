@@ -68,7 +68,9 @@ export function valider<T extends z.ZodType>(raa: unknown, skjema: T): { data: z
   const r = skjema.safeParse(raa);
   if (r.success) return { data: r.data };
   const detaljer = r.error.issues.slice(0, 5).map((i) => `${i.path.join(".") || "body"}: ${i.message}`);
-  return { svar: NextResponse.json({ feil: "Ugyldige data", detaljer }, { status: 400 }) };
+  // Første grunn står i feil, så skjemaene viser hva som er galt og ikke bare «Ugyldige data».
+  const forste = r.error.issues[0]?.message;
+  return { svar: NextResponse.json({ feil: forste ? `Ugyldige data: ${forste}` : "Ugyldige data", detaljer }, { status: 400 }) };
 }
 
 // ---------------- Demomodus ----------------

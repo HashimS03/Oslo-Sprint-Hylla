@@ -15,7 +15,7 @@ const bilde = (maks: number) =>
     .regex(/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/, "Bildet må være en JPEG-, PNG- eller WebP-data-URL");
 
 const id = z.string().trim().min(1).max(64);
-const hylleId = z.string().trim().min(1).max(12);
+const hylleId = z.string().trim().min(1).max(20);
 const antall = z.number().int().min(0).max(100_000);
 const antallPerVare = z.record(z.string().max(64), antall);
 const tekst = (maks: number) => z.string().trim().max(maks);
@@ -94,7 +94,7 @@ export const NyVareSkjema = z.object({
     .string()
     .trim()
     .toUpperCase()
-    .regex(/^[A-ZÆØÅ][A-ZÆØÅ0-9-]{0,9}$/, "Hylla trenger en kort ID som starter med en bokstav, f.eks. T1"),
+    .regex(/^[A-ZÆØÅ0-9][A-ZÆØÅ0-9 _-]{0,19}$/, "Hylla kan bare ha bokstaver, tall, mellomrom og bindestrek (maks 20 tegn), f.eks. HYLLE 1"),
   nivaa: tekst(40).optional(),
   // Som før: bare de tre første bildene lagres.
   bilder: z.array(bilde(LITE_BILDE)).max(10).transform((b) => b.slice(0, 3)).optional(),
