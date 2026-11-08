@@ -85,12 +85,34 @@ export function Sidemeny({ lager, avvik, tema }: { lager: string; avvik: number;
   );
 }
 
-/** Henter ferske tall fra serveren jevnlig, så dashboardet viser nye skann og avvik uten at noen trykker. */
-export function AutoOppdater({ sekunder = 3 }: { sekunder?: number }) {
+/**
+ * Holder dashboardet ferskt uten å laste hele siden hele tiden. Hvert sekund spør vi bare om noe er endret
+ * (et lite oppslag), og laster siden på nytt når det er det. Hvert 20. sekund laster vi uansett, så avvik
+ * som kommer av at tiden går (uten ny lagring), også dukker opp.
+ */
+export function AutoOppdater({ sekunder = 1 }: { sekunder?: number }) {
   const router = useRouter();
   useEffect(() => {
-    const t = setInterval(() => {
-      if (document.visibilityState === "visible") router.refresh();
+    let sist = "";
+    let sistLastet = Date.now();
+    let opptatt = false;
+    const t = setInterval(async () => {
+      if (document.visibilityState !== "visible" || opptatt) return;
+      opptatt = true;
+      try {
+        const r = await fetch("/api/endret", { cache: "no-store" });
+        const { endret } = (await r.json()) as { endret: string };
+        const ny = sist !== "" && endret !== sist;
+        sist = endret;
+        if (ny || Date.now() - sistLastet > 20_000) {
+          sistLastet = Date.now();
+          router.refresh();
+        }
+      } catch {
+        // nettet var borte et øyeblikk, vi prøver igjen neste gang
+      } finally {
+        opptatt = false;
+      }
     }, sekunder * 1000);
     return () => clearInterval(t);
   }, [router, sekunder]);
