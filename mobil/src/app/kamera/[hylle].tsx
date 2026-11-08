@@ -37,7 +37,8 @@ export default function KameraStasjon() {
   useKeepAwake();
   const inn = useSafeAreaInsets();
   // tak=1: telefonen følger med på én kamerasone (T1) og sender hendelser. Ellers er det den gamle telle-flyten.
-  const { hylle, tak } = useLocalSearchParams<{ hylle: string; tak?: string }>();
+  const { hylle, tak, navn: hylleNavn } = useLocalSearchParams<{ hylle: string; tak?: string; navn?: string }>();
+  const visNavn = hylleNavn || hylle;
   const [tillatelse, spor] = useCameraPermissions();
   const kamera = useRef<CameraView>(null);
   const [klar, setKlar] = useState(false);
@@ -140,7 +141,7 @@ export default function KameraStasjon() {
   }, [klar, runde, leggTilLogg, tak]);
 
   const avslutt = () =>
-    Alert.alert("Stoppe kameraet?", `Hylle ${hylle} blir ikke fulgt med på lenger.`, [
+    Alert.alert("Stoppe kameraet?", `${visNavn} blir ikke fulgt med på lenger.`, [
       { text: "Fortsett", style: "cancel" },
       { text: "Stopp", style: "destructive", onPress: () => router.back() },
     ]);
@@ -148,7 +149,7 @@ export default function KameraStasjon() {
   if (!tillatelse?.granted) {
     return (
       <View style={[st.mork, { paddingTop: inn.top + 40, padding: 24, gap: 16 }]}>
-        <Display style={{ color: F.hvit, fontSize: 28 }}>Kameratelefon for {hylle}</Display>
+        <Display style={{ color: F.hvit, fontSize: 28 }}>Kameratelefon for {visNavn}</Display>
         <Txt style={{ color: "#C9D0CE" }}>Telefonen trenger kameraet for å følge med på hylla.</Txt>
         <Knapp tekst="Gi tilgang til kamera" onPress={spor} />
         <Knapp tekst="Avbryt" variant="hvit" onPress={() => router.back()} />
@@ -163,7 +164,7 @@ export default function KameraStasjon() {
         <Rad style={{ justifyContent: "space-between" }}>
           <Rad gap={8}>
             <View style={[st.prikk, { backgroundColor: klar ? "#4CC38A" : F.gul }]} />
-            <Mono style={{ color: F.hvit, fontSize: 13 }}>{klar ? "AKTIV" : "STARTER"} · HYLLE {hylle}</Mono>
+            <Mono style={{ color: F.hvit, fontSize: 13 }}>{klar ? "AKTIV" : "STARTER"} · {visNavn.toUpperCase()}</Mono>
           </Rad>
           <Pressable accessibilityLabel="Stopp kamera" hitSlop={12} onPress={avslutt}>
             <Ikon navn="lukk" size={24} farge={F.hvit} />

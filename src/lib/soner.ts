@@ -76,6 +76,26 @@ function kandidater(s: State, soner: SoneHylle[]): string[] {
   return valgt.length ? valgt : s.varer.map((v) => v.sku);
 }
 
+/**
+ * En telefon som følger med på én hylle: hylla kan være hvilken som helst hylle dere har laget, ikke bare T1 og T2.
+ * Har hylla ingen kamerasone ennå, får den en egen sone som dekker hele bildet, på et eget kamera, så den ikke
+ * blander seg med takkameraets soner. Returnerer kamera-id-en sonen hører til.
+ */
+export async function sikreSoneForHylle(hylleId: string): Promise<string> {
+  const finnes = (await hentState()).hyller.find((h) => h.id === hylleId);
+  if (!finnes) throw new Error(`Fant ikke hylla ${hylleId}`);
+  if (finnes.sone) return finnes.sone.kamera;
+  const kameraId = `kam_${hylleId.toLowerCase().replace(/[^a-z0-9]+/g, "")}`;
+  await endreState((s) => {
+    const h = s.hyller.find((x) => x.id === hylleId);
+    if (h && !h.sone) h.sone = { kamera: kameraId, x: 0, y: 0, b: 1, h: 1 };
+    if (!s.kameraer.some((k) => k.id === kameraId)) {
+      s.kameraer.push({ id: kameraId, navn: `Kamera · ${h?.navn || hylleId}`, hylle: hylleId, sistSett: new Date().toISOString(), bilderIdag: 0 });
+    }
+  });
+  return (await hentState()).hyller.find((h) => h.id === hylleId)?.sone?.kamera ?? kameraId;
+}
+
 /** Hendelser fra kameraet, nyeste sist. `etter` er en ISO-tid, `sone` filtrerer på sone. */
 export async function hentKameraHendelser(opts: { etter?: string; sone?: string } = {}) {
   const s = await hentState();
@@ -91,6 +111,7 @@ export async function behandleTakbilde(opts: {
   /** En telefon som følger med på bare én sone: hele bildet er da sonen, og vi klipper ikke. */
   kunSone?: string;
 }) {
+  if (opts.kunSone) opts = { ...opts, kameraId: await sikreSoneForHylle(opts.kunSone) };
   const state = await hentState();
   const alleSoner = sonerForKamera(state, opts.kameraId);
   const soner = opts.kunSone ? alleSoner.filter((z) => z.id === opts.kunSone) : alleSoner;
