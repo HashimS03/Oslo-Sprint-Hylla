@@ -5,6 +5,7 @@ import { beholdning, vare } from "@/lib/lager";
 import { klokke, kortDato } from "@/lib/format";
 import { AvvikChip, Innhold, Panel, Topp } from "@/components/dash";
 import { AvvikHandlinger } from "./AvvikHandlinger";
+import { KameraAvvikSide } from "./KameraAvvikSide";
 import { SendTilSkanner } from "./SendTilSkanner";
 import { oppdragFor, oppdragVisning } from "@/lib/oppdrag";
 
@@ -13,6 +14,8 @@ export const dynamic = "force-dynamic";
 export default async function Avvik({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const s = await hentState();
+  const kam = s.matcherAvvik?.find((x) => x.id === id);
+  if (kam) return <KameraAvvikSide s={s} a={kam} />;
   const h = s.hendelser.find((x) => x.id === id);
   if (!h || !(h.avvik || h.type === "mulig_svinn" || h.type === "svinn")) notFound();
   const v = vare(s, h.sku);
