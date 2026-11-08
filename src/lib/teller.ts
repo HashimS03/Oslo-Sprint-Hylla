@@ -1,5 +1,6 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
+import sharp from "sharp";
 import type { Bokse, Hylle, State, TelleResultat } from "./types";
 import { beholdning, sisteTelling, vare } from "./lager";
 import { samPrompter } from "./prompt";
@@ -218,7 +219,20 @@ export function parseBoksDetaljer(raa: string): Bokse[] {
   });
 }
 
-async function sam31Antall(bilde: string, prompt: string): Promise<Bokse[]> {
+/** Mindre bilde gir raskere svar fra SAM. Boksene er andeler av bildet, så størrelsen påvirker ikke resultatet. */
+const SAM_MAKS_PX = Number(process.env.SAM3_MAKS_PX ?? 640);
+async function nedskaler(dataUrl: string): Promise<string> {
+  try {
+    const buf = Buffer.from(dataUrl.slice(dataUrl.indexOf(",") + 1), "base64");
+    const ut = await sharp(buf).resize({ width: SAM_MAKS_PX, height: SAM_MAKS_PX, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 80 }).toBuffer();
+    return `data:image/jpeg;base64,${ut.toString("base64")}`;
+  } catch {
+    return dataUrl;
+  }
+}
+
+async function sam31Antall(bildeStort: string, prompt: string): Promise<Bokse[]> {
+  const bilde = await nedskaler(bildeStort);
   const res = await fetch(META_URL, {
     method: "POST",
     headers: { authorization: `Bearer ${metaNokkel()}`, "content-type": "application/json" },
@@ -245,14 +259,14 @@ export const sam31Teller: Teller = {
           // Prøv søketekstene etter tur til en av dem finner noe sikkert. Den beste vinner.
           let prompt = "";
           let c: Bokse[] = [];
-          for (const p of samPrompter(v)) {
-            const funn = await sam31Antall(bilde, p);
+          // Søketekstene kjøres samtidig (ikke etter hverandre), så tiden er den av dem som tar lengst.
+          const alle = await Promise.all(samPrompter(v).map(async (p) => ({ p, funn: await sam31Antall(bilde, p) })));
+          for (const { p, funn } of alle) {
             const sikreHer = funn.filter((x) => x.c >= SAM_TERSKEL).length;
             if (!prompt || sikreHer > c.filter((x) => x.c >= SAM_TERSKEL).length) {
               prompt = p;
               c = funn;
             }
-            if (sikreHer > 0) break;
           }
           const sikre = c.filter((x) => x.c >= SAM_TERSKEL).length;
           const med = c.filter((x) => x.c >= SAM_LAV_TERSKEL).length;

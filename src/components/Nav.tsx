@@ -86,7 +86,7 @@ export function Sidemeny({ lager, avvik, tema }: { lager: string; avvik: number;
 }
 
 /** Henter ferske tall fra serveren jevnlig, så dashboardet viser nye skann og avvik uten at noen trykker. */
-export function AutoOppdater({ sekunder = 10 }: { sekunder?: number }) {
+export function AutoOppdater({ sekunder = 3 }: { sekunder?: number }) {
   const router = useRouter();
   useEffect(() => {
     const t = setInterval(() => {

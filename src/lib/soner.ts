@@ -17,6 +17,9 @@ import type { Bokse, Hylle, KameraHendelse, Sone, State } from "./types";
 
 const GJENGLEMT_MS = Number(process.env.GJENGLEMT_MS ?? 10 * 60 * 1000);
 const LAV_SIKKERHET = 0.6;
+/** Takkameraet teller raskere enn den gamle telle-flyten: ett stille bilde holder, og bare en kort pause mellom tellinger. */
+const TAK_STILLE = Number(process.env.KAMERA_STILLE ?? 1);
+const TAK_PAUSE_MS = Number(process.env.KAMERA_PAUSE_MS ?? 1200);
 /** Har kameraet ikke sett sonen på så lenge, regnes neste bilde som en ny start: det setter bare utgangspunktet. */
 const NY_START_MS = Number(process.env.KAMERA_NY_START_S ?? 60) * 1000;
 
@@ -122,7 +125,7 @@ export async function behandleTakbilde(opts: {
       } catch (e) {
         return { ...grunn, status: "feil", bevegelse: 0, endring: 0, feil: e instanceof Error ? e.message : "Klipping feilet" };
       }
-      const v = await vurder(nokkel, klipp, opts.tving);
+      const v = await vurder(nokkel, klipp, opts.tving, { stille: TAK_STILLE, pause: TAK_PAUSE_MS });
       const mal = { bevegelse: v.bevegelse, endring: v.endring };
       if (!v.skalTelle) return { ...grunn, status: v.status, ...mal };
 
