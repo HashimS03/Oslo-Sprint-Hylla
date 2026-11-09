@@ -22,7 +22,7 @@ Design principles: the event log is the source of truth (stock is always the sum
 
 ## Team
 
- Hashem Sheikh ([@HashimS03](https://github.com/HashimS03)), Ho Daniel ([@hodaniel03](https://github.com/hodaniel03), camera counting), Muhayudin "Mayo" Awan ([@muhayudinawan](https://github.com/muhayudinawan), scanner app and security).
+Hashem Sheikh ([@HashimS03](https://github.com/HashimS03)), Ho Daniel ([@hodaniel03](https://github.com/hodaniel03), camera counting), Muhayudin "Mayo" Awan ([@muhayudinawan](https://github.com/muhayudinawan), scanner app and security).
 
 Built with heavy use of Claude Code as a pair programmer, which is why many commits are authored by Claude.
 
