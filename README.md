@@ -2,8 +2,6 @@
 
 **AI stock-counting assistant for small warehouses and shops.** Built in 45 hours at [Oslo Sprint 2026](https://oslosprint.org/) (6 to 8 Nov 2026, BI Startup Village) for Holio's challenge #7, *stock counting and shrinkage*.
 
-<!-- TODO Hashim: add result, e.g. "Top 10 finalist" or "Pitched in the final", only if true -->
-
 ![Hylla dashboard](video/assets/app/home-clean.png)
 
 ▶️ **Demo film:** [video/hylla-forklaring.mp4](video/hylla-forklaring.mp4) <!-- or a YouTube/Vimeo link -->
@@ -22,15 +20,9 @@ The system knows what *should* be on the shelf. Nobody knows what actually *is* 
 
 Design principles: the event log is the source of truth (stock is always the sum of events), the AI only counts while plain code does the reasoning, and nothing is saved until a person confirms.
 
-## My part
+## Team
 
-<!-- TODO Hashim: write 3 to 5 bullets in your own words. Suggested from the git history, please correct: -->
-- Built the manager dashboard in `src/app/` and most of the shared API and stock logic in `src/lib/`
-- Wired deviations from the dashboard to the scanner app as tasks
-- Deployed the app to Vercel with Supabase for storage
-- <!-- pitch? product decisions? -->
-
-**Team:** Hashem Sheikh ([@HashimS03](https://github.com/HashimS03)), Ho Daniel ([@hodaniel03](https://github.com/hodaniel03), camera counting), Muhayudin "Mayo" Awan ([@muhayudinawan](https://github.com/muhayudinawan), scanner app and security).
+ Hashem Sheikh ([@HashimS03](https://github.com/HashimS03)), Ho Daniel ([@hodaniel03](https://github.com/hodaniel03), camera counting), Muhayudin "Mayo" Awan ([@muhayudinawan](https://github.com/muhayudinawan), scanner app and security).
 
 Built with heavy use of Claude Code as a pair programmer, which is why many commits are authored by Claude.
 
