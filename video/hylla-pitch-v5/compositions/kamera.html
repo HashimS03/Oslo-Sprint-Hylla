@@ -1,0 +1,113 @@
+<template>
+<style>
+#root{position:absolute;inset:0;font-family:"Inter",sans-serif;color:#F4F6FA;overflow:hidden;background:#000}
+.k-full{position:absolute;left:0;top:0;width:1920px;height:1080px}
+#k-foto{object-fit:cover}
+#k-vign{background:radial-gradient(ellipse at center,rgba(0,0,0,0) 55%,rgba(0,0,0,.55) 100%)}
+.k-boks{position:absolute;background:rgba(8,10,14,.78);border:1px solid #3A4250;border-radius:10px}
+#k-hv{left:44px;top:40px;padding:14px 20px}
+#k-hv .t{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:26px;letter-spacing:.06em}
+#k-hv .u{font-family:"JetBrains Mono",monospace;font-size:20px;color:#B8C0CC;margin-top:4px}
+#k-teller{left:44px;top:170px;padding:14px 22px}
+#k-teller .e{font-size:22px;color:#B8C0CC}
+#k-teller .n{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:84px;line-height:1;margin-top:4px}
+#k-hh{right:44px;top:40px;padding:14px 20px;font-family:"JetBrains Mono",monospace;font-size:26px;letter-spacing:.06em}
+#k-rec{display:inline-block;width:16px;height:16px;border-radius:50%;background:#FF4D5A;margin-right:12px;vertical-align:middle}
+#k-tittel{left:50%;top:40px;margin-left:-310px;width:620px;text-align:center;padding:14px 20px;font-weight:800;font-size:32px}
+#k-varsel{position:absolute;left:44px;bottom:44px;width:560px;background:#FF4D5A;color:#1A0508;border-radius:10px;padding:16px 24px}
+#k-varsel .a{font-weight:800;font-size:30px}
+#k-varsel .b{font-weight:600;font-size:24px;margin-top:4px}
+#k-matcher{left:1420px;top:850px;width:456px;padding:16px 22px}
+#k-matcher .h{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:20px;letter-spacing:.1em;color:#B8C0CC}
+#k-matcher .l{font-size:26px;margin-top:8px;font-weight:600}
+#k-bar{margin-top:12px;height:10px;border-radius:5px;background:#272D38;overflow:hidden}
+#k-fyll{height:100%;width:100%;background:#F4C430;transform-origin:left center}
+#k-kilde{position:absolute;left:50%;bottom:36px;margin-left:-250px;width:500px;text-align:center;font-family:"JetBrains Mono",monospace;font-size:20px;color:#B8C0CC;background:rgba(8,10,14,.6);padding:6px 12px;border-radius:6px}
+</style>
+<div id="root" data-composition-id="kamera" data-width="1920" data-height="1080">
+<img id="k-foto" class="k-full" src="assets/pall.webp" alt="Takkamera over pall" />
+<svg id="k-svg" class="k-full" viewBox="0 0 1672 941" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" data-layout-ignore>
+<defs>
+<clipPath id="k-klipp"><rect x="985" y="395" width="180" height="173"/></clipPath>
+<filter id="k-uskarp" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
+</defs>
+<g id="k-sone"><rect x="395" y="205" width="780" height="585" fill="none" stroke="#22D3EE" stroke-width="3" stroke-dasharray="14 10"/>
+<rect x="395" y="175" width="110" height="30" fill="#22D3EE"/><text x="404" y="197" font-family="JetBrains Mono" font-weight="700" font-size="19" fill="#06242B">SONE T1</text></g>
+<g id="k-m1"><polygon points="439,220 586,220 600,234 600,371 586,385 439,385 425,371 425,234" fill="#22D3EE" fill-opacity="0.2" stroke="#22D3EE" stroke-width="3.5" stroke-linejoin="round"/><rect x="433" y="228" width="140" height="27" rx="4" fill="#22D3EE"/><text x="441" y="248" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.96</text></g>
+<g id="k-m2"><polygon points="624,220 771,220 785,234 785,371 771,385 624,385 610,371 610,234" fill="#A3E635" fill-opacity="0.2" stroke="#A3E635" stroke-width="3.5" stroke-linejoin="round"/><rect x="618" y="228" width="140" height="27" rx="4" fill="#A3E635"/><text x="626" y="248" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.94</text></g>
+<g id="k-m3"><polygon points="809,220 956,220 970,234 970,371 956,385 809,385 795,371 795,234" fill="#F472B6" fill-opacity="0.2" stroke="#F472B6" stroke-width="3.5" stroke-linejoin="round"/><rect x="803" y="228" width="140" height="27" rx="4" fill="#F472B6"/><text x="811" y="248" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.97</text></g>
+<g id="k-m5"><polygon points="439,395 586,395 600,409 600,554 586,568 439,568 425,554 425,409" fill="#818CF8" fill-opacity="0.2" stroke="#818CF8" stroke-width="3.5" stroke-linejoin="round"/><rect x="433" y="403" width="140" height="27" rx="4" fill="#818CF8"/><text x="441" y="423" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.95</text></g>
+<g id="k-m6"><polygon points="624,395 771,395 785,409 785,554 771,568 624,568 610,554 610,409" fill="#34D399" fill-opacity="0.2" stroke="#34D399" stroke-width="3.5" stroke-linejoin="round"/><rect x="618" y="403" width="140" height="27" rx="4" fill="#34D399"/><text x="626" y="423" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.98</text></g>
+<g id="k-m7"><polygon points="809,395 956,395 970,409 970,554 956,568 809,568 795,554 795,409" fill="#FB923C" fill-opacity="0.2" stroke="#FB923C" stroke-width="3.5" stroke-linejoin="round"/><rect x="803" y="403" width="140" height="27" rx="4" fill="#FB923C"/><text x="811" y="423" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.92</text></g>
+<g id="k-m9"><polygon points="439,570 586,570 600,584 600,731 586,745 439,745 425,731 425,584" fill="#E879F9" fill-opacity="0.2" stroke="#E879F9" stroke-width="3.5" stroke-linejoin="round"/><rect x="433" y="578" width="140" height="27" rx="4" fill="#E879F9"/><text x="441" y="598" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.96</text></g>
+<g id="k-m10"><polygon points="624,570 771,570 785,584 785,731 771,745 624,745 610,731 610,584" fill="#4ADE80" fill-opacity="0.2" stroke="#4ADE80" stroke-width="3.5" stroke-linejoin="round"/><rect x="618" y="578" width="140" height="27" rx="4" fill="#4ADE80"/><text x="626" y="598" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.94</text></g>
+<g id="k-m11"><polygon points="809,570 956,570 970,584 970,731 956,745 809,745 795,731 795,584" fill="#F87171" fill-opacity="0.2" stroke="#F87171" stroke-width="3.5" stroke-linejoin="round"/><rect x="803" y="578" width="140" height="27" rx="4" fill="#F87171"/><text x="811" y="598" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.97</text></g>
+<g id="k-m12"><polygon points="999,570 1151,570 1165,584 1165,731 1151,745 999,745 985,731 985,584" fill="#2DD4BF" fill-opacity="0.2" stroke="#2DD4BF" stroke-width="3.5" stroke-linejoin="round"/><rect x="993" y="578" width="140" height="27" rx="4" fill="#2DD4BF"/><text x="1001" y="598" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.93</text></g>
+
+<g id="k-patch4" opacity="1"><rect x="985" y="220" width="180" height="165" fill="#8F6A3E"/>
+<rect x="985" y="235" width="180" height="38" fill="#A47A4A"/><rect x="985" y="290" width="180" height="38" fill="#9C7345"/><rect x="985" y="342" width="180" height="38" fill="#A47A4A"/>
+<rect x="985" y="273" width="180" height="4" fill="#4A3320"/><rect x="985" y="328" width="180" height="4" fill="#4A3320"/>
+<rect x="985" y="220" width="180" height="165" fill="#000" fill-opacity="0.18"/></g>
+<g id="k-patch" opacity="0"><rect x="985" y="395" width="180" height="173" fill="#8F6A3E"/>
+<rect x="985" y="410" width="180" height="40" fill="#A47A4A"/><rect x="985" y="470" width="180" height="40" fill="#9C7345"/><rect x="985" y="528" width="180" height="40" fill="#A47A4A"/>
+<rect x="985" y="450" width="180" height="4" fill="#4A3320"/><rect x="985" y="512" width="180" height="4" fill="#4A3320"/>
+<rect x="985" y="395" width="180" height="173" fill="#000" fill-opacity="0.18"/></g>
+<g id="k-tom" opacity="0"><rect x="979" y="389" width="192" height="185" rx="8" fill="#FF4D5A" fill-opacity="0.16" stroke="#FF4D5A" stroke-width="4" stroke-dasharray="14 8"/>
+<rect x="979" y="355" width="190" height="30" fill="#FF4D5A"/><text x="988" y="377" font-family="JetBrains Mono" font-weight="700" font-size="19" fill="#1A0508">TOM PLASS −1</text></g>
+<g id="k-klon">
+<rect id="k-skygge" x="1001" y="415" width="180" height="173" rx="8" fill="#000" opacity="0" filter="url(#k-uskarp)"/>
+<g clip-path="url(#k-klipp)"><image href="assets/pall.webp" x="0" y="0" width="1672" height="941"/></g>
+<g id="k-m8"><polygon points="999,395 1151,395 1165,409 1165,554 1151,568 999,568 985,554 985,409" fill="#38BDF8" fill-opacity="0.2" stroke="#38BDF8" stroke-width="3.5" stroke-linejoin="round"/>
+<rect id="k-m8-lapp" x="993" y="403" width="140" height="27" rx="4" fill="#38BDF8"/><text id="k-m8-tekst" x="1001" y="423" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.95</text>
+<g id="k-m8-tas" opacity="0"><rect x="993" y="403" width="222" height="27" rx="4" fill="#FF4D5A"/><text x="1001" y="423" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#1A0508">Red Bull 0.95 · tas</text></g></g>
+</g>
+<g id="k-person" opacity="0"><polygon points="1105,388 1190,362 1245,300 1335,250 1450,242 1565,290 1602,420 1596,525 1530,588 1526,642 1450,694 1368,694 1338,648 1255,642 1232,592 1185,574 1100,562 1130,540 1170,500 1110,470" fill="#FF3DCB" fill-opacity="0.22" stroke="#FF3DCB" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="1245" y="205" width="160" height="30" rx="4" fill="#FF3DCB"/><text x="1255" y="227" font-family="JetBrains Mono" font-weight="700" font-size="19" fill="#1A0516">Person 0.97</text></g>
+</svg>
+<div id="k-vign" class="k-full" data-layout-allow-occlusion data-layout-ignore></div>
+<div id="k-tittel" class="k-boks">Kameraet ser uttaket</div>
+<div id="k-hv" class="k-boks"><div class="t">KAM TAK · SONE T1</div><div class="u">Segmentering · ovenfra</div></div>
+<div id="k-teller" class="k-boks"><div class="e">Red Bull i sonen</div><div class="n" id="k-antall">0</div></div>
+<div id="k-hh" class="k-boks"><span id="k-rec"></span><span id="k-tid">00:00</span></div>
+<div id="k-varsel" style="opacity:0"><div class="a" id="k-va">UTTAK PÅGÅR · T1</div><div class="b" id="k-vb">Venter på skanning (±15 s)</div></div>
+<div id="k-matcher" class="k-boks" style="opacity:0"><div class="h">MATCHER</div><div class="l" id="k-ml">Leter etter skanning</div><div id="k-bar"><div id="k-fyll"></div></div><div class="l" id="k-sek" style="color:#F4C430;font-size:24px">15 s (spolet)</div></div>
+<div id="k-kilde">Illustrasjon · segmentering i YOLO-stil</div>
+<div id="k-svart" class="k-full" style="background:#000"></div>
+</div>
+<script>
+(function(){
+const tl = gsap.timeline({ paused: true });
+tl.fromTo("#k-svart", { opacity: 1 }, { opacity: 0, duration: 0.35, ease: "power2.out" }, 0);
+tl.fromTo("#k-hv, #k-hh, #k-teller, #k-tittel", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.15);
+tl.fromTo("#k-sone", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.35);
+for (let s = 0; s <= 9; s++) {
+  tl.set("#k-tid", { textContent: "00:" + String(s + 4).padStart(2, "0") }, s);
+  tl.set("#k-rec", { opacity: s % 2 === 0 ? 1 : 0.25 }, s);
+}
+tl.set("#k-antall", { textContent: "0" }, 0);
+[1,2,3,5,6,7,8,9,10,11,12].forEach((n, i) => {
+  const t = 0.5 + i * 0.08;
+  tl.fromTo(n === 8 ? "#k-m8" : "#k-m" + n, { opacity: 0 }, { opacity: 1, duration: 0.22, ease: "power2.out" }, t);
+  tl.set("#k-antall", { textContent: String(i + 1) }, t + 0.1);
+});
+tl.fromTo("#k-person", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 1.2);
+tl.fromTo("#k-varsel", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.7);
+tl.fromTo("#k-m8-tas", { opacity: 0 }, { opacity: 1, duration: 0.01 }, 1.7);
+tl.fromTo("#k-patch", { opacity: 0 }, { opacity: 1, duration: 0.01 }, 2.0);
+tl.fromTo("#k-skygge", { opacity: 0 }, { opacity: 0.55, duration: 0.4 }, 2.0);
+tl.fromTo("#k-klon", { x: 0, y: 0, scale: 1, opacity: 1 }, { scale: 1.07, svgOrigin: "1075 481", duration: 0.4, ease: "power2.out" }, 2.0);
+tl.to("#k-klon", { x: 340, y: 60, opacity: 0, duration: 1.2, ease: "power1.in" }, 2.45);
+tl.set("#k-antall", { textContent: "10" }, 3.1);
+tl.fromTo("#k-antall", { color: "#F4F6FA" }, { color: "#FF4D5A", duration: 0.3 }, 3.1);
+tl.fromTo("#k-tom", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 3.1);
+tl.fromTo("#k-matcher", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 3.7);
+tl.fromTo("#k-fyll", { scaleX: 1 }, { scaleX: 0, duration: 1.2, ease: "none" }, 4.1);
+for (let k = 0; k <= 15; k++) { tl.set("#k-sek", { textContent: (15 - k) + " s (spolet)" }, 4.1 + k * (1.2 / 15)); }
+tl.set("#k-ml", { textContent: "Ingen skanning funnet" }, 5.4);
+tl.set("#k-va", { textContent: "AVVIK · Uregistrert uttak" }, 5.5);
+tl.set("#k-vb", { textContent: "T1 · Red Bull −1 · bilde sendt til driftsleder" }, 5.5);
+tl.fromTo("#k-svart", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.in" }, 8.35);
+window.__timelines["kamera"] = tl;
+})();
+</script>
+</template>

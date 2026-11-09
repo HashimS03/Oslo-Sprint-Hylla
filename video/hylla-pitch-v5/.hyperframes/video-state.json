@@ -1,0 +1,368 @@
+{
+  "version": 1,
+  "historyId": "d6044588-6ca8-42cd-afd8-49c70b2e4528",
+  "currentRevision": "95382fdd-e34f-44d2-9744-b661fe7e05e9",
+  "pendingChanges": false,
+  "files": {
+    "AGENTS.md": {
+      "hash": "18bcca1593d1b29cd7442b3dc91d18ada440affb9b7acd577c1da57446f3d24f",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/18/18bcca1593d1b29cd7442b3dc91d18ada440affb9b7acd577c1da57446f3d24f"
+    },
+    "CLAUDE.md": {
+      "hash": "18bcca1593d1b29cd7442b3dc91d18ada440affb9b7acd577c1da57446f3d24f",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/18/18bcca1593d1b29cd7442b3dc91d18ada440affb9b7acd577c1da57446f3d24f"
+    },
+    "assets/pall.webp": {
+      "hash": "47a48f85beb1c76adeddd4ae12ce30efa9b88a1ee635f079f3708b7041941242",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/47/47a48f85beb1c76adeddd4ae12ce30efa9b88a1ee635f079f3708b7041941242"
+    },
+    "compositions/kamera.html": {
+      "hash": "2bd879563a6d1894abf07bb5ff241a2b66799a881fef92664fc70cc0c1bdf996",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/2b/2bd879563a6d1894abf07bb5ff241a2b66799a881fef92664fc70cc0c1bdf996"
+    },
+    "compositions/tile.html": {
+      "hash": "dd68a992961520bad66af5350dbdebbd85d3a8512f2a25a2ddcab84d5fc9e7f1",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/dd/dd68a992961520bad66af5350dbdebbd85d3a8512f2a25a2ddcab84d5fc9e7f1"
+    },
+    "hyperframes.json": {
+      "hash": "35a6d4ea79ebe911f0d81705f7aace5d8ff0316b745b0311d56af50c9c237cb7",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/35/35a6d4ea79ebe911f0d81705f7aace5d8ff0316b745b0311d56af50c9c237cb7"
+    },
+    "index.html": {
+      "hash": "16e4d7a207a91bdce8b06a586f69de4714c1077a2807535d03942dd066b1c5a6",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/16/16e4d7a207a91bdce8b06a586f69de4714c1077a2807535d03942dd066b1c5a6"
+    },
+    "meta.json": {
+      "hash": "f8990d5e54772a7918e719764a22edb7f1a2e4d071eb49a9e5f8b8d12fb45ff0",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/f8/f8990d5e54772a7918e719764a22edb7f1a2e4d071eb49a9e5f8b8d12fb45ff0"
+    },
+    "package.json": {
+      "hash": "6be88d4dc7ad252c1172644312de524f049dcd1943285feb297830ff06b2f5f3",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/6b/6be88d4dc7ad252c1172644312de524f049dcd1943285feb297830ff06b2f5f3"
+    },
+    "assets/pitch.mp4": {
+      "hash": "f320d0c49e8ec8c6d5f2fcfa91a85d829967e503f556a74852ea00f94297e12f",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/f3/f320d0c49e8ec8c6d5f2fcfa91a85d829967e503f556a74852ea00f94297e12f"
+    }
+  },
+  "revisions": {
+    "1eaa95fd-1465-4e05-b98c-a12b13190feb": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1794148326925,
+      "endedAt": 1794148326925,
+      "files": {
+        "compositions/tile.html": {
+          "before": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/af/af5a9c414f5c861d11f818538ed228b53165c5b650f631c5cd66793eebb10abd",
+          "after": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/9c/9c2e434980731e4c792bc1762b3b20d471a1b0247a2c489dbe66deba46a35108"
+        }
+      }
+    },
+    "95382fdd-e34f-44d2-9744-b661fe7e05e9": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1794148361487,
+      "endedAt": 1794148361488,
+      "files": {
+        "compositions/tile.html": {
+          "before": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/9c/9c2e434980731e4c792bc1762b3b20d471a1b0247a2c489dbe66deba46a35108",
+          "after": "/Users/hodanielkhuu/.cache/hyperframes/history/d6044588-6ca8-42cd-afd8-49c70b2e4528/blobs/dd/dd68a992961520bad66af5350dbdebbd85d3a8512f2a25a2ddcab84d5fc9e7f1"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": {
+      "revision": "95382fdd-e34f-44d2-9744-b661fe7e05e9",
+      "id": "52fc9b32-6335-4ce5-8d8c-f408d10211ca"
+    },
+    "revisions": {
+      "1eaa95fd-1465-4e05-b98c-a12b13190feb": [
+        {
+          "id": "2fd67f70-621e-4d84-9ece-ddc9427f2931",
+          "scope": "project",
+          "metadata": {
+            "ok": false,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 45000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto",
+              "includeUnmounted": false
+            }
+          },
+          "createdAt": 1794148336472,
+          "contentHash": "4b5f74960f969559015950e5448c1093f36640c12e11a0874bf7060f622754fc",
+          "revision": "1eaa95fd-1465-4e05-b98c-a12b13190feb",
+          "inputFingerprint": "b249378e5d1a42f3b2633989ee848ae243ffb141619661b943ad993eb0fc14fd",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "6486e44a-7a0d-4390-8a76-f66ddd7baec0"
+        }
+      ],
+      "95382fdd-e34f-44d2-9744-b661fe7e05e9": [
+        {
+          "id": "52fc9b32-6335-4ce5-8d8c-f408d10211ca",
+          "scope": "project",
+          "report": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v5/.hyperframes/artifacts/checks/52fc9b32-6335-4ce5-8d8c-f408d10211ca.json",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 45000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto",
+              "includeUnmounted": false
+            }
+          },
+          "createdAt": 1794148371574,
+          "contentHash": "63ae01866ea1371ba826a2aac2850c2221978bca06fc77d9627fd7f261803434",
+          "revision": "95382fdd-e34f-44d2-9744-b661fe7e05e9",
+          "inputFingerprint": "7e8fdf80a05b33267a43e603baad886f68585eb0e7bde4ebc3a2fdf34db0b0c9",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ]
+    },
+    "unversioned": [
+      {
+        "id": "057a8af9-d46a-431e-b5be-c9f6dd70d8d3",
+        "scope": "project",
+        "report": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v5/.hyperframes/artifacts/checks/057a8af9-d46a-431e-b5be-c9f6dd70d8d3.json",
+        "metadata": {
+          "ok": false,
+          "browserSkipped": false,
+          "options": {
+            "samples": 9,
+            "atTransitions": false,
+            "maxIssues": 80,
+            "collapseStatic": true,
+            "tolerance": 2,
+            "timeout": 45000,
+            "contrast": true,
+            "strict": false,
+            "snapshots": false,
+            "browserGpuMode": "auto",
+            "includeUnmounted": false
+          }
+        },
+        "createdAt": 1794148317776,
+        "contentHash": "7eb2b1246cb4c6b6ce018b47ddda7745ccf8479ed873ad287c56351f80ca9dd3",
+        "revision": null,
+        "inputFingerprint": "1d337572d4448a4e7dc658ff600ef5c78cdf1e7138320d358f3d54c8efe6a919",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "snapshots": {
+    "latest": null,
+    "revisions": {
+      "1eaa95fd-1465-4e05-b98c-a12b13190feb": [
+        {
+          "scope": "full",
+          "id": "74b20b24-30f2-4094-8646-06972e51ec76-0",
+          "time": 7,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1794148345798,
+          "contentHash": "2d23c362c50820246d239a15112c7681f97ce12db5296078cd548139702b3d20",
+          "revision": "1eaa95fd-1465-4e05-b98c-a12b13190feb",
+          "inputFingerprint": "b249378e5d1a42f3b2633989ee848ae243ffb141619661b943ad993eb0fc14fd",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "6486e44a-7a0d-4390-8a76-f66ddd7baec0"
+        },
+        {
+          "scope": "full",
+          "id": "74b20b24-30f2-4094-8646-06972e51ec76-1",
+          "time": 28.5,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1794148345798,
+          "contentHash": "e4e25198255e067ea0ea58a69a0c94df7fd17b397b3c259f30f2251b719c563b",
+          "revision": "1eaa95fd-1465-4e05-b98c-a12b13190feb",
+          "inputFingerprint": "b249378e5d1a42f3b2633989ee848ae243ffb141619661b943ad993eb0fc14fd",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "6486e44a-7a0d-4390-8a76-f66ddd7baec0"
+        },
+        {
+          "scope": "full",
+          "id": "74b20b24-30f2-4094-8646-06972e51ec76-2",
+          "time": 34.5,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1794148345798,
+          "contentHash": "bdff59e2ca3c63003d3bc8f1661623224e57321b0d950da2fb0e4ad7ae7aaedf",
+          "revision": "1eaa95fd-1465-4e05-b98c-a12b13190feb",
+          "inputFingerprint": "b249378e5d1a42f3b2633989ee848ae243ffb141619661b943ad993eb0fc14fd",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "6486e44a-7a0d-4390-8a76-f66ddd7baec0"
+        },
+        {
+          "scope": "full",
+          "id": "74b20b24-30f2-4094-8646-06972e51ec76-3",
+          "time": 36.5,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1794148345798,
+          "contentHash": "eb823afc2ccff115ee18e0259af94299331e57941dc42dd56e608b601940662f",
+          "revision": "1eaa95fd-1465-4e05-b98c-a12b13190feb",
+          "inputFingerprint": "b249378e5d1a42f3b2633989ee848ae243ffb141619661b943ad993eb0fc14fd",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "6486e44a-7a0d-4390-8a76-f66ddd7baec0"
+        },
+        {
+          "scope": "full",
+          "id": "74b20b24-30f2-4094-8646-06972e51ec76-4",
+          "time": 38.5,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1794148345798,
+          "contentHash": "ad06c29eb260e5767b287600931d5f8b1e436a4fcd3f6dfdaec54624670c6653",
+          "revision": "1eaa95fd-1465-4e05-b98c-a12b13190feb",
+          "inputFingerprint": "b249378e5d1a42f3b2633989ee848ae243ffb141619661b943ad993eb0fc14fd",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "6486e44a-7a0d-4390-8a76-f66ddd7baec0"
+        },
+        {
+          "scope": "full",
+          "id": "74b20b24-30f2-4094-8646-06972e51ec76-5",
+          "time": 40.5,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1794148345798,
+          "contentHash": "b180ecd0defcabe84d0ca649c75b14daffb52a4c562fa6f48d5a3db5eba97a0b",
+          "revision": "1eaa95fd-1465-4e05-b98c-a12b13190feb",
+          "inputFingerprint": "b249378e5d1a42f3b2633989ee848ae243ffb141619661b943ad993eb0fc14fd",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "6486e44a-7a0d-4390-8a76-f66ddd7baec0"
+        },
+        {
+          "scope": "full",
+          "id": "74b20b24-30f2-4094-8646-06972e51ec76-6",
+          "time": 46,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1794148345798,
+          "contentHash": "83834ec51dbde38f3e68bba0a6db3653841ae1b4e40827a3f61c1abfb68f328f",
+          "revision": "1eaa95fd-1465-4e05-b98c-a12b13190feb",
+          "inputFingerprint": "b249378e5d1a42f3b2633989ee848ae243ffb141619661b943ad993eb0fc14fd",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "6486e44a-7a0d-4390-8a76-f66ddd7baec0"
+        },
+        {
+          "scope": "full",
+          "id": "74b20b24-30f2-4094-8646-06972e51ec76-7",
+          "time": 67.95,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1794148345798,
+          "contentHash": "bd1ba9329f88ba4a53a0331572a90b5c35b2749b7a4c7c64aee5f52a6050ef49",
+          "revision": "1eaa95fd-1465-4e05-b98c-a12b13190feb",
+          "inputFingerprint": "b249378e5d1a42f3b2633989ee848ae243ffb141619661b943ad993eb0fc14fd",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision",
+          "status": "cleaned",
+          "cleanedAfterRender": "6486e44a-7a0d-4390-8a76-f66ddd7baec0"
+        }
+      ]
+    },
+    "unversioned": []
+  },
+  "renders": {
+    "latest": {
+      "id": "6486e44a-7a0d-4390-8a76-f66ddd7baec0",
+      "completedAt": 1794148443014,
+      "output": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v5-kamera.mp4",
+      "status": "completed",
+      "revision": "95382fdd-e34f-44d2-9744-b661fe7e05e9"
+    },
+    "retainedRevisions": [
+      "95382fdd-e34f-44d2-9744-b661fe7e05e9"
+    ]
+  },
+  "pendingArtifactCleanup": []
+}

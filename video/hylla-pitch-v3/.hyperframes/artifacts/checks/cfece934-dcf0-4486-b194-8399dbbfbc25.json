@@ -1,0 +1,349 @@
+{
+  "ok": true,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 2,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "gsap_repeated_fromto_without_baseline",
+        "severity": "warning",
+        "message": "2 tl.fromTo() calls target \"#k-svart\" with no stable baseline. The last-authored fromTo \"from\" values become the element's resting state for any seek before the first tween actually runs, because GSAP applies fromTo from-values at authoring time (immediateRender), not at tween position.",
+        "selector": "#k-svart",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v3/compositions/kamera.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Add `immediateRender: false` to every fromTo except the earliest-positioned one (at 0s), so pre-first-tween seeks keep its \"from\" values. A hiding `tl.set(..., 0)` baseline trips gsap_timeline_set_initial_hide, and a `gsap.set` authored before the fromTo calls is overwritten by them."
+      },
+      {
+        "code": "gsap_repeated_fromto_without_baseline",
+        "severity": "warning",
+        "message": "2 tl.fromTo() calls target \"#t-kort\" with no stable baseline. The last-authored fromTo \"from\" values become the element's resting state for any seek before the first tween actually runs, because GSAP applies fromTo from-values at authoring time (immediateRender), not at tween position.",
+        "selector": "#t-kort",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v3/compositions/tile.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Add `immediateRender: false` to every fromTo except the earliest-positioned one (at 2.8s), so pre-first-tween seeks keep its \"from\" values. A hiding `tl.set(..., 0)` baseline trips gsap_timeline_set_initial_hide, and a `gsap.set` authored before the fromTo calls is overwritten by them."
+      }
+    ],
+    "filesScanned": 3
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 1,
+    "findings": [
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 29.25,
+        "selector": "#t-bar > span:nth-of-type(2)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1640,
+          "top": 386,
+          "right": 1798.41,
+          "bottom": 406,
+          "width": 158.41,
+          "height": 20
+        },
+        "containerSelector": "#k-foto",
+        "text": "KAMERA · SONE T1",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "compositions/tile.html",
+        "bbox": {
+          "x": 1640,
+          "y": 386,
+          "width": 158.41,
+          "height": 20
+        },
+        "firstSeen": 29.25,
+        "lastSeen": 29.25,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          29.25
+        ]
+      }
+    ],
+    "duration": 58.5,
+    "samples": [
+      3.25,
+      9.75,
+      16.25,
+      22.75,
+      29.25,
+      35.75,
+      42.25,
+      48.75,
+      55.25
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 1,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 1,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 2.8:1; WCAG AA requires 4.5:1.",
+        "text": "KAMERA · SONE T1",
+        "fg": "rgb(244,246,250)",
+        "bg": "rgb(237,110,79)",
+        "ratio": 2.8,
+        "requiredRatio": 4.5,
+        "suggestedColor": "rgb(45,45,46)",
+        "large": false,
+        "selector": "div > div:nth-of-type(1) > div > div > div > span:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/tile.html",
+        "bbox": {
+          "x": 1640,
+          "y": 386,
+          "width": 158.40625,
+          "height": 20
+        },
+        "time": 29.25,
+        "times": [
+          29.25
+        ]
+      }
+    ],
+    "enabled": true,
+    "samples": [
+      3.25,
+      16.25,
+      29.25,
+      42.25,
+      55.25
+    ],
+    "checked": 13,
+    "passed": 12
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 3,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "film_silent",
+        "severity": "warning",
+        "message": "This 59 s film has no sound source (no <audio>, no <video> with sound): add a music bed and sounds on the visible actions unless the person asked for silence; see references/sound.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and \"KAMERA · SONE T1\" renders at 15 px for 51.50 s: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "KAMERA · SONE T1",
+        "selector": "#t-bar > span:nth-of-type(2)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/tile.html",
+        "bbox": {
+          "x": 1640,
+          "y": 386,
+          "width": 158.41,
+          "height": 20
+        },
+        "time": 3,
+        "times": [
+          3
+        ],
+        "fontPx": 15,
+        "floorPx": 28,
+        "seconds": 51.5,
+        "elements": [
+          {
+            "selector": "#t-bar > span:nth-of-type(2)",
+            "text": "KAMERA · SONE T1",
+            "fontPx": 15,
+            "time": 3,
+            "seconds": 51.5
+          }
+        ]
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 9 text elements stay under it for 0.5 s or more, the smallest \"Illustrasjon · segmentering i YOLO-stil\" at 20 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "Illustrasjon · segmentering i YOLO-stil",
+        "selector": "#k-kilde",
+        "dataAttributes": {},
+        "sourceFile": "compositions/kamera.html",
+        "bbox": {
+          "x": 726,
+          "y": 1012,
+          "width": 468,
+          "height": 26
+        },
+        "time": 25.125,
+        "times": [
+          25.125,
+          25.625,
+          25.625,
+          25.625,
+          25.625,
+          29.25,
+          31.25,
+          31.25,
+          31.25
+        ],
+        "fontPx": 20,
+        "floorPx": 28,
+        "seconds": 9,
+        "elements": [
+          {
+            "selector": "#k-kilde",
+            "text": "Illustrasjon · segmentering i YOLO-stil",
+            "fontPx": 20,
+            "time": 25.125,
+            "seconds": 9
+          },
+          {
+            "selector": "div.u",
+            "text": "Segmentering · ovenfra",
+            "fontPx": 20,
+            "time": 25.625,
+            "seconds": 8.5
+          },
+          {
+            "selector": "div.h",
+            "text": "MATCHER",
+            "fontPx": 20,
+            "time": 31.25,
+            "seconds": 2.875
+          },
+          {
+            "selector": "div.e",
+            "text": "Red Bull i sonen",
+            "fontPx": 22,
+            "time": 25.625,
+            "seconds": 8.5
+          },
+          {
+            "selector": "#k-vb",
+            "text": "Venter på skanning (±15 s)",
+            "fontPx": 24,
+            "time": 29.25,
+            "seconds": 4.875
+          },
+          {
+            "selector": "#k-sek",
+            "text": "15 s (spolet)",
+            "fontPx": 24,
+            "time": 31.25,
+            "seconds": 2.875
+          },
+          {
+            "selector": "div.t",
+            "text": "KAM TAK · SONE T1",
+            "fontPx": 26,
+            "time": 25.625,
+            "seconds": 8.5
+          },
+          {
+            "selector": "#k-tid",
+            "text": "00:04",
+            "fontPx": 26,
+            "time": 25.625,
+            "seconds": 8.5
+          },
+          {
+            "selector": "#k-ml",
+            "text": "Leter etter skanning",
+            "fontPx": 26,
+            "time": 31.25,
+            "seconds": 2.875
+          }
+        ]
+      }
+    ],
+    "enabled": true,
+    "step": 0.125,
+    "samples": 468
+  },
+  "audio": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 1,
+    "findings": [
+      {
+        "code": "audio_none",
+        "severity": "info",
+        "message": "The film has no sound: no clip in it plays audio.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0
+      }
+    ]
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}

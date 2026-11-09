@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="no"><head><meta charset="UTF-8" /><meta name="viewport" content="width=1920, height=1080" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<style>
+:root{--ink:#F4F6FA;--dim:#B8C0CC;--rod:#FF4D5A;--mono:"JetBrains Mono",monospace;}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;font-family:"Inter",sans-serif;color:var(--ink)}
+.full{position:absolute;left:0;top:0;width:1920px;height:1080px}
+#foto{object-fit:cover}
+#vignett{background:radial-gradient(ellipse at center,rgba(0,0,0,0) 55%,rgba(0,0,0,.55) 100%)}
+#hud-v{position:absolute;left:44px;top:40px;background:rgba(8,10,14,.72);border:1px solid #3A4250;border-radius:10px;padding:14px 20px}
+#hud-v .t{font-family:var(--mono);font-weight:700;font-size:26px;letter-spacing:.06em}
+#hud-v .u{font-family:var(--mono);font-size:18px;color:var(--dim);margin-top:4px}
+#teller{position:absolute;left:44px;top:170px;background:rgba(8,10,14,.78);border:1px solid #3A4250;border-radius:10px;padding:14px 22px}
+#teller .e{font-size:20px;color:var(--dim)}
+#teller .n{font-family:var(--mono);font-weight:700;font-size:80px;line-height:1;margin-top:4px}
+#hud-h{position:absolute;right:44px;top:40px;background:rgba(8,10,14,.72);border:1px solid #3A4250;border-radius:10px;padding:14px 20px;font-family:var(--mono);font-size:26px;letter-spacing:.06em}
+#rec{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--rod);margin-right:12px;vertical-align:middle}
+#varsel{position:absolute;left:44px;bottom:44px;background:var(--rod);color:#1A0508;border-radius:10px;padding:16px 24px}
+#varsel .a{font-weight:800;font-size:30px}
+#varsel .b{font-weight:600;font-size:22px;margin-top:4px}
+#kilde{position:absolute;right:44px;bottom:36px;font-family:var(--mono);font-size:18px;color:var(--dim);background:rgba(8,10,14,.6);padding:6px 12px;border-radius:6px}
+</style></head><body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="3" data-width="1920" data-height="1080" data-no-timeline>
+<img id="foto" class="clip full" data-start="0" data-duration="3" data-track-index="0" src="assets/pall.webp" alt="Takkamera over pall" />
+<div id="seg" class="clip full" data-start="0" data-duration="3" data-track-index="1" style="z-index:1" data-layout-ignore>
+<svg class="full" viewBox="0 0 1672 941" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<rect x="395" y="205" width="780" height="585" fill="none" stroke="#22D3EE" stroke-width="3" stroke-dasharray="14 10"/>
+<rect x="395" y="175" width="110" height="30" fill="#22D3EE"/><text x="404" y="197" font-family="JetBrains Mono" font-weight="700" font-size="19" fill="#06242B">SONE T1</text>
+<g><polygon points="439,220 586,220 600,234 600,371 586,385 439,385 425,371 425,234" fill="#22D3EE" fill-opacity="0.2" stroke="#22D3EE" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="433" y="228" width="140" height="27" rx="4" fill="#22D3EE"/><text x="441" y="248" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.96</text></g>
+<g><polygon points="624,220 771,220 785,234 785,371 771,385 624,385 610,371 610,234" fill="#A3E635" fill-opacity="0.2" stroke="#A3E635" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="618" y="228" width="140" height="27" rx="4" fill="#A3E635"/><text x="626" y="248" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.94</text></g>
+<g><polygon points="809,220 956,220 970,234 970,371 956,385 809,385 795,371 795,234" fill="#F472B6" fill-opacity="0.2" stroke="#F472B6" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="803" y="228" width="140" height="27" rx="4" fill="#F472B6"/><text x="811" y="248" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.97</text></g>
+<g><polygon points="999,220 1151,220 1165,234 1165,371 1151,385 999,385 985,371 985,234" fill="#FACC15" fill-opacity="0.2" stroke="#FACC15" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="993" y="228" width="140" height="27" rx="4" fill="#FACC15"/><text x="1001" y="248" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.93</text></g>
+<g><polygon points="439,395 586,395 600,409 600,554 586,568 439,568 425,554 425,409" fill="#818CF8" fill-opacity="0.2" stroke="#818CF8" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="433" y="403" width="140" height="27" rx="4" fill="#818CF8"/><text x="441" y="423" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.95</text></g>
+<g><polygon points="624,395 771,395 785,409 785,554 771,568 624,568 610,554 610,409" fill="#34D399" fill-opacity="0.2" stroke="#34D399" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="618" y="403" width="140" height="27" rx="4" fill="#34D399"/><text x="626" y="423" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.98</text></g>
+<g><polygon points="809,395 956,395 970,409 970,554 956,568 809,568 795,554 795,409" fill="#FB923C" fill-opacity="0.2" stroke="#FB923C" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="803" y="403" width="140" height="27" rx="4" fill="#FB923C"/><text x="811" y="423" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.92</text></g>
+<g><polygon points="999,395 1151,395 1165,409 1165,554 1151,568 999,568 985,554 985,409" fill="#FF4D5A" fill-opacity="0.2" stroke="#FF4D5A" stroke-width="3.5" stroke-linejoin="round" stroke-dasharray="14 8"/>
+<rect x="993" y="403" width="222" height="27" rx="4" fill="#FF4D5A"/><text x="1001" y="423" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.95 · tas</text></g>
+<g><polygon points="439,570 586,570 600,584 600,731 586,745 439,745 425,731 425,584" fill="#E879F9" fill-opacity="0.2" stroke="#E879F9" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="433" y="578" width="140" height="27" rx="4" fill="#E879F9"/><text x="441" y="598" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.96</text></g>
+<g><polygon points="624,570 771,570 785,584 785,731 771,745 624,745 610,731 610,584" fill="#4ADE80" fill-opacity="0.2" stroke="#4ADE80" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="618" y="578" width="140" height="27" rx="4" fill="#4ADE80"/><text x="626" y="598" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.94</text></g>
+<g><polygon points="809,570 956,570 970,584 970,731 956,745 809,745 795,731 795,584" fill="#F87171" fill-opacity="0.2" stroke="#F87171" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="803" y="578" width="140" height="27" rx="4" fill="#F87171"/><text x="811" y="598" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.97</text></g>
+<g><polygon points="999,570 1151,570 1165,584 1165,731 1151,745 999,745 985,731 985,584" fill="#2DD4BF" fill-opacity="0.2" stroke="#2DD4BF" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="993" y="578" width="140" height="27" rx="4" fill="#2DD4BF"/><text x="1001" y="598" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#0B1020">Red Bull 0.93</text></g>
+
+<polygon points="1105,388 1190,362 1245,300 1335,250 1450,242 1565,290 1602,420 1596,525 1530,588 1526,642 1450,694 1368,694 1338,648 1255,642 1232,592 1185,574 1100,562 1130,540 1170,500 1110,470" fill="#FF3DCB" fill-opacity="0.22" stroke="#FF3DCB" stroke-width="3.5" stroke-linejoin="round"/>
+<rect x="1245" y="205" width="160" height="30" rx="4" fill="#FF3DCB"/><text x="1255" y="227" font-family="JetBrains Mono" font-weight="700" font-size="19" fill="#1A0516">Person 0.97</text>
+</svg></div>
+<div id="vignett" class="clip full" data-start="0" data-duration="3" data-track-index="2" style="z-index:2" data-layout-allow-occlusion data-layout-ignore></div>
+<div id="hud" class="clip full" data-start="0" data-duration="3" data-track-index="3" style="z-index:3">
+<div id="hud-v"><div class="t">KAM TAK · SONE T1</div><div class="u">Segmentering · ovenfra</div></div>
+<div id="teller"><div class="e">Red Bull i sonen</div><div class="n">12</div></div>
+<div id="hud-h"><span id="rec"></span>00:07</div>
+<div id="varsel"><div class="a">UTTAK PÅGÅR · T1</div><div class="b">Venter på skanning (±15 s)</div></div>
+<div id="kilde">Illustrasjon · segmentering i YOLO-stil</div>
+</div></div></body></html>

@@ -1,0 +1,1215 @@
+{
+  "ok": false,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 6,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "composition_file_too_large",
+        "severity": "warning",
+        "message": "This HTML composition file has 310 lines. Smaller sub-compositions are easier to read, iterate on, and diff.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/takkamera/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Split coherent scenes or layers into separate .html files under compositions/, then mount them from the parent with data-composition-src so each file stays small enough to inspect, revise, and validate independently."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"kamera\"> is a timeline element that contains nested <svg>. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#kamera",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/takkamera/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"kamera\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"skanning-lag\"> is a timeline element that contains nested <div id=\"skanning\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#skanning-lag",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/takkamera/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"skanning-lag\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"hud\"> is a timeline element that contains nested <div id=\"hud-venstre\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#hud",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/takkamera/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"hud\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"matcher-lag\"> is a timeline element that contains nested <div id=\"matcher\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#matcher-lag",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/takkamera/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"matcher-lag\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      },
+      {
+        "code": "nested_structure_needs_subcomposition",
+        "severity": "warning",
+        "message": "<div id=\"svart-lag\"> is a timeline element that contains nested <div id=\"svart\">. The timeline shows one row per top-level element, and the root composition is built only from sub-compositions.",
+        "selector": "#svart-lag",
+        "dataAttributes": {},
+        "sourceFile": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/takkamera/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Move <div id=\"svart-lag\"> and its contents into a sub-composition file and mount it with data-composition-src."
+      }
+    ],
+    "filesScanned": 1
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": false,
+    "errorCount": 15,
+    "warningCount": 1,
+    "infoCount": 1,
+    "findings": [
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 2.667,
+        "selector": "#sone > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 482,
+          "top": 125,
+          "right": 566,
+          "bottom": 151,
+          "width": 84,
+          "height": 26
+        },
+        "containerSelector": "#vignett",
+        "text": "SONE T1",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 482,
+          "y": 125,
+          "width": 84,
+          "height": 26
+        },
+        "firstSeen": 2.667,
+        "lastSeen": 15.111,
+        "occurrences": 8,
+        "heldMs": 0,
+        "times": [
+          2.667,
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 2.667,
+        "selector": "#maske-1 > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 617,
+          "top": 313,
+          "right": 734,
+          "bottom": 333,
+          "width": 117,
+          "height": 20
+        },
+        "containerSelector": "#vignett",
+        "text": "Red Bull 0.96",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 617,
+          "y": 313,
+          "width": 117,
+          "height": 20
+        },
+        "firstSeen": 2.667,
+        "lastSeen": 15.111,
+        "occurrences": 8,
+        "heldMs": 0,
+        "times": [
+          2.667,
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 2.667,
+        "selector": "#maske-2 > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 801,
+          "top": 313,
+          "right": 918,
+          "bottom": 333,
+          "width": 117,
+          "height": 20
+        },
+        "containerSelector": "#vignett",
+        "text": "Red Bull 0.94",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 801,
+          "y": 313,
+          "width": 117,
+          "height": 20
+        },
+        "firstSeen": 2.667,
+        "lastSeen": 15.111,
+        "occurrences": 8,
+        "heldMs": 0,
+        "times": [
+          2.667,
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 2.667,
+        "selector": "#maske-3 > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 985,
+          "top": 313,
+          "right": 1102,
+          "bottom": 333,
+          "width": 117,
+          "height": 20
+        },
+        "containerSelector": "#vignett",
+        "text": "Red Bull 0.97",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 985,
+          "y": 313,
+          "width": 117,
+          "height": 20
+        },
+        "firstSeen": 2.667,
+        "lastSeen": 15.111,
+        "occurrences": 8,
+        "heldMs": 0,
+        "times": [
+          2.667,
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 2.667,
+        "selector": "#maske-4 > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1169,
+          "top": 313,
+          "right": 1286,
+          "bottom": 333,
+          "width": 117,
+          "height": 20
+        },
+        "containerSelector": "#vignett",
+        "text": "Red Bull 0.93",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1169,
+          "y": 313,
+          "width": 117,
+          "height": 20
+        },
+        "firstSeen": 2.667,
+        "lastSeen": 15.111,
+        "occurrences": 8,
+        "heldMs": 0,
+        "times": [
+          2.667,
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 2.667,
+        "selector": "#maske-5 > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 617,
+          "top": 477,
+          "right": 734,
+          "bottom": 497,
+          "width": 117,
+          "height": 20
+        },
+        "containerSelector": "#vignett",
+        "text": "Red Bull 0.95",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 617,
+          "y": 477,
+          "width": 117,
+          "height": 20
+        },
+        "firstSeen": 2.667,
+        "lastSeen": 15.111,
+        "occurrences": 8,
+        "heldMs": 0,
+        "times": [
+          2.667,
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 2.667,
+        "selector": "#maske-6 > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 801,
+          "top": 477,
+          "right": 918,
+          "bottom": 497,
+          "width": 117,
+          "height": 20
+        },
+        "containerSelector": "#vignett",
+        "text": "Red Bull 0.98",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 801,
+          "y": 477,
+          "width": 117,
+          "height": 20
+        },
+        "firstSeen": 2.667,
+        "lastSeen": 15.111,
+        "occurrences": 8,
+        "heldMs": 0,
+        "times": [
+          2.667,
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 4.444,
+        "selector": "#maske-7 > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 985,
+          "top": 477,
+          "right": 1102,
+          "bottom": 497,
+          "width": 117,
+          "height": 20
+        },
+        "containerSelector": "#vignett",
+        "text": "Red Bull 0.92",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 985,
+          "y": 477,
+          "width": 117,
+          "height": 20
+        },
+        "firstSeen": 4.444,
+        "lastSeen": 15.111,
+        "occurrences": 7,
+        "heldMs": 0,
+        "times": [
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 4.444,
+        "selector": "#maske-8 > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1169,
+          "top": 477,
+          "right": 1286,
+          "bottom": 497,
+          "width": 117,
+          "height": 20
+        },
+        "containerSelector": "#vignett",
+        "text": "Red Bull 0.95",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1169,
+          "y": 477,
+          "width": 117,
+          "height": 20
+        },
+        "firstSeen": 4.444,
+        "lastSeen": 15.111,
+        "occurrences": 7,
+        "heldMs": 0,
+        "times": [
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 4.444,
+        "selector": "#maske-9 > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 617,
+          "top": 641,
+          "right": 734,
+          "bottom": 661,
+          "width": 117,
+          "height": 20
+        },
+        "containerSelector": "#vignett",
+        "text": "Red Bull 0.96",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 617,
+          "y": 641,
+          "width": 117,
+          "height": 20
+        },
+        "firstSeen": 4.444,
+        "lastSeen": 15.111,
+        "occurrences": 7,
+        "heldMs": 0,
+        "times": [
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 4.444,
+        "selector": "#maske-10 > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 801,
+          "top": 641,
+          "right": 918,
+          "bottom": 661,
+          "width": 117,
+          "height": 20
+        },
+        "containerSelector": "#vignett",
+        "text": "Red Bull 0.94",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 801,
+          "y": 641,
+          "width": 117,
+          "height": 20
+        },
+        "firstSeen": 4.444,
+        "lastSeen": 15.111,
+        "occurrences": 7,
+        "heldMs": 0,
+        "times": [
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 4.444,
+        "selector": "#maske-11 > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 985,
+          "top": 641,
+          "right": 1102,
+          "bottom": 661,
+          "width": 117,
+          "height": 20
+        },
+        "containerSelector": "#vignett",
+        "text": "Red Bull 0.97",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 985,
+          "y": 641,
+          "width": 117,
+          "height": 20
+        },
+        "firstSeen": 4.444,
+        "lastSeen": 15.111,
+        "occurrences": 7,
+        "heldMs": 0,
+        "times": [
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 4.444,
+        "selector": "#maske-12 > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1169,
+          "top": 641,
+          "right": 1286,
+          "bottom": 661,
+          "width": 117,
+          "height": 20
+        },
+        "containerSelector": "#vignett",
+        "text": "Red Bull 0.93",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1169,
+          "y": 641,
+          "width": 117,
+          "height": 20
+        },
+        "firstSeen": 4.444,
+        "lastSeen": 15.111,
+        "occurrences": 7,
+        "heldMs": 0,
+        "times": [
+          4.444,
+          6.222,
+          8,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 6.222,
+        "selector": "#maske-person > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1408,
+          "top": 395,
+          "right": 1513.61,
+          "bottom": 416,
+          "width": 105.61,
+          "height": 21
+        },
+        "containerSelector": "#vignett",
+        "text": "Person 0.97",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1408,
+          "y": 395,
+          "width": 105.61,
+          "height": 21
+        },
+        "firstSeen": 6.222,
+        "lastSeen": 8,
+        "occurrences": 2,
+        "heldMs": 0,
+        "times": [
+          6.222,
+          8
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "error",
+        "time": 9.778,
+        "selector": "#tomplass > text:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 1155,
+          "top": 429,
+          "right": 1291.81,
+          "bottom": 454,
+          "width": 136.81,
+          "height": 25
+        },
+        "containerSelector": "#vignett",
+        "text": "TOM PLASS −1",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "lifetime": {
+          "start": 0,
+          "end": 16
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1155,
+          "y": 429,
+          "width": 136.81,
+          "height": 25
+        },
+        "firstSeen": 9.778,
+        "lastSeen": 15.111,
+        "occurrences": 4,
+        "heldMs": 0,
+        "times": [
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "warning",
+        "time": 0.889,
+        "selector": "#arbeider",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 2050,
+          "top": 552,
+          "right": 2200,
+          "bottom": 812,
+          "width": 150,
+          "height": 260
+        },
+        "containerSelector": "svg.full",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "right": 280
+        },
+        "dataAttributes": {
+          "data-svg-origin": "-100 -148"
+        },
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 2050,
+          "y": 552,
+          "width": 150,
+          "height": 260
+        },
+        "firstSeen": 0.889,
+        "lastSeen": 15.111,
+        "occurrences": 7,
+        "heldMs": 0,
+        "times": [
+          0.889,
+          2.667,
+          4.444,
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      },
+      {
+        "code": "canvas_overflow",
+        "severity": "info",
+        "time": 9.778,
+        "selector": "#maske-person > text:nth-of-type(1)",
+        "message": "Text extends outside the composition canvas.",
+        "rect": {
+          "left": 1940.64,
+          "top": 395,
+          "right": 2046.25,
+          "bottom": 416,
+          "width": 105.61,
+          "height": 21
+        },
+        "containerSelector": "#root",
+        "text": "Person 0.97",
+        "fixHint": "Move the text inward, reduce its size, or mark intentional off-canvas animation with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 1080,
+          "width": 1920,
+          "height": 1080
+        },
+        "overflow": {
+          "right": 126.25
+        },
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 1940.64,
+          "y": 395,
+          "width": 105.61,
+          "height": 21
+        },
+        "firstSeen": 9.778,
+        "lastSeen": 15.111,
+        "occurrences": 4,
+        "heldMs": 0,
+        "times": [
+          9.778,
+          11.556,
+          13.333,
+          15.111
+        ]
+      }
+    ],
+    "duration": 16,
+    "samples": [
+      0.889,
+      2.667,
+      4.444,
+      6.222,
+      8,
+      9.778,
+      11.556,
+      13.333,
+      15.111
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 17,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": true,
+    "samples": [
+      0.889,
+      4.444,
+      8,
+      11.556,
+      15.111
+    ],
+    "checked": 95,
+    "passed": 95
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 2,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "film_silent",
+        "severity": "warning",
+        "message": "This 16 s film has no sound source (no <audio>, no <video> with sound): add a music bed and sounds on the visible actions unless the person asked for silence; see references/sound.md.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 26 text elements stay under it for 0.5 s or more, the smallest \"Red Bull 0.96\" at 15 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "Red Bull 0.96",
+        "selector": "#maske-1 > text:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 617,
+          "y": 313,
+          "width": 117,
+          "height": 20
+        },
+        "time": 1.875,
+        "times": [
+          0,
+          0.625,
+          0.625,
+          0.625,
+          0.625,
+          1.25,
+          1.875,
+          2.125,
+          2.25,
+          2.375,
+          2.5,
+          2.75,
+          2.875,
+          3,
+          3.25,
+          3.375,
+          3.5,
+          3.75,
+          5,
+          9.75,
+          9.75,
+          9.75,
+          9.75,
+          11,
+          12,
+          12
+        ],
+        "fontPx": 15,
+        "floorPx": 28,
+        "seconds": 14.125,
+        "elements": [
+          {
+            "selector": "#maske-1 > text:nth-of-type(1)",
+            "text": "Red Bull 0.96",
+            "fontPx": 15,
+            "time": 1.875,
+            "seconds": 14.125
+          },
+          {
+            "selector": "#maske-2 > text:nth-of-type(1)",
+            "text": "Red Bull 0.94",
+            "fontPx": 15,
+            "time": 2.125,
+            "seconds": 13.875
+          },
+          {
+            "selector": "#maske-3 > text:nth-of-type(1)",
+            "text": "Red Bull 0.97",
+            "fontPx": 15,
+            "time": 2.25,
+            "seconds": 13.75
+          },
+          {
+            "selector": "#maske-4 > text:nth-of-type(1)",
+            "text": "Red Bull 0.93",
+            "fontPx": 15,
+            "time": 2.375,
+            "seconds": 13.625
+          },
+          {
+            "selector": "#maske-5 > text:nth-of-type(1)",
+            "text": "Red Bull 0.95",
+            "fontPx": 15,
+            "time": 2.5,
+            "seconds": 13.5
+          },
+          {
+            "selector": "#maske-6 > text:nth-of-type(1)",
+            "text": "Red Bull 0.98",
+            "fontPx": 15,
+            "time": 2.75,
+            "seconds": 13.25
+          },
+          {
+            "selector": "#maske-7 > text:nth-of-type(1)",
+            "text": "Red Bull 0.92",
+            "fontPx": 15,
+            "time": 2.875,
+            "seconds": 13.125
+          },
+          {
+            "selector": "#maske-8 > text:nth-of-type(1)",
+            "text": "Red Bull 0.95",
+            "fontPx": 15,
+            "time": 3,
+            "seconds": 13
+          },
+          {
+            "selector": "#maske-9 > text:nth-of-type(1)",
+            "text": "Red Bull 0.96",
+            "fontPx": 15,
+            "time": 3.25,
+            "seconds": 12.75
+          },
+          {
+            "selector": "#maske-10 > text:nth-of-type(1)",
+            "text": "Red Bull 0.94",
+            "fontPx": 15,
+            "time": 3.375,
+            "seconds": 12.625
+          },
+          {
+            "selector": "#maske-11 > text:nth-of-type(1)",
+            "text": "Red Bull 0.97",
+            "fontPx": 15,
+            "time": 3.5,
+            "seconds": 12.5
+          },
+          {
+            "selector": "#maske-12 > text:nth-of-type(1)",
+            "text": "Red Bull 0.93",
+            "fontPx": 15,
+            "time": 3.75,
+            "seconds": 12.25
+          },
+          {
+            "selector": "#bunntekst",
+            "text": "SIMULERING · segmentering i YOLO-stil",
+            "fontPx": 16,
+            "time": 0,
+            "seconds": 16
+          },
+          {
+            "selector": "#maske-person > text:nth-of-type(1)",
+            "text": "Person 0.97",
+            "fontPx": 16,
+            "time": 5,
+            "seconds": 4.75
+          },
+          {
+            "selector": "div.topp",
+            "text": "MATCHER",
+            "fontPx": 16,
+            "time": 9.75,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.under",
+            "text": "Segmentering · ovenfra",
+            "fontPx": 18,
+            "time": 0.625,
+            "seconds": 15.375
+          },
+          {
+            "selector": "div.etikett",
+            "text": "Red Bull i sonen",
+            "fontPx": 18,
+            "time": 0.625,
+            "seconds": 15.375
+          },
+          {
+            "selector": "#m-linje2",
+            "text": "Leter etter skanning (±15 s)",
+            "fontPx": 19,
+            "time": 9.75,
+            "seconds": 6.25
+          },
+          {
+            "selector": "#tomplass > text:nth-of-type(1)",
+            "text": "TOM PLASS −1",
+            "fontPx": 19,
+            "time": 11,
+            "seconds": 5
+          },
+          {
+            "selector": "div.a2",
+            "text": "T1 · Red Bull −1 · ingen skanning",
+            "fontPx": 19,
+            "time": 12,
+            "seconds": 4
+          },
+          {
+            "selector": "#sone > text:nth-of-type(1)",
+            "text": "SONE T1",
+            "fontPx": 20,
+            "time": 1.25,
+            "seconds": 14.75
+          },
+          {
+            "selector": "#sek",
+            "text": "15 s",
+            "fontPx": 20,
+            "time": 9.75,
+            "seconds": 6.25
+          },
+          {
+            "selector": "#m-linje1",
+            "text": "Uttak oppdaget: Red Bull −1",
+            "fontPx": 22,
+            "time": 9.75,
+            "seconds": 6.25
+          },
+          {
+            "selector": "div.tittel",
+            "text": "KAM TAK · SONE T1",
+            "fontPx": 24,
+            "time": 0.625,
+            "seconds": 15.375
+          },
+          {
+            "selector": "#tidskode",
+            "text": "00:00",
+            "fontPx": 24,
+            "time": 0.625,
+            "seconds": 15.375
+          },
+          {
+            "selector": "div.a1",
+            "text": "AVVIK · Uregistrert uttak",
+            "fontPx": 24,
+            "time": 12,
+            "seconds": 4
+          }
+        ]
+      }
+    ],
+    "enabled": true,
+    "step": 0.125,
+    "samples": 128
+  },
+  "audio": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 1,
+    "findings": [
+      {
+        "code": "audio_none",
+        "severity": "info",
+        "message": "The film has no sound: no clip in it plays audio.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0
+      }
+    ]
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}

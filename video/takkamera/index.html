@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --ground: #14171C;
+        --ink: #F4F6FA;
+        --dim: #9AA3B2;
+        --gul: #F4C430;
+        --rod: #FF4D5A;
+        --font-display: "Inter", sans-serif;
+        --font-mono: "JetBrains Mono", monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 1920px; height: 1080px; font-family: var(--font-display); color: var(--ink); overflow: hidden; }
+      .full { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+      #hud-venstre { position: absolute; left: 60px; top: 56px; width: 380px; }
+      #hud-venstre .tittel { font-family: var(--font-mono); font-weight: 700; font-size: 24px; letter-spacing: 0.06em; }
+      #hud-venstre .under { font-family: var(--font-mono); font-size: 18px; color: var(--dim); margin-top: 6px; }
+      #teller { margin-top: 34px; background: rgba(10,12,16,0.78); border: 1px solid #343B48; border-radius: 10px; padding: 18px 22px; }
+      #teller .etikett { font-size: 18px; color: var(--dim); }
+      #teller .tall { font-family: var(--font-mono); font-weight: 700; font-size: 84px; line-height: 1; margin-top: 6px; }
+      #hud-hoyre { position: absolute; right: 60px; top: 56px; width: 380px; text-align: right; font-family: var(--font-mono); font-size: 24px; letter-spacing: 0.06em; }
+      #rec-prikk { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: var(--rod); margin-right: 12px; vertical-align: middle; }
+      #bunntekst { position: absolute; left: 60px; bottom: 44px; font-family: var(--font-mono); font-size: 16px; color: var(--dim); letter-spacing: 0.04em; }
+      #vignett { background: radial-gradient(ellipse at center, rgba(0,0,0,0) 52%, rgba(0,0,0,0.62) 100%); }
+      #skanning { position: absolute; left: 0; top: 0; width: 1920px; height: 6px; background: linear-gradient(rgba(34,211,238,0), rgba(34,211,238,0.5), rgba(34,211,238,0)); opacity: 0; }
+      #svart { background: #000; }
+      #matcher { position: absolute; left: 1500px; top: 560px; width: 370px; background: rgba(10,12,16,0.9); border: 1px solid #343B48; border-radius: 12px; padding: 20px 22px; }
+      #matcher .topp { font-family: var(--font-mono); font-weight: 700; font-size: 16px; letter-spacing: 0.1em; color: var(--dim); }
+      #matcher .linje { font-size: 22px; margin-top: 12px; line-height: 1.25; }
+      #matcher .bar { margin-top: 14px; height: 10px; border-radius: 5px; background: #272D38; overflow: hidden; }
+      #matcher #bar-fyll { height: 100%; width: 100%; background: var(--gul); transform-origin: left center; }
+      #matcher .sek { font-family: var(--font-mono); font-size: 20px; color: var(--gul); margin-top: 8px; }
+      #avvik { margin-top: 16px; background: var(--rod); color: #1A0508; border-radius: 8px; padding: 14px 16px; }
+      #avvik .a1 { font-weight: 800; font-size: 24px; }
+      #avvik .a2 { font-size: 19px; margin-top: 4px; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1920" data-height="1080">
+
+      <div id="kamera" class="clip full" data-start="0" data-duration="16" data-track-index="0" style="z-index:1">
+        <svg class="full" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="dose" cx="40%" cy="38%" r="70%"><stop offset="0" stop-color="#F2F5F9"/><stop offset="1" stop-color="#AEB8C6"/></radialGradient>
+            <pattern id="fliser" width="120" height="120" patternUnits="userSpaceOnUse"><rect width="120" height="120" fill="#262A31"/><path d="M0 0H120M0 0V120" stroke="#30353E" stroke-width="2"/></pattern>
+          </defs>
+          <rect x="0" y="0" width="1920" height="1080" fill="url(#fliser)"/>
+          <rect x="300" y="60" width="1320" height="960" fill="#22262D" opacity="0.5"/>
+          <!-- gulbånd rundt arbeidsområdet -->
+          <rect x="500" y="140" width="940" height="800" fill="none" stroke="#C9A227" stroke-width="10" stroke-dasharray="46 30" opacity="0.7"/>
+          <!-- pall -->
+          <g id="pall">
+            <rect x="565" y="240" width="790" height="600" rx="6" fill="#8A5E37"/>
+            <rect x="565" y="262" width="790" height="64" fill="#A8774A"/>
+            <rect x="565" y="360" width="790" height="64" fill="#A8774A"/>
+            <rect x="565" y="458" width="790" height="64" fill="#A8774A"/>
+            <rect x="565" y="556" width="790" height="64" fill="#A8774A"/>
+            <rect x="565" y="654" width="790" height="64" fill="#A8774A"/>
+            <rect x="565" y="752" width="790" height="64" fill="#A8774A"/>
+            <rect x="565" y="240" width="790" height="600" rx="6" fill="none" stroke="#5E3F24" stroke-width="4"/>
+          </g>
+          <!-- sone T1 -->
+          <g id="sone" data-layout-ignore>
+            <rect x="470" y="120" width="970" height="840" rx="10" fill="none" stroke="#22D3EE" stroke-width="3" stroke-dasharray="14 10"/>
+            <rect x="470" y="120" width="132" height="34" fill="#22D3EE"/>
+            <text x="482" y="145" font-family="JetBrains Mono" font-weight="700" font-size="20" fill="#06242B">SONE T1</text>
+          </g>
+          <!-- bokser -->
+          <g id="bokser">
+        <g id="slot-1" transform="translate(599,301)">
+          <g id="boks-1">
+            <rect id="skygge-1" x="14" y="16" width="170" height="150" rx="8" fill="#000" opacity="0"/>
+            <rect x="0" y="0" width="170" height="150" rx="8" fill="#33415C" stroke="#1E2940" stroke-width="3"/>
+            <circle cx="25" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/>
+            <g id="maske-1" opacity="0" data-layout-ignore>
+              <polygon points="9,20 22,11 145,5 164,23 159,125 149,138 25,140 6,125" fill="#22D3EE" fill-opacity="0.34" stroke="#22D3EE" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="10" width="124" height="24" rx="4" fill="#22D3EE"/>
+              <text x="18" y="27" font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#0B1020">Red Bull 0.96</text>
+            </g>
+          </g>
+        </g>
+        <g id="slot-2" transform="translate(783,301)">
+          <g id="boks-2">
+            <rect id="skygge-2" x="14" y="16" width="170" height="150" rx="8" fill="#000" opacity="0"/>
+            <rect x="0" y="0" width="170" height="150" rx="8" fill="#33415C" stroke="#1E2940" stroke-width="3"/>
+            <circle cx="25" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/>
+            <g id="maske-2" opacity="0" data-layout-ignore>
+              <polygon points="10,22 19,7 145,9 161,19 165,127 145,139 26,144 10,125" fill="#A3E635" fill-opacity="0.34" stroke="#A3E635" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="10" width="124" height="24" rx="4" fill="#A3E635"/>
+              <text x="18" y="27" font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#0B1020">Red Bull 0.94</text>
+            </g>
+          </g>
+        </g>
+        <g id="slot-3" transform="translate(967,301)">
+          <g id="boks-3">
+            <rect id="skygge-3" x="14" y="16" width="170" height="150" rx="8" fill="#000" opacity="0"/>
+            <rect x="0" y="0" width="170" height="150" rx="8" fill="#33415C" stroke="#1E2940" stroke-width="3"/>
+            <circle cx="25" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/>
+            <g id="maske-3" opacity="0" data-layout-ignore>
+              <polygon points="11,23 22,6 146,5 162,25 160,125 148,139 25,139 10,127" fill="#F472B6" fill-opacity="0.34" stroke="#F472B6" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="10" width="124" height="24" rx="4" fill="#F472B6"/>
+              <text x="18" y="27" font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#0B1020">Red Bull 0.97</text>
+            </g>
+          </g>
+        </g>
+        <g id="slot-4" transform="translate(1151,301)">
+          <g id="boks-4">
+            <rect id="skygge-4" x="14" y="16" width="170" height="150" rx="8" fill="#000" opacity="0"/>
+            <rect x="0" y="0" width="170" height="150" rx="8" fill="#33415C" stroke="#1E2940" stroke-width="3"/>
+            <circle cx="25" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/>
+            <g id="maske-4" opacity="0" data-layout-ignore>
+              <polygon points="11,25 24,7 145,9 162,24 160,125 145,142 26,139 10,125" fill="#FACC15" fill-opacity="0.34" stroke="#FACC15" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="10" width="124" height="24" rx="4" fill="#FACC15"/>
+              <text x="18" y="27" font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#0B1020">Red Bull 0.93</text>
+            </g>
+          </g>
+        </g>
+        <g id="slot-5" transform="translate(599,465)">
+          <g id="boks-5">
+            <rect id="skygge-5" x="14" y="16" width="170" height="150" rx="8" fill="#000" opacity="0"/>
+            <rect x="0" y="0" width="170" height="150" rx="8" fill="#33415C" stroke="#1E2940" stroke-width="3"/>
+            <circle cx="25" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/>
+            <g id="maske-5" opacity="0" data-layout-ignore>
+              <polygon points="11,20 22,11 149,8 164,21 162,127 148,140 23,140 12,126" fill="#818CF8" fill-opacity="0.34" stroke="#818CF8" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="10" width="124" height="24" rx="4" fill="#818CF8"/>
+              <text x="18" y="27" font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#0B1020">Red Bull 0.95</text>
+            </g>
+          </g>
+        </g>
+        <g id="slot-6" transform="translate(783,465)">
+          <g id="boks-6">
+            <rect id="skygge-6" x="14" y="16" width="170" height="150" rx="8" fill="#000" opacity="0"/>
+            <rect x="0" y="0" width="170" height="150" rx="8" fill="#33415C" stroke="#1E2940" stroke-width="3"/>
+            <circle cx="25" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/>
+            <g id="maske-6" opacity="0" data-layout-ignore>
+              <polygon points="12,25 20,6 149,7 162,22 161,128 148,140 25,139 6,129" fill="#34D399" fill-opacity="0.34" stroke="#34D399" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="10" width="124" height="24" rx="4" fill="#34D399"/>
+              <text x="18" y="27" font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#0B1020">Red Bull 0.98</text>
+            </g>
+          </g>
+        </g>
+        <g id="slot-7" transform="translate(967,465)">
+          <g id="boks-7">
+            <rect id="skygge-7" x="14" y="16" width="170" height="150" rx="8" fill="#000" opacity="0"/>
+            <rect x="0" y="0" width="170" height="150" rx="8" fill="#33415C" stroke="#1E2940" stroke-width="3"/>
+            <circle cx="25" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/>
+            <g id="maske-7" opacity="0" data-layout-ignore>
+              <polygon points="10,20 25,8 146,8 161,19 164,123 151,142 25,145 12,127" fill="#FB923C" fill-opacity="0.34" stroke="#FB923C" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="10" width="124" height="24" rx="4" fill="#FB923C"/>
+              <text x="18" y="27" font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#0B1020">Red Bull 0.92</text>
+            </g>
+          </g>
+        </g>
+        <g id="slot-8" transform="translate(1151,465)">
+          <g id="boks-8">
+            <rect id="skygge-8" x="14" y="16" width="170" height="150" rx="8" fill="#000" opacity="0"/>
+            <rect x="0" y="0" width="170" height="150" rx="8" fill="#33415C" stroke="#1E2940" stroke-width="3"/>
+            <circle cx="25" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/>
+            <g id="maske-8" opacity="0" data-layout-ignore>
+              <polygon points="9,24 21,10 148,9 164,22 159,129 145,140 24,144 11,125" fill="#38BDF8" fill-opacity="0.34" stroke="#38BDF8" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="10" width="124" height="24" rx="4" fill="#38BDF8"/>
+              <text x="18" y="27" font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#0B1020">Red Bull 0.95</text>
+            </g>
+          </g>
+        </g>
+        <g id="slot-9" transform="translate(599,629)">
+          <g id="boks-9">
+            <rect id="skygge-9" x="14" y="16" width="170" height="150" rx="8" fill="#000" opacity="0"/>
+            <rect x="0" y="0" width="170" height="150" rx="8" fill="#33415C" stroke="#1E2940" stroke-width="3"/>
+            <circle cx="25" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/>
+            <g id="maske-9" opacity="0" data-layout-ignore>
+              <polygon points="7,24 24,8 150,9 163,25 162,125 150,141 26,141 6,128" fill="#E879F9" fill-opacity="0.34" stroke="#E879F9" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="10" width="124" height="24" rx="4" fill="#E879F9"/>
+              <text x="18" y="27" font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#0B1020">Red Bull 0.96</text>
+            </g>
+          </g>
+        </g>
+        <g id="slot-10" transform="translate(783,629)">
+          <g id="boks-10">
+            <rect id="skygge-10" x="14" y="16" width="170" height="150" rx="8" fill="#000" opacity="0"/>
+            <rect x="0" y="0" width="170" height="150" rx="8" fill="#33415C" stroke="#1E2940" stroke-width="3"/>
+            <circle cx="25" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/>
+            <g id="maske-10" opacity="0" data-layout-ignore>
+              <polygon points="9,20 23,6 148,5 159,25 161,124 150,139 24,142 12,128" fill="#4ADE80" fill-opacity="0.34" stroke="#4ADE80" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="10" width="124" height="24" rx="4" fill="#4ADE80"/>
+              <text x="18" y="27" font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#0B1020">Red Bull 0.94</text>
+            </g>
+          </g>
+        </g>
+        <g id="slot-11" transform="translate(967,629)">
+          <g id="boks-11">
+            <rect id="skygge-11" x="14" y="16" width="170" height="150" rx="8" fill="#000" opacity="0"/>
+            <rect x="0" y="0" width="170" height="150" rx="8" fill="#33415C" stroke="#1E2940" stroke-width="3"/>
+            <circle cx="25" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/>
+            <g id="maske-11" opacity="0" data-layout-ignore>
+              <polygon points="7,20 22,9 149,7 159,25 162,129 149,140 26,142 8,130" fill="#F87171" fill-opacity="0.34" stroke="#F87171" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="10" width="124" height="24" rx="4" fill="#F87171"/>
+              <text x="18" y="27" font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#0B1020">Red Bull 0.97</text>
+            </g>
+          </g>
+        </g>
+        <g id="slot-12" transform="translate(1151,629)">
+          <g id="boks-12">
+            <rect id="skygge-12" x="14" y="16" width="170" height="150" rx="8" fill="#000" opacity="0"/>
+            <rect x="0" y="0" width="170" height="150" rx="8" fill="#33415C" stroke="#1E2940" stroke-width="3"/>
+            <circle cx="25" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="32" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="32" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="29" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="75" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="75" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="72" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="25" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="25" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="21" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="65" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="65" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="61" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="105" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="105" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="101" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/><circle cx="145" cy="118" r="17" fill="url(#dose)" stroke="#8793A3" stroke-width="1.5"/><circle cx="145" cy="118" r="9" fill="none" stroke="#9AA6B5" stroke-width="1"/><rect x="141" y="115" width="9" height="5" rx="2" fill="#6F7B8B"/>
+            <g id="maske-12" opacity="0" data-layout-ignore>
+              <polygon points="10,20 20,6 146,6 159,24 160,123 148,144 25,140 8,127" fill="#2DD4BF" fill-opacity="0.34" stroke="#2DD4BF" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="10" width="124" height="24" rx="4" fill="#2DD4BF"/>
+              <text x="18" y="27" font-family="JetBrains Mono" font-weight="700" font-size="15" fill="#0B1020">Red Bull 0.93</text>
+            </g>
+          </g>
+        </g>
+          </g>
+          <!-- tom plass -->
+          <g id="tomplass" opacity="0">
+            <rect x="1145" y="459" width="182" height="162" rx="10" fill="#FF4D5A" fill-opacity="0.16" stroke="#FF4D5A" stroke-width="4" stroke-dasharray="16 10"/>
+            <rect x="1145" y="425" width="190" height="32" fill="#FF4D5A"/>
+            <text x="1155" y="448" font-family="JetBrains Mono" font-weight="700" font-size="19" fill="#1A0508">TOM PLASS −1</text>
+          </g>
+          <!-- arbeider -->
+          <g id="arbeider">
+            <line id="arm-o" x1="0" y1="-58" x2="-62" y2="-86" stroke="#D96A00" stroke-width="22" stroke-linecap="round"/>
+            <line id="arm-n" x1="0" y1="58" x2="-62" y2="86" stroke="#D96A00" stroke-width="22" stroke-linecap="round"/>
+            <ellipse cx="0" cy="0" rx="30" ry="68" fill="#FF7A00" stroke="#B34E00" stroke-width="3"/>
+            <line x1="-9" y1="-50" x2="-9" y2="50" stroke="#FFE9B0" stroke-width="6"/>
+            <line x1="9" y1="-50" x2="9" y2="50" stroke="#FFE9B0" stroke-width="6"/>
+            <circle cx="-4" cy="0" r="27" fill="#F2C14E" stroke="#B88A12" stroke-width="3"/>
+            <circle id="hand-o" cx="-62" cy="-86" r="12" fill="#E8B48A"/>
+            <circle id="hand-n" cx="-62" cy="86" r="12" fill="#E8B48A"/>
+            <g id="maske-person" opacity="0" data-layout-ignore>
+              <ellipse cx="-24" cy="0" rx="62" ry="112" fill="#FF3DCB" fill-opacity="0.26" stroke="#FF3DCB" stroke-width="3"/>
+              <rect x="-100" y="-148" width="150" height="26" rx="4" fill="#FF3DCB"/>
+              <text x="-92" y="-129" font-family="JetBrains Mono" font-weight="700" font-size="16" fill="#1A0516">Person 0.97</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <div id="vignett" class="clip full" data-layout-allow-occlusion data-layout-ignore data-start="0" data-duration="16" data-track-index="1" style="z-index:2"></div>
+      <div id="skanning-lag" class="clip full" data-layout-allow-occlusion data-layout-ignore data-start="0" data-duration="16" data-track-index="2" style="z-index:3"><div id="skanning"></div></div>
+
+      <div id="hud" class="clip full" data-start="0" data-duration="16" data-track-index="3" style="z-index:4">
+        <div id="hud-venstre">
+          <div class="tittel">KAM TAK · SONE T1</div>
+          <div class="under">Segmentering · ovenfra</div>
+          <div id="teller">
+            <div class="etikett">Red Bull i sonen</div>
+            <div class="tall" id="antall">0</div>
+          </div>
+        </div>
+        <div id="hud-hoyre"><span id="rec-prikk"></span><span id="tidskode">00:00</span></div>
+        <div id="bunntekst">SIMULERING · segmentering i YOLO-stil</div>
+      </div>
+
+      <div id="matcher-lag" class="clip full" data-start="0" data-duration="16" data-track-index="4" style="z-index:5">
+        <div id="matcher" style="opacity:0">
+          <div class="topp">MATCHER</div>
+          <div class="linje" id="m-linje1">Uttak oppdaget: Red Bull −1</div>
+          <div class="linje" style="color:#9AA3B2;font-size:19px" id="m-linje2">Leter etter skanning (±15 s)</div>
+          <div class="bar"><div id="bar-fyll"></div></div>
+          <div class="sek" id="sek">15 s</div>
+          <div id="avvik" style="display:none">
+            <div class="a1">AVVIK · Uregistrert uttak</div>
+            <div class="a2">T1 · Red Bull −1 · ingen skanning</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="svart-lag" class="clip full" data-start="0" data-duration="16" data-track-index="5" style="z-index:9"><div id="svart" class="full"></div></div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const TX = 1151, TY = 465;
+
+      // Åpning
+      tl.fromTo("#svart", { opacity: 1 }, { opacity: 0, duration: 0.9, ease: "power2.out" }, 0);
+      tl.fromTo("#hud-venstre, #hud-hoyre", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.4);
+      tl.fromTo("#skanning", { opacity: 1, y: 0 }, { opacity: 1, y: 1080, duration: 1.4, ease: "none" }, 0.5);
+      tl.set("#skanning", { opacity: 0 }, 2.0);
+      tl.fromTo("#sone", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 1.0);
+
+      // Tidskode og blinkende REC-prikk
+      for (let s = 0; s <= 16; s++) {
+        const m = String(Math.floor(s / 60)).padStart(2, "0"), ss = String(s % 60).padStart(2, "0");
+        tl.set("#tidskode", { textContent: m + ":" + ss }, s);
+        tl.set("#rec-prikk", { opacity: s % 2 === 0 ? 1 : 0.25 }, s);
+      }
+
+      // Segmentering av boksene, én etter én
+      for (let i = 1; i <= 12; i++) {
+        const t = 1.8 + (i - 1) * 0.16;
+        tl.fromTo("#maske-" + i, { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, t);
+        tl.set("#antall", { textContent: String(i) }, t + 0.1);
+      }
+
+      // Arbeideren kommer inn fra høyre
+      gsap.set("#arbeider", { x: 2150, y: 700 });
+      tl.to("#arbeider", { x: 1500, y: 540, duration: 1.8, ease: "power1.out" }, 4.2);
+      tl.fromTo("#maske-person", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 4.9);
+
+      // Rekker ut og griper boksen
+      const hendene = { duration: 1.0, ease: "power2.inOut" };
+      tl.to("#arm-o", { attr: { x2: -172, y2: -45 }, ...hendene }, 6.1);
+      tl.to("#hand-o", { attr: { cx: -172, cy: -45 }, ...hendene }, 6.1);
+      tl.to("#arm-n", { attr: { x2: -172, y2: 45 }, ...hendene }, 6.1);
+      tl.to("#hand-n", { attr: { cx: -172, cy: 45 }, ...hendene }, 6.1);
+      tl.to("#skygge-8", { opacity: 0.45, duration: 0.5 }, 7.2);
+      tl.to("#boks-8", { scale: 1.07, svgOrigin: (TX + 85) + " " + (TY + 75), duration: 0.5, ease: "power2.out" }, 7.2);
+
+      // Går ut av sonen med boksen
+      tl.to("#arbeider", { x: 2300, duration: 2.8, ease: "none" }, 7.8);
+      tl.to("#boks-8", { x: 800, duration: 2.8, ease: "none" }, 7.8);
+
+      // Boksen forlater sonen: telleren faller, avviket vises
+      tl.set("#antall", { textContent: "11" }, 8.9);
+      tl.fromTo("#antall", { color: "#F4F6FA" }, { color: "#FF4D5A", duration: 0.3 }, 8.9);
+      tl.fromTo("#tomplass", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 8.9);
+      tl.to("#tomplass", { opacity: 0.45, duration: 0.5, yoyo: true, repeat: 3, ease: "sine.inOut" }, 9.4);
+
+      // Matcheren leter etter skanning
+      tl.fromTo("#matcher", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 9.6);
+      tl.fromTo("#bar-fyll", { scaleX: 1 }, { scaleX: 0, duration: 1.6, ease: "none" }, 10.2);
+      for (let k = 0; k <= 15; k++) {
+        tl.set("#sek", { textContent: (15 - k) + " s (spolet)" }, 10.2 + k * (1.6 / 15));
+      }
+      tl.set("#m-linje2", { textContent: "Ingen skanning funnet" }, 11.8);
+      tl.set("#avvik", { display: "block" }, 11.9);
+      tl.fromTo("#avvik", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.6)" }, 11.9);
+
+      // Avslutning
+      tl.to("#svart", { opacity: 1, duration: 0.8, ease: "power2.in" }, 15.2);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

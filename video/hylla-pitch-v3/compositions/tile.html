@@ -1,0 +1,48 @@
+<template>
+<style>
+#root{position:absolute;inset:0;font-family:"Inter",sans-serif}
+#t-kort{position:absolute;left:1608px;top:175px;width:274px;height:235px;border-radius:12px;overflow:hidden;background:#0E1116;border:1px solid #343B48;opacity:0}
+#t-bilde{position:absolute;left:0;top:0;width:274px;height:205px}
+#t-bar{position:absolute;left:0;top:205px;width:274px;height:30px;background:#14171C;color:#F4F6FA;font-family:"JetBrains Mono",monospace;font-weight:700;font-size:15px;letter-spacing:.06em;display:flex;align-items:center;padding-left:12px;gap:8px}
+#t-prikk{width:11px;height:11px;border-radius:50%;background:#FF4D5A}
+</style>
+<div id="root" data-composition-id="tile" data-width="1920" data-height="1080">
+<div id="t-kort">
+<svg id="t-bilde" viewBox="385 192 800 598" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" data-layout-ignore>
+<image href="assets/pall.webp" x="0" y="0" width="1672" height="941"/>
+<polygon id="t-m1" points="439,220 586,220 600,234 600,371 586,385 439,385 425,371 425,234" fill="#22D3EE" fill-opacity="0.22" stroke="#22D3EE" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+<polygon id="t-m2" points="624,220 771,220 785,234 785,371 771,385 624,385 610,371 610,234" fill="#A3E635" fill-opacity="0.22" stroke="#A3E635" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+<polygon id="t-m3" points="809,220 956,220 970,234 970,371 956,385 809,385 795,371 795,234" fill="#F472B6" fill-opacity="0.22" stroke="#F472B6" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+<polygon id="t-m4" points="999,220 1151,220 1165,234 1165,371 1151,385 999,385 985,371 985,234" fill="#FACC15" fill-opacity="0.22" stroke="#FACC15" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+<polygon id="t-m5" points="439,395 586,395 600,409 600,554 586,568 439,568 425,554 425,409" fill="#818CF8" fill-opacity="0.22" stroke="#818CF8" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+<polygon id="t-m6" points="624,395 771,395 785,409 785,554 771,568 624,568 610,554 610,409" fill="#34D399" fill-opacity="0.22" stroke="#34D399" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+<polygon id="t-m7" points="809,395 956,395 970,409 970,554 956,568 809,568 795,554 795,409" fill="#FB923C" fill-opacity="0.22" stroke="#FB923C" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+<polygon id="t-m8" points="999,395 1151,395 1165,409 1165,554 1151,568 999,568 985,554 985,409" fill="#38BDF8" fill-opacity="0.22" stroke="#38BDF8" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+<polygon id="t-m9" points="439,570 586,570 600,584 600,731 586,745 439,745 425,731 425,584" fill="#E879F9" fill-opacity="0.22" stroke="#E879F9" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+<polygon id="t-m10" points="624,570 771,570 785,584 785,731 771,745 624,745 610,731 610,584" fill="#4ADE80" fill-opacity="0.22" stroke="#4ADE80" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+<polygon id="t-m11" points="809,570 956,570 970,584 970,731 956,745 809,745 795,731 795,584" fill="#F87171" fill-opacity="0.22" stroke="#F87171" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+<polygon id="t-m12" points="999,570 1151,570 1165,584 1165,731 1151,745 999,745 985,731 985,584" fill="#2DD4BF" fill-opacity="0.22" stroke="#2DD4BF" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+
+<g id="t-patch" opacity="0"><rect x="985" y="395" width="180" height="173" fill="#8F6A3E"/>
+<rect x="985" y="410" width="180" height="40" fill="#A47A4A"/><rect x="985" y="470" width="180" height="40" fill="#9C7345"/><rect x="985" y="528" width="180" height="40" fill="#A47A4A"/>
+<rect x="985" y="450" width="180" height="4" fill="#4A3320"/><rect x="985" y="512" width="180" height="4" fill="#4A3320"/>
+<rect x="985" y="395" width="180" height="173" fill="#000" fill-opacity="0.18"/></g>
+<rect id="t-tom" x="979" y="389" width="192" height="185" rx="8" fill="#FF4D5A" fill-opacity="0.2" stroke="#FF4D5A" stroke-width="6" stroke-dasharray="16 9" opacity="0"/>
+</svg>
+<div id="t-bar"><span id="t-prikk"></span><span>KAMERA · SONE T1</span></div>
+</div>
+</div>
+<script>
+(function(){
+const tl = gsap.timeline({ paused: true });
+tl.fromTo("#t-kort", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 2.8);
+for (let n = 1; n <= 12; n++) tl.fromTo("#t-m" + n, { opacity: 0 }, { opacity: 1, duration: 0.2 }, 3.4 + n * 0.1);
+for (let s = 0; s <= 54; s++) tl.set("#t-prikk", { opacity: s % 2 === 0 ? 1 : 0.3 }, s);
+tl.fromTo("#t-patch", { opacity: 0 }, { opacity: 1, duration: 0.01 }, 34.1);
+tl.fromTo("#t-tom", { opacity: 0 }, { opacity: 1, duration: 0.01 }, 34.1);
+tl.fromTo("#t-m8", { opacity: 0 }, { opacity: 0, duration: 0.01 }, 34.1);
+tl.fromTo("#t-kort", { opacity: 1 }, { opacity: 0, duration: 0.3 }, 54.3);
+window.__timelines["tile"] = tl;
+})();
+</script>
+</template>

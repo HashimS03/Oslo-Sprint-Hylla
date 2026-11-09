@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "historyId": "08e77ac6-9fef-489c-9be7-6757d1ef8754",
+  "currentRevision": "408b7945-09d5-4574-baf5-723458480a38",
+  "pendingChanges": false,
+  "files": {
+    "AGENTS.md": {
+      "hash": "18bcca1593d1b29cd7442b3dc91d18ada440affb9b7acd577c1da57446f3d24f",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/08e77ac6-9fef-489c-9be7-6757d1ef8754/blobs/18/18bcca1593d1b29cd7442b3dc91d18ada440affb9b7acd577c1da57446f3d24f"
+    },
+    "CLAUDE.md": {
+      "hash": "18bcca1593d1b29cd7442b3dc91d18ada440affb9b7acd577c1da57446f3d24f",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/08e77ac6-9fef-489c-9be7-6757d1ef8754/blobs/18/18bcca1593d1b29cd7442b3dc91d18ada440affb9b7acd577c1da57446f3d24f"
+    },
+    "assets/pall.webp": {
+      "hash": "47a48f85beb1c76adeddd4ae12ce30efa9b88a1ee635f079f3708b7041941242",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/08e77ac6-9fef-489c-9be7-6757d1ef8754/blobs/47/47a48f85beb1c76adeddd4ae12ce30efa9b88a1ee635f079f3708b7041941242"
+    },
+    "hyperframes.json": {
+      "hash": "35a6d4ea79ebe911f0d81705f7aace5d8ff0316b745b0311d56af50c9c237cb7",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/08e77ac6-9fef-489c-9be7-6757d1ef8754/blobs/35/35a6d4ea79ebe911f0d81705f7aace5d8ff0316b745b0311d56af50c9c237cb7"
+    },
+    "index.html": {
+      "hash": "65558780c527e51f5f2c0b75e9fb83f27cd46a72ab92fa4138d7f357f556f98b",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/08e77ac6-9fef-489c-9be7-6757d1ef8754/blobs/65/65558780c527e51f5f2c0b75e9fb83f27cd46a72ab92fa4138d7f357f556f98b"
+    },
+    "meta.json": {
+      "hash": "7c90d2048694656ee86009bbc280be8c5048b5ec693a4a055de25ee500fecc4a",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/08e77ac6-9fef-489c-9be7-6757d1ef8754/blobs/7c/7c90d2048694656ee86009bbc280be8c5048b5ec693a4a055de25ee500fecc4a"
+    },
+    "package.json": {
+      "hash": "8f97329f0ab5bc92e9de624b3577d96c0fb08c26a6fccc856d442469b570ef4f",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/08e77ac6-9fef-489c-9be7-6757d1ef8754/blobs/8f/8f97329f0ab5bc92e9de624b3577d96c0fb08c26a6fccc856d442469b570ef4f"
+    }
+  },
+  "revisions": {
+    "408b7945-09d5-4574-baf5-723458480a38": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1794146439359,
+      "endedAt": 1794146439359,
+      "files": {
+        "index.html": {
+          "before": "/Users/hodanielkhuu/.cache/hyperframes/history/08e77ac6-9fef-489c-9be7-6757d1ef8754/blobs/2b/2bd6e2702e19fb2f85214343207376153d284004d96fff1e8605bbed3c55d8e9",
+          "after": "/Users/hodanielkhuu/.cache/hyperframes/history/08e77ac6-9fef-489c-9be7-6757d1ef8754/blobs/65/65558780c527e51f5f2c0b75e9fb83f27cd46a72ab92fa4138d7f357f556f98b"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "snapshots": {
+    "latest": {
+      "revision": "408b7945-09d5-4574-baf5-723458480a38",
+      "id": "db6b8c34-e691-4ed4-a606-f9990d5e7e31-1"
+    },
+    "revisions": {
+      "408b7945-09d5-4574-baf5-723458480a38": [
+        {
+          "scope": "full",
+          "id": "db6b8c34-e691-4ed4-a606-f9990d5e7e31-0",
+          "image": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/takkamera-foto/.hyperframes/artifacts/snapshots/3dcb3260-0fd8-4d01-ae47-b68bbe26df38/frame-00-at-1s.png",
+          "time": 1,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1794146443048,
+          "contentHash": "b5a6f5eaa80e3a6670a5ca585ff0be294d0cfa258c9be84409f50ecba02ddcc1",
+          "revision": "408b7945-09d5-4574-baf5-723458480a38",
+          "inputFingerprint": "3034ebe62cee559e18c9bea717c50e79858a5db5a297817c12e5f23f6df03abc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "db6b8c34-e691-4ed4-a606-f9990d5e7e31-1",
+          "image": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/takkamera-foto/.hyperframes/artifacts/snapshots/3dcb3260-0fd8-4d01-ae47-b68bbe26df38/frame-01-at-2.91s.png",
+          "time": 2.91,
+          "metadata": {
+            "width": 1920,
+            "height": 1080,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1794146443048,
+          "contentHash": "b5a6f5eaa80e3a6670a5ca585ff0be294d0cfa258c9be84409f50ecba02ddcc1",
+          "revision": "408b7945-09d5-4574-baf5-723458480a38",
+          "inputFingerprint": "3034ebe62cee559e18c9bea717c50e79858a5db5a297817c12e5f23f6df03abc",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ]
+    },
+    "unversioned": [
+      {
+        "scope": "full",
+        "id": "2e0bb2ab-5746-46bc-a9cf-04dc078a5d0d-0",
+        "image": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/takkamera-foto/.hyperframes/artifacts/snapshots/e5a2a50f-39d1-4973-b7b3-f467f236f6fa/frame-00-at-1s.png",
+        "time": 1,
+        "metadata": {
+          "width": 1920,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1794146428577,
+        "contentHash": "2d0d2da1d866f97635b88d2d4513134b432a09a12a5075ee4cc0df7bfcf07f37",
+        "revision": null,
+        "inputFingerprint": "091b826b3f40bc38272651e4f91adb9a8391d819fa115fae72a2d5bc656aa901",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "2e0bb2ab-5746-46bc-a9cf-04dc078a5d0d-1",
+        "image": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/takkamera-foto/.hyperframes/artifacts/snapshots/e5a2a50f-39d1-4973-b7b3-f467f236f6fa/frame-01-at-2.91s.png",
+        "time": 2.91,
+        "metadata": {
+          "width": 1920,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1794146428577,
+        "contentHash": "2d0d2da1d866f97635b88d2d4513134b432a09a12a5075ee4cc0df7bfcf07f37",
+        "revision": null,
+        "inputFingerprint": "091b826b3f40bc38272651e4f91adb9a8391d819fa115fae72a2d5bc656aa901",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  }
+}

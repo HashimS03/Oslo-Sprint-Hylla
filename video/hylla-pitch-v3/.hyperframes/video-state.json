@@ -1,0 +1,284 @@
+{
+  "version": 1,
+  "historyId": "223675d7-e558-470e-b1af-91c4fc4cba50",
+  "currentRevision": "6cca6304-2601-40ef-8dfd-dc0e6b7f595d",
+  "pendingChanges": false,
+  "files": {
+    "AGENTS.md": {
+      "hash": "18bcca1593d1b29cd7442b3dc91d18ada440affb9b7acd577c1da57446f3d24f",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/223675d7-e558-470e-b1af-91c4fc4cba50/blobs/18/18bcca1593d1b29cd7442b3dc91d18ada440affb9b7acd577c1da57446f3d24f"
+    },
+    "CLAUDE.md": {
+      "hash": "18bcca1593d1b29cd7442b3dc91d18ada440affb9b7acd577c1da57446f3d24f",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/223675d7-e558-470e-b1af-91c4fc4cba50/blobs/18/18bcca1593d1b29cd7442b3dc91d18ada440affb9b7acd577c1da57446f3d24f"
+    },
+    "assets/pall.webp": {
+      "hash": "47a48f85beb1c76adeddd4ae12ce30efa9b88a1ee635f079f3708b7041941242",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/223675d7-e558-470e-b1af-91c4fc4cba50/blobs/47/47a48f85beb1c76adeddd4ae12ce30efa9b88a1ee635f079f3708b7041941242"
+    },
+    "compositions/kamera.html": {
+      "hash": "ee857628af8e4cfb8533fa028128a8d0f9660ff7c801ca255ce408bd24d173c1",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/223675d7-e558-470e-b1af-91c4fc4cba50/blobs/ee/ee857628af8e4cfb8533fa028128a8d0f9660ff7c801ca255ce408bd24d173c1"
+    },
+    "compositions/tile.html": {
+      "hash": "3529897a92f468e6f197910463b47de5dda6d8a5e48beebeb0567f7b4396e381",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/223675d7-e558-470e-b1af-91c4fc4cba50/blobs/35/3529897a92f468e6f197910463b47de5dda6d8a5e48beebeb0567f7b4396e381"
+    },
+    "hyperframes.json": {
+      "hash": "35a6d4ea79ebe911f0d81705f7aace5d8ff0316b745b0311d56af50c9c237cb7",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/223675d7-e558-470e-b1af-91c4fc4cba50/blobs/35/35a6d4ea79ebe911f0d81705f7aace5d8ff0316b745b0311d56af50c9c237cb7"
+    },
+    "index.html": {
+      "hash": "371a061c14caf827f8e4a90e0519ce32c92a14ee35be4ba38eed1191235f03a0",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/223675d7-e558-470e-b1af-91c4fc4cba50/blobs/37/371a061c14caf827f8e4a90e0519ce32c92a14ee35be4ba38eed1191235f03a0"
+    },
+    "meta.json": {
+      "hash": "f8990d5e54772a7918e719764a22edb7f1a2e4d071eb49a9e5f8b8d12fb45ff0",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/223675d7-e558-470e-b1af-91c4fc4cba50/blobs/f8/f8990d5e54772a7918e719764a22edb7f1a2e4d071eb49a9e5f8b8d12fb45ff0"
+    },
+    "package.json": {
+      "hash": "6be88d4dc7ad252c1172644312de524f049dcd1943285feb297830ff06b2f5f3",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/223675d7-e558-470e-b1af-91c4fc4cba50/blobs/6b/6be88d4dc7ad252c1172644312de524f049dcd1943285feb297830ff06b2f5f3"
+    },
+    "assets/pitch.mp4": {
+      "hash": "e9c0ae01ea68c8b5fe8919e8f56de08df48de4cbefb6c0d0ec44de7242eee6c8",
+      "content": "/Users/hodanielkhuu/.cache/hyperframes/history/223675d7-e558-470e-b1af-91c4fc4cba50/blobs/e9/e9c0ae01ea68c8b5fe8919e8f56de08df48de4cbefb6c0d0ec44de7242eee6c8"
+    }
+  },
+  "revisions": {
+    "6cca6304-2601-40ef-8dfd-dc0e6b7f595d": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1794147036126,
+      "endedAt": 1794147036127,
+      "files": {
+        "compositions/kamera.html": {
+          "before": "/Users/hodanielkhuu/.cache/hyperframes/history/223675d7-e558-470e-b1af-91c4fc4cba50/blobs/f0/f0a76cb96162b7e2e2d093d08e02a184c32e1e877fa17826d301e54d3031f999",
+          "after": "/Users/hodanielkhuu/.cache/hyperframes/history/223675d7-e558-470e-b1af-91c4fc4cba50/blobs/ee/ee857628af8e4cfb8533fa028128a8d0f9660ff7c801ca255ce408bd24d173c1"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": {
+      "revision": null,
+      "id": "cfece934-dcf0-4486-b194-8399dbbfbc25"
+    },
+    "revisions": {},
+    "unversioned": [
+      {
+        "id": "cfece934-dcf0-4486-b194-8399dbbfbc25",
+        "scope": "project",
+        "report": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v3/.hyperframes/artifacts/checks/cfece934-dcf0-4486-b194-8399dbbfbc25.json",
+        "metadata": {
+          "ok": true,
+          "browserSkipped": false,
+          "options": {
+            "samples": 9,
+            "atTransitions": false,
+            "maxIssues": 80,
+            "collapseStatic": true,
+            "tolerance": 2,
+            "timeout": 45000,
+            "contrast": true,
+            "strict": false,
+            "snapshots": false,
+            "browserGpuMode": "auto",
+            "includeUnmounted": false
+          }
+        },
+        "createdAt": 1794147011595,
+        "contentHash": "095751661ce9a020455f8684477f7afab11df90da753737b3f64670d2b0c2464",
+        "revision": null,
+        "inputFingerprint": "ec50a4cdf754a3481d93063d15fa990412dbd361493b52856b565804ffa9864d",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "snapshots": {
+    "latest": {
+      "revision": null,
+      "id": "05bbd442-8108-4846-a61a-aaa97ec1d626-7"
+    },
+    "revisions": {},
+    "unversioned": [
+      {
+        "scope": "full",
+        "id": "05bbd442-8108-4846-a61a-aaa97ec1d626-0",
+        "image": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v3/.hyperframes/artifacts/snapshots/6e03cd9c-5a76-499d-8410-80a846696a3f/frame-00-at-5s.png",
+        "time": 5,
+        "metadata": {
+          "width": 1920,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1794147023578,
+        "contentHash": "ff277dc7b3af5e231320256ed28c0cfd8e7aaddd0f8b1e377e1a5c7cadab577e",
+        "revision": null,
+        "inputFingerprint": "ec50a4cdf754a3481d93063d15fa990412dbd361493b52856b565804ffa9864d",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "05bbd442-8108-4846-a61a-aaa97ec1d626-1",
+        "image": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v3/.hyperframes/artifacts/snapshots/6e03cd9c-5a76-499d-8410-80a846696a3f/frame-01-at-26.5s.png",
+        "time": 26.5,
+        "metadata": {
+          "width": 1920,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1794147023579,
+        "contentHash": "2dc878c782e055d747370495f5b72b1d6f013a6d09f4a3124188b51219baea82",
+        "revision": null,
+        "inputFingerprint": "ec50a4cdf754a3481d93063d15fa990412dbd361493b52856b565804ffa9864d",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "05bbd442-8108-4846-a61a-aaa97ec1d626-2",
+        "image": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v3/.hyperframes/artifacts/snapshots/6e03cd9c-5a76-499d-8410-80a846696a3f/frame-02-at-29s.png",
+        "time": 29,
+        "metadata": {
+          "width": 1920,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1794147023579,
+        "contentHash": "3bfb688d475ae5f9231930b71dbfc092a255c2afee4c81a0e3147ba33420ff2e",
+        "revision": null,
+        "inputFingerprint": "ec50a4cdf754a3481d93063d15fa990412dbd361493b52856b565804ffa9864d",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "05bbd442-8108-4846-a61a-aaa97ec1d626-3",
+        "image": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v3/.hyperframes/artifacts/snapshots/6e03cd9c-5a76-499d-8410-80a846696a3f/frame-03-at-31.5s.png",
+        "time": 31.5,
+        "metadata": {
+          "width": 1920,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1794147023579,
+        "contentHash": "e716675a9cdcc640b90d55313dff95eb2ae067837e06da1152744aaddb2057ed",
+        "revision": null,
+        "inputFingerprint": "ec50a4cdf754a3481d93063d15fa990412dbd361493b52856b565804ffa9864d",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "05bbd442-8108-4846-a61a-aaa97ec1d626-4",
+        "image": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v3/.hyperframes/artifacts/snapshots/6e03cd9c-5a76-499d-8410-80a846696a3f/frame-04-at-33s.png",
+        "time": 33,
+        "metadata": {
+          "width": 1920,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1794147023579,
+        "contentHash": "48cf3946927a833b566833163e15584bea52473f015f47b36962f920d9626593",
+        "revision": null,
+        "inputFingerprint": "ec50a4cdf754a3481d93063d15fa990412dbd361493b52856b565804ffa9864d",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "05bbd442-8108-4846-a61a-aaa97ec1d626-5",
+        "image": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v3/.hyperframes/artifacts/snapshots/6e03cd9c-5a76-499d-8410-80a846696a3f/frame-05-at-40s.png",
+        "time": 40,
+        "metadata": {
+          "width": 1920,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1794147023579,
+        "contentHash": "f36f120eaa7213e2b7d77802f473558d6682463e3bb0828b53fa6469ad02b791",
+        "revision": null,
+        "inputFingerprint": "ec50a4cdf754a3481d93063d15fa990412dbd361493b52856b565804ffa9864d",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "05bbd442-8108-4846-a61a-aaa97ec1d626-6",
+        "image": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v3/.hyperframes/artifacts/snapshots/6e03cd9c-5a76-499d-8410-80a846696a3f/frame-06-at-50s.png",
+        "time": 50,
+        "metadata": {
+          "width": 1920,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1794147023579,
+        "contentHash": "4d8b5a2fd8c5be3a06c4de349c30446c168a78ca3ce0ecfff9210a0351f7b320",
+        "revision": null,
+        "inputFingerprint": "ec50a4cdf754a3481d93063d15fa990412dbd361493b52856b565804ffa9864d",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "05bbd442-8108-4846-a61a-aaa97ec1d626-7",
+        "image": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v3/.hyperframes/artifacts/snapshots/6e03cd9c-5a76-499d-8410-80a846696a3f/frame-07-at-58.25s.png",
+        "time": 58.25,
+        "metadata": {
+          "width": 1920,
+          "height": 1080,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1794147023579,
+        "contentHash": "cfc09809fa02a3c34412e6d446a61ad0f15aec03fc41300f214789339e222dc6",
+        "revision": null,
+        "inputFingerprint": "ec50a4cdf754a3481d93063d15fa990412dbd361493b52856b565804ffa9864d",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "renders": {
+    "latest": {
+      "id": "7403666e-1680-45c6-a444-6761ff128ac8",
+      "completedAt": 1794147089743,
+      "output": "/Users/hodanielkhuu/vscode/Oslo-Sprint-Hylla/video/hylla-pitch-v3.mp4",
+      "status": "completed",
+      "revision": "6cca6304-2601-40ef-8dfd-dc0e6b7f595d"
+    },
+    "retainedRevisions": [
+      "6cca6304-2601-40ef-8dfd-dc0e6b7f595d"
+    ]
+  },
+  "pendingArtifactCleanup": []
+}
